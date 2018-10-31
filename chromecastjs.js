@@ -130,8 +130,6 @@ var ChromecastJS = function(scope, reciever) {
                         })
                       }
                     }
-                    if (cc.Player.mediaInfo.tracks.length)
-                    cc.Player.mediaInfo.tracks
                     if (typeof cc.Events['media'] != 'undefined') {
                         cc.Events['media'](cc.Media)
                     }
