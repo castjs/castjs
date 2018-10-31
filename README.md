@@ -36,7 +36,9 @@ var media = {
     label: 'French',
     srclang: 'fr',
     src: 'http://127.0.0.1/fr.vtt'
-  }]
+  }],
+  time: 0,
+  paused: false
 }
 cc.cast(media)
 cc.cast(media, function() {
