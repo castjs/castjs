@@ -111,10 +111,11 @@ document.getElementById('CastButton').addEventListener('click', function() {
 ```
 ## Control functions
 ```javascript
-cc.seek(25)
-cc.changeSubtitle(2)
-cc.volume(0.5)
-cc.playOrPause()
-cc.muteOrUnmute()
-cc.disconnect()
+cc.seek(25)              // Change the media time
+cc.changeSubtitle(1)     // Change subtitle by index during casting 0,1,2...subtitles.length
+cc.volume(0.5)           // Change volume *1 means 100% TV volume, you have been warned*
+cc.playOrPause()         // Switch pause / play
+cc.muteOrUnmute()        // Switch mute / unmute
+cc.disconnect()          // Disconnect chromecast session
 ```
+## Help us to improve this library and make it a solid wrapper, I respond to issues or pull request within 1 hour!
