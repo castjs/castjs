@@ -1,156 +1,60 @@
 # ChromecastJS
-Javascript wrapper for the Chromecast SDK
 
-Hi my name is Fenny and I created this wrapper to make is easier to cast media to any chromecast inside the browser.
-It supports most features the cast SDK has to offer:
-Cast, events, seeking, changing subtitles, volume, play/pause, mute/unmute, disconnect etc
+<img src="https://i.imgur.com/uI4i1m5.png" align="right"
+     title="Chromecast Javascript Wrapper" width="400" height="125">
 
-Help me to improve this library and make it a solid wrapper, I respond to issues or pull request within 1 hour.
-Enjoy!
+ChromecastJS is a javascript wrapper arround the complex chromecast SDK.
+This wrapper provides simple events and functions to communicate easily with any chromecast.
+Feel free to take a look at the source code, you can see that is a minimal wrapper that is only 5.51 KB minified!
 
-## Init
-```javascript
-// Init the ChromecastJS function, you can define your own join_policy and receiver_app_id.
-var cc = new ChromecastJS()
-var cc = new ChromecastJS(chrome.cast.AutoJoinPolicy.TAB_AND_ORIGIN_SCOPED, chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID)
-// Receiver:
-// chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID // Default
-// AutoJoinPolicy:
-// chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-// chrome.cast.AutoJoinPolicy.PAGE_SCOPED
-// chrome.cast.AutoJoinPolicy.TAB_AND_ORIGIN_SCOPED // Default
-```
-## Functions
-#### .cast(media)
-```javascript
-//Cast media to the chromecast, make sure you use full paths and CORS is enabled
-var media = {
-  content: 'http://127.0.0.1/movie.mp4',
-  poster: 'http://127.0.0.1/poster.jpg',
-  title: 'Movie title',
-  description: 'Action / Drama',
-  subtitles: [{
-    active: true,
-    label: 'English',
-    srclang: 'gb',
-    src: 'http://127.0.0.1/gb.vtt'
-  }, {
-    label: 'French',
-    srclang: 'fr',
-    src: 'http://127.0.0.1/fr.vtt'
-  }],
-  time: 0,
-  paused: false
-}
-cc.cast(media)
-cc.cast(media, function() {
-  console.log('Playing!')
+
+## Getting started
+
+* **content**: relative.
+* **poster**: relative.
+* **title**: relative.
+* **description**: relative.
+* **subtitles**: relative.
+* **time**: relative.
+* **duration**: relative.
+* **volume**: relative.
+* **muted**: relative.
+* **paused**: relative.
+* **state**: relative.
+
+## JavaScript API
+
+```js
+var ccJS = new ChromecastJS();
+
+ccJS.on('available', function() {
+  console.log('Chromecast found on the network')
 })
-```
-#### .seek(time)
-```javascript
-cc.seek(20)
-```
-#### .changeSubtitle(index)
-```javascript
-cc.changeSubtitle(2)
-```
-#### .volume(volume)
-```javascript
-cc.volume(0.3)
-```
-#### .playOrPause()
-```javascript
-cc.playOrPause()
-```
-#### .muteOrUnmute()
-```javascript
-cc.muteOrUnmute()
-```
-#### .disconnect()
-```javascript
-cc.disconnect()
-```
-## Events
-#### available
-```javascript
-//There is a chromecast detected on the network
-cc.on('available', function() {
-  console.log('chromecast is available')
+ccJS.on('connected', function() {
+  console.log('Connected with chromecast')
 })
-```
-#### connected
-```javascript
-//We got are now connected with the chromecast
-cc.on('connected', function() {
-  console.log('connected with chromecast')
+ccJS.on('media', function(media) {
+  console.log('Media changed:', media)
 })
-```
-#### media
-```javascript
-//When media is loaded or changed on the chromecast
-cc.on('media', function(media) {
-  console.log('media changed:', media)
+ccJS.on('playOrPause', function(paused) {
+  console.log('Media is paused or unpaused:', paused)
 })
-```
-#### playOrPause
-```javascript
-//When media is played or paused will trigger this event and callback the paused boolean
-cc.on('playOrPause', function(paused) {
-  console.log('playorpause:', paused)
+ccJS.on('muteOrUnmute', function(muted) {
+  console.log('Media is muted or unmuted:', muted)
 })
-```
-#### muteOrUnmute
-```javascript
-//When media is mute or unmuted will trigger this event and callback the muted boolean
-cc.on('muteOrUnmute', function(muted) {
-  console.log('muteOrUnmute:', muted)
+ccJS.on('volume', function(volume) {
+  console.log('Volume change detected:', volume)
 })
-```
-#### volume
-```javascript
-//When volume is changed will trigger this event and callback the volume int value
-cc.on('volume', function(volume) {
-  console.log('volume:', volume)
+ccJS.on('state', function(state) {
+  console.log('Cast state changed:', state)
 })
-```
-#### state
-```javascript
-//When the state is changed returns state string value
-cc.on('state', function(state) {
-  console.log('state:', state)
-})
-// Playerstates:
-// IDLE
-// PLAYING
-// PAUSED
-// BUFFERING
-// DISCONNECTED
-```
-#### time
-```javascript
-//When there is a time or duration change, will return a object with details
-cc.on('time', function(time) {
+ccJS.on('time', function(time) {
   console.log('time:', time)
 })
-// Object:
-//  {
-//    progress: 45,
-//    time: 00:03:45,
-//    duration: 00:11:23
-/  }
-```
-#### disconnect
-```javascript
-//When a session is disconnected
-cc.on('disconnect', function() {
+ccJS.on('disconnect', function() {
   console.log('disconnected')
 })
-```
-#### error
-```javascript
-//Catch any error
-cc.on('error', function(err) {
+ccJS.on('error', function(err) {
   console.log('error:', err)
 })
 ```
