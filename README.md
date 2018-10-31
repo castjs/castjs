@@ -118,4 +118,4 @@ cc.playOrPause()         // Switch pause / play
 cc.muteOrUnmute()        // Switch mute / unmute
 cc.disconnect()          // Disconnect chromecast session
 ```
-## Help us to improve this library and make it a solid wrapper, I respond to issues or pull request within 1 hour!
+# Help us to improve this library and make it a solid wrapper, I respond to issues or pull request within 1 hour!
