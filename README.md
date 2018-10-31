@@ -80,7 +80,7 @@ cc.on('error', function(err) {
 })
 ```
 ## Cast function
-```
+```javascript
 // Cast media to the chromecast, initialize the media object
 var media = {
     // Only the actual content key is required
@@ -110,7 +110,7 @@ document.getElementById('CastButton').addEventListener('click', function() {
 })
 ```
 ## Control functions
-```
+```javascript
 cc.seek(25)
 cc.changeSubtitle(2)
 cc.volume(0.5)
