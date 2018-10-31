@@ -2,8 +2,8 @@
 Javascript wrapper for the Chromecast SDK
 
 Hi my name is Fenny and I created this wrapper to make is easier to cast media to any chromecast inside the browser.
-It supports all features the google SDK has to offer:
-Cast, many events, seeking, changing subtitles, volume, play/pause, mute/unmute, disconnect etc
+It supports most features the cast SDK has to offer:
+Cast, events, seeking, changing subtitles, volume, play/pause, mute/unmute, disconnect etc
 
 Help me to improve this library and make it a solid wrapper, I respond to issues or pull request within 1 hour.
 Enjoy!
