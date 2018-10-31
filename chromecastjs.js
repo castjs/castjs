@@ -1,8 +1,9 @@
-var castSender = document.createElement('script');
-castSender.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
-document.body.appendChild(castSender)
 var ChromecastJS = function(scope, reciever) {
-    // Variables
+    if (typeof cast === 'undefined') {
+        var castSender = document.createElement('script');
+        castSender.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
+        document.body.appendChild(castSender)
+    }
     var cc = this
     this.Available = false
     this.Events = []
@@ -99,7 +100,9 @@ var ChromecastJS = function(scope, reciever) {
         cc.Controller.addEventListener('playerStateChanged', playerStateChanged)
 
         cc.Available = true;
-        cc.Events['available'](true)
+        if (typeof cc.Events['available'] != 'undefined') {
+            cc.Events['available']()
+        }
     }
 
     function isConnectedChanged() {
@@ -136,7 +139,9 @@ var ChromecastJS = function(scope, reciever) {
                 } else {
                     cc.Session = cast.framework.CastContext.getInstance().getCurrentSession()
                     if (cc.Session) {
-                        var mediaInfo = new chrome.cast.media.MediaInfo(cc.Media.content, 'video/mp4');
+                        var mediaInfo = new chrome.cast.media.MediaInfo(cc.Media.content);
+                        //mediaInfo.contentType = 'video/mp4';
+                        //Do we need to define the contentType? If so, we have to somehow define the mime type from the file name
                         mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
 
                         if (cc.Media.subtitles.length > 0) {
@@ -243,6 +248,7 @@ var ChromecastJS = function(scope, reciever) {
     }
 
     function playerStateChanged() {
+        console.log(cc.Player.playerState)
         if (cc.Player.playerState) {
             cc.Media.state = cc.Player.playerState
         } else {
