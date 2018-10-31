@@ -1,8 +1,8 @@
 var castSender = document.createElement('script');
 castSender.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
 document.body.appendChild(castSender)
-
-var ChromeCastJS = function(reciever, scope) {
+var ChromecastJS = function(scope, reciever) {
+    // Variables
     var cc = this
     this.Available = false
     this.Events = []
@@ -23,10 +23,11 @@ var ChromeCastJS = function(reciever, scope) {
         state: 'DISCONNECTED'
     }
     this.Media = this.MediaTemplate
-    ChromeCastJS.prototype.on = function(event, callback) {
+    // Prototypes
+    ChromecastJS.prototype.on = function(event, callback) {
         this.Events[event] = callback
     }
-    ChromeCastJS.prototype.cast = function(media, callback) {
+    ChromecastJS.prototype.cast = function(media, callback) {
         if (!media.content) {
             if (typeof cc.Events['error'] != 'undefined') {
                 cc.Events['error']('No media content specified.')
@@ -51,35 +52,37 @@ var ChromeCastJS = function(reciever, scope) {
             }
         }
     }
-    ChromeCastJS.prototype.seek = function(percentage) {
+    ChromecastJS.prototype.seek = function(percentage) {
         if (percentage && cc.Player.canSeek) {
             cc.Player.currentTime = cc.Controller.getSeekTime(percentage, cc.Player.duration)
             cc.Controller.seek()
         }
     }
-    ChromeCastJS.prototype.volume = function(volume) {
+    ChromecastJS.prototype.volume = function(volume) {
         cc.Player.volumeLevel = volume
         cc.Controller.setVolumeLevel()
     }
-    ChromeCastJS.prototype.playOrPause = function() {
+    ChromecastJS.prototype.playOrPause = function() {
         cc.Controller.playOrPause()
     }
-    ChromeCastJS.prototype.muteOrUnmute = function() {
+    ChromecastJS.prototype.muteOrUnmute = function() {
         cc.Controller.muteOrUnmute()
     }
-    ChromeCastJS.prototype.disconnect = function() {
+    ChromecastJS.prototype.disconnect = function() {
         cast.framework.CastContext.getInstance().endCurrentSession()
     }
-    ChromeCastJS.prototype.changeSubtitle = function(id) {
+    ChromecastJS.prototype.changeSubtitle = function(id) {
         var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([id + 1]);
         cast.framework.CastContext.getInstance().b.getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null);
     }
+    // Check if a chromecast is available, trigger 'initialize' event
     var castInterval = setInterval(function() {
         if (typeof window.chrome != 'undefined' && typeof window.chrome.cast != 'undefined' && window.chrome.cast.isAvailable) {
             clearInterval(castInterval)
             initialize()  
         }
     }, 250)
+    // Functions
     function initialize() {
         cast.framework.CastContext.getInstance().setOptions({
             receiverApplicationId: reciever || chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
