@@ -103,7 +103,7 @@ cc.on('muteOrUnmute', function(muted) {
   console.log('muteOrUnmute:', muted)
 })
 ```
-#### muteOrUnmute
+#### volume
 ```javascript
 //When volume is changed will trigger this event and callback the volume int value
 cc.on('volume', function(volume) {
@@ -143,7 +143,7 @@ cc.on('disconnect', function() {
   console.log('disconnected')
 })
 ```
-#### disconnect
+#### error
 ```javascript
 //Catch any error
 cc.on('error', function(err) {
