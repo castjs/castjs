@@ -13,6 +13,8 @@ Enjoy!
 // Init the ChromecastJS function, you can define your own join_policy and receiver_app_id.
 var cc = new ChromecastJS()
 var cc = new ChromecastJS(chrome.cast.AutoJoinPolicy.TAB_AND_ORIGIN_SCOPED, chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID)
+// Receiver:
+// chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID // Default
 // AutoJoinPolicy:
 // chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
 // chrome.cast.AutoJoinPolicy.PAGE_SCOPED
