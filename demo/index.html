@@ -171,7 +171,6 @@ document.getElementById('disconnect').addEventListener('click', function() {
 })
 document.getElementById('seek').addEventListener('click', function(e) {
   if (this.parentNode.classList.value == 'disconnected') {
-    console.log('wtf')
     return false
   }
   var x = e.pageX - this.offsetLeft,
