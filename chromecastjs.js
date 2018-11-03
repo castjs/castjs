@@ -151,13 +151,13 @@ var ChromecastJS = function(scope, reciever) {
                     }
                     // Format loaded subtitles
                     for (var i = 0; i < that.Player.mediaInfo.tracks.length; i++) {
-                      if (that.Player.mediaInfo.tracks[i].type === 'TEXT') {
-                        that.Media.subtitles.push({
-                          label: 	that.Player.mediaInfo.tracks[i].name,
-                          srclang: 	that.Player.mediaInfo.tracks[i].language,
-                          src: 		that.Player.mediaInfo.tracks[i].trackContentId
-                        })
-                      }
+                      	if (that.Player.mediaInfo.tracks[i].type === 'TEXT') {
+                        	that.Media.subtitles.push({
+                          		label: 		that.Player.mediaInfo.tracks[i].name,
+                          		srclang: 	that.Player.mediaInfo.tracks[i].language,
+                          		src: 		that.Player.mediaInfo.tracks[i].trackContentId
+                        	})
+                      	}
                     }
                     if (typeof that.Events['media'] !== 'undefined') {
                         that.Events['media'](that.Media)
