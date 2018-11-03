@@ -12,15 +12,7 @@ https://fenny.github.io/ChromecastJS/demo/index.html
 ```javascript
 // Initialize ChromecastJS Object
 
-// receiverApplicationId:
-// chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID      [DEFAULT]
-
-// autoJoinPolicy:
-// chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-// chrome.cast.AutoJoinPolicy.PAGE_SCOPED
-// chrome.cast.AutoJoinPolicy.TAB_AND_ORIGIN_SCOPED     [DEFAULT]
-
-//       new ChromecastJS(autoJoinPolicy, receiverApplicationId)
+// var cc = new ChromecastJS(tab_and_origin_scoped, receiver_id)
 var cc = new ChromecastJS()
 
 cc.on('available', function() {
@@ -53,9 +45,9 @@ cc.on('muteOrUnmute', function(muted) {
     // Media muted or unmuted, returns boolean
     // muted: false
 })
-cc.on('volume', function(volume) {
+cc.on('volume', function(percentage) {
     // Media volume changed, returns int
-    // volume: 0.18
+    // percentage: 18
 })
 cc.on('state', function(state) {
     // Chromecast state changed, returns string
@@ -114,7 +106,7 @@ document.getElementById('CastButton').addEventListener('click', function() {
 ```javascript
 cc.seek(25)              // Change the media time
 cc.changeSubtitle(1)     // Change subtitle by index during casting 0,1,2...subtitles.length
-cc.volume(0.5)           // Change volume *1 means 100% TV volume, you have been warned*
+cc.volume(50)            // Change volume in percentage
 cc.playOrPause()         // Switch pause / play
 cc.muteOrUnmute()        // Switch mute / unmute
 cc.disconnect()          // Disconnect chromecast session
