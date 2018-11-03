@@ -1,1 +1,218 @@
-Hello
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChromecastJS Demo</title>
+<link href="https://fonts.googleapis.com/css?family=Inconsolata:700" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Inconsolata', monospace;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  textarea, input, button {
+    font-family: 'Inconsolata', monospace;
+    font-weight: 700;
+  }
+  textarea {
+    height: 174px;
+    width: 100%;
+  }
+  input, progress {
+    width: 100%;
+    margin-bottom: 5px;
+    vertical-align: middle;
+    font-size: 12px;
+    color: #0084ff;
+  }
+  .center {
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    display: block;
+  }
+  .wrap {
+    width: 400px;
+    float: left;
+    padding: 15px;
+  }
+  #logs {
+    color: #ff7b00;
+  }
+  #media {
+    color: #07a100;
+  }
+  #controls.disconnected {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+  #controls.disconnected > button {
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+  <div class="center">
+    <h1 style="text-align: center;margin-bottom: 5px;">ChromecastJS Demo</h1>
+    <p style="text-align: center;margin-top: 0px;">Make sure that all sources have CORS enabled!</p>
+    <a style="display: block;text-align: center;margin-top: 0px;" href="https://github.com/Fenny/ChromecastJS">https://github.com/Fenny/ChromecastJS</a>
+    <div class="wrap">
+      Content:<input id="content" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"><br>
+      Poster:<input id="poster" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/poster.png"><br>
+      Title:<input id="title" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Video Title"><br>
+      Description:<input id="description" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Video Description"><br>
+      Subtitle 1:<input id="subtitle1" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/english.vtt"><br>
+      Subtitle 2:<input id="subtitle2" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/spanish.vtt"><br><br>
+      <button id="cast">Cast Media to Chromecast</button>
+      <button id="disconnect">Disconnect</button><br><br>
+
+      <div id="controls" class="disconnected">
+        <button id="playOrPause">Pause</button>
+        <button id="muteOrUnmute">Mute</button>
+        <button id="useSubtitle1">Change Subtitle 1</button>
+        <button id="useSubtitle2">Change Subtitle 2</button><br><br>
+        Time:<progress id="seek" value="0" max="100"></progress><br>
+        Volume:<progress id="volume" value="0" max="100"></progress>
+      </div>
+    </div>
+    <div class="wrap">
+      Media:<textarea id="media" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      Logs:<textarea id="logs" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+
+<script src="/hi.js"></script>
+<script>
+function log(msg) {
+  document.getElementById('logs').value += msg + '\n'
+  var textarea = document.getElementById('logs');
+  textarea.scrollTop = textarea.scrollHeight;
+}
+var mediaInterval = null
+var cc = new ChromecastJS()
+cc.on('available', function() {
+  log('Available:\tChromecast found on network')
+})
+cc.on('connected', function() {
+  log('Connected:\tWe have a session')
+})
+cc.on('media', function(media) {
+  log('Media:\t\tNew media detected')
+  document.getElementById('controls').classList.remove('disconnected')
+  document.getElementById('media').value = JSON.stringify(media, undefined, 4);
+  mediaInterval = setInterval(function() {
+    document.getElementById('media').value = JSON.stringify(cc.Media, undefined, 4);
+  }, 1000)
+})
+cc.on('playOrPause', function(paused) {
+  log('Paused:\t\t' + paused)
+  if (paused) {
+    document.getElementById('playOrPause').innerHTML = 'Play'
+  } else {
+    document.getElementById('playOrPause').innerHTML = 'Pause'
+  }
+})
+cc.on('muteOrUnmute', function(muted) {
+  log('Muted:\t\t' + muted)
+  if (muted) {
+    document.getElementById('muteOrUnmute').innerHTML = 'Unmute'
+  } else {
+    document.getElementById('muteOrUnmute').innerHTML = 'Mute'
+  }
+})
+cc.on('volume', function(percentage) {
+  log('Volume:\t\t' + percentage)
+  document.getElementById('volume').value = percentage
+})
+cc.on('state', function(state) {
+  log('State:\t\t' + state)
+})
+cc.on('time', function(time) {
+  document.getElementById('seek').value = time.progress
+})
+cc.on('disconnect', function() {
+  clearInterval(mediaInterval)
+  log('Disconnect:\tSession dropped')
+})
+cc.on('error', function(err) {
+  clearInterval(mediaInterval)
+  log('Error:\t' + err)
+})
+document.getElementById('playOrPause').addEventListener('click', function() {
+  if (this.parentNode.classList.value == 'disconnected') {
+    return false
+  }
+  cc.playOrPause()
+})
+document.getElementById('muteOrUnmute').addEventListener('click', function() {
+  if (this.parentNode.classList.value == 'disconnected') {
+    return false
+  }
+  cc.muteOrUnmute()
+})
+document.getElementById('useSubtitle1').addEventListener('click', function() {
+  if (this.parentNode.classList.value == 'disconnected') {
+    return false
+  }
+  cc.changeSubtitle(0)
+})
+document.getElementById('useSubtitle2').addEventListener('click', function() {
+  if (this.parentNode.classList.value == 'disconnected') {
+    return false
+  }
+  cc.changeSubtitle(1)
+})
+document.getElementById('disconnect').addEventListener('click', function() {
+  cc.disconnect()
+  document.getElementById('controls').classList.add('disconnected')
+})
+document.getElementById('seek').addEventListener('click', function(e) {
+  if (this.parentNode.classList.value == 'disconnected') {
+    console.log('wtf')
+    return false
+  }
+  var x = e.pageX - this.offsetLeft,
+      y = e.pageY - this.offsetTop,
+      clickedValue = x * this.max / this.offsetWidth;
+  cc.seek(clickedValue)
+})
+document.getElementById('volume').addEventListener('click', function(e) {
+  if (this.parentNode.classList.value == 'disconnected') {
+    return false
+  }
+  var x = e.pageX - this.offsetLeft,
+      y = e.pageY - this.offsetTop,
+      clickedValue = x * this.max / this.offsetWidth;
+  cc.volume(clickedValue)
+})
+document.getElementById('cast').addEventListener('click', function() {
+  var media = {
+    content:      document.getElementById('content').value || null,
+    poster:       document.getElementById('poster').value || null,
+    title:        document.getElementById('title').value || null,
+    description:  document.getElementById('description').value || null,
+    subtitles: []
+  }
+  if (document.getElementById('subtitle1').value) {
+    media.subtitles.push({
+      active: true,
+      label: 'Subtitle 1',
+      srclang: 'en',
+      src: document.getElementById('subtitle1').value
+    })
+  }
+  if (document.getElementById('subtitle2').value) {
+    media.subtitles.push({
+      label: 'Subtitle 2',
+      srclang: 'en',
+      src: document.getElementById('subtitle2').value
+    })
+  }
+  cc.cast(media)
+})
+</script>
+</body>
+</html>
