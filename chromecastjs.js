@@ -1,39 +1,54 @@
 var ChromecastJS = function(scope, reciever) {
-    if (typeof cast === 'undefined') {
-        var castSender = document.createElement('script');
-        castSender.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
-        document.body.appendChild(castSender)
+	// Load framework if not exist
+	if (typeof cast === 'undefined') {
+        var castFramework = document.createElement('script');
+        castFramework.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
+        document.body.appendChild(castFramework)
     }
-    var cc = this
-    this.Available = false
-    this.Events = []
-    this.Player = null
-    this.Controller = null
-    this.Session = null
-    this.MediaTemplate = {
-        content: null,
-        poster: null,
-        title: null,
-        description: null,
-        subtitles: [],
-        time: 0,
-        duration: 0,
-        volume: 0.5,
-        muted: false,
-        paused: false,
-        state: 'DISCONNECTED'
+	// Define global object
+	var that 		= this
+	// Define object variables
+	that.Scope      = (scope) 		? scope 	: 'tab_and_origin_scoped'
+	that.Receiver 	= (reciever) 	? reciever 	: 'CC1AD845'
+	that.Events 	= []
+	that.Available 	= false
+	that.Connected 	= false
+	that.Player 	= null
+	that.Controller = null
+	that.Session 	= null
+	that.Template 	= {
+        content: 		null,
+        poster: 		null,
+        title: 			null,
+        description: 	null,
+        subtitles: 		[],
+        time: 			0,
+        duration: 		0,
+        volume: 		0.3,
+        muted: 			false,
+        paused: 		false,
+        state: 			'DISCONNECTED'
     }
-    this.Media = this.MediaTemplate
-    // Prototypes
-    ChromecastJS.prototype.on = function(event, callback) {
-        this.Events[event] = callback
-    }
-    ChromecastJS.prototype.cast = function(media, callback) {
-        if (!media.content) {
-            if (typeof cc.Events['error'] != 'undefined') {
-                cc.Events['error']('No media content specified.')
+    that.Media 		= that.Template
+	// Define object methods
+	ChromecastJS.prototype.on = function(event, callback) {
+		that.Events[event] = callback
+		return that
+	}
+	ChromecastJS.prototype.cast = function(media, callback) {
+		if (!media.content) {
+            if (typeof that.Events['error'] !== 'undefined') {
+                that.Events['error']('No media content specified.')
+            }
+            if (callback) {
+                callback('No media content specified.')
             }
             return
+        }
+        for (var key in media) {
+            if (media.hasOwnProperty(key)) {
+                that.Media[key] = media[key]
+            }
         }
         cast.framework.CastContext.getInstance().requestSession().then(function() {
             if (callback) {
@@ -43,225 +58,205 @@ var ChromecastJS = function(scope, reciever) {
             if (callback) {
                 callback(e)
             }
-            if (typeof cc.Events['error'] != 'undefined') {
-                cc.Events['error']('requestSession:', e)
+            if (typeof that.Events['error'] !== 'undefined') {
+                that.Events['error']('ChromecastJS.cast():', e)
             }
         })
-        for (var key in media) {
-            if (media.hasOwnProperty(key)) {
-                cc.Media[key] = media[key]
-            }
-        }
-    }
-    ChromecastJS.prototype.seek = function(percentage) {
-        if (percentage && cc.Player.canSeek) {
-            cc.Player.currentTime = cc.Controller.getSeekTime(percentage, cc.Player.duration)
-            cc.Controller.seek()
-        }
-    }
-    ChromecastJS.prototype.volume = function(volume) {
-        cc.Player.volumeLevel = volume
-        cc.Controller.setVolumeLevel()
-    }
-    ChromecastJS.prototype.playOrPause = function() {
-        cc.Controller.playOrPause()
-    }
-    ChromecastJS.prototype.muteOrUnmute = function() {
-        cc.Controller.muteOrUnmute()
-    }
-    ChromecastJS.prototype.disconnect = function() {
-        cast.framework.CastContext.getInstance().endCurrentSession()
-    }
-    ChromecastJS.prototype.changeSubtitle = function(id) {
-        var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([id + 1]);
-        cast.framework.CastContext.getInstance().b.getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null);
-    }
-    // Check if a chromecast is available, trigger 'initialize' event
+	}
+	ChromecastJS.prototype.seek = function(percentage) {
+		if (!that.Connected || !that.Player.canSeek) {
+			return that
+		}
+        that.Player.currentTime = that.Controller.getSeekTime(percentage, that.Player.duration)
+        that.Controller.seek()
+        return that
+	}
+	ChromecastJS.prototype.volume = function(volume) {
+		if (!that.Connected || !that.Player.canPause) {
+			return that
+		}
+		that.Player.volumeLevel = volume
+        that.Controller.setVolumeLevel()
+        return that
+	}
+	ChromecastJS.prototype.playOrPause = function() {
+		if (!that.Connected || !that.Player.canPause) {
+			return that
+		}
+		that.Controller.playOrPause()
+		return that
+	}
+	ChromecastJS.prototype.muteOrUnmute = function() {
+		if (!that.Connected || !that.Player.canControlVolume) {
+			return that
+		}
+		that.Controller.muteOrUnmute()
+		return that
+	}
+	ChromecastJS.prototype.changeSubtitle = function(index) {
+		if (!that.Connected) {
+			return that
+		}
+		var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([index])
+        cast.framework.CastContext.getInstance().b.getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null)
+        return that
+	}
+	ChromecastJS.prototype.disconnect = function() {
+		cast.framework.CastContext.getInstance().endCurrentSession()
+		return that
+	}
+	// Check if a chromecast is available, trigger 'Init' event
     var castInterval = setInterval(function() {
-        if (typeof window.chrome != 'undefined' && typeof window.chrome.cast != 'undefined' && window.chrome.cast.isAvailable) {
+        if (typeof window.chrome !== 'undefined' && typeof window.chrome.cast !== 'undefined' && window.chrome.cast.isAvailable) {
             clearInterval(castInterval)
-            initialize()  
+            Init()  
         }
     }, 250)
-    // Functions
-    function initialize() {
-        cast.framework.CastContext.getInstance().setOptions({
-            receiverApplicationId: reciever || chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-            autoJoinPolicy: scope || chrome.cast.AutoJoinPolicy.TAB_AND_ORIGIN_SCOPED
-        });
-        cc.Player = new cast.framework.RemotePlayer()
-        cc.Controller = new cast.framework.RemotePlayerController(cc.Player)
-
-        cc.Controller.addEventListener('isConnectedChanged', isConnectedChanged)
-        cc.Controller.addEventListener('currentTimeChanged', currentTimeChanged)
-        cc.Controller.addEventListener('durationChanged', durationChanged)
-        cc.Controller.addEventListener('volumeLevelChanged', volumeLevelChanged)
-        cc.Controller.addEventListener('isMutedChanged', isMutedChanged)
-        cc.Controller.addEventListener('playerStateChanged', playerStateChanged)
-
-        cc.Available = true;
-        if (typeof cc.Events['available'] != 'undefined') {
-            cc.Events['available']()
+    // Initialize cast framework events
+    function Init() {
+        cast.framework.CastContext.getInstance().setOptions({receiverApplicationId: that.Receiver, autoJoinPolicy: that.Scope})
+        that.Player 	= new cast.framework.RemotePlayer()
+        that.Controller = new cast.framework.RemotePlayerController(that.Player)
+        that.Controller.addEventListener('isConnectedChanged', 	IsConnectedChanged)
+        that.Controller.addEventListener('currentTimeChanged', 	TimeChanged)
+        that.Controller.addEventListener('durationChanged', 	TimeChanged)
+        that.Controller.addEventListener('volumeLevelChanged', 	VolumeLevelChanged)
+        that.Controller.addEventListener('isMutedChanged', 		IsMutedChanged)
+        that.Controller.addEventListener('playerStateChanged', 	PlayerStateChanged)
+        that.Available = true;
+        if (typeof that.Events['available'] !== 'undefined') {
+            that.Events['available']()
         }
     }
-
-    function isConnectedChanged() {
-        setTimeout(function() {
-            if (cc.Player.isConnected) {
-                if (typeof cc.Events['connected'] != 'undefined') {
-                    cc.Events['connected']()
+    function IsConnectedChanged() {
+    	// Avoid bug in the cast framework not updating the Player object instantly
+    	setTimeout(function() {
+    		if (that.Player.isConnected) {
+    			that.Connected = true
+    			if (typeof that.Events['connected'] !== 'undefined') {
+                    that.Events['connected']()
                 }
-                if (cc.Player.isMediaLoaded) {
-                    cc.Media = {
-                        content: cc.Player.mediaInfo.contentId,
-                        poster: cc.Player.imageUrl || null,
-                        title: cc.Player.title || null,
-                        description: cc.Player.mediaInfo.metadata.subtitle || null,
-                        subtitles: [],
-                        time: cc.Player.currentTime,
-                        duration: cc.Player.duration,
-                        volume: cc.Player.volumeLevel,
-                        muted: cc.Player.isMuted,
-                        state: cc.Player.playerState
+                if (that.Player.isMediaLoaded) {
+					that.Media = {
+                        content: 		that.Player.mediaInfo.contentId,
+                        poster: 		that.Player.imageUrl || null,
+                        title: 			that.Player.title || null,
+                        description: 	that.Player.mediaInfo.metadata.subtitle || null,
+                        subtitles: 		[],
+                        time: 			that.Player.currentTime,
+                        duration: 		that.Player.duration,
+                        volume: 		that.Player.volumeLevel,
+                        muted: 			that.Player.isMuted,
+                        state: 			that.Player.playerState
                     }
-                    for (var i = 0; i < cc.Player.mediaInfo.tracks.length; i++) {
-                      if (cc.Player.mediaInfo.tracks[i].type == 'TEXT') {
-                        cc.Media.subtitles.push({
-                          label: cc.Player.mediaInfo.tracks[i].name,
-                          srclang: cc.Player.mediaInfo.tracks[i].language,
-                          src: cc.Player.mediaInfo.tracks[i].trackContentId
+                    // Format loaded subtitles
+                    for (var i = 0; i < that.Player.mediaInfo.tracks.length; i++) {
+                      if (that.Player.mediaInfo.tracks[i].type === 'TEXT') {
+                        that.Media.subtitles.push({
+                          label: 	that.Player.mediaInfo.tracks[i].name,
+                          srclang: 	that.Player.mediaInfo.tracks[i].language,
+                          src: 		that.Player.mediaInfo.tracks[i].trackContentId
                         })
                       }
                     }
-                    if (typeof cc.Events['media'] != 'undefined') {
-                        cc.Events['media'](cc.Media)
+                    if (typeof that.Events['media'] !== 'undefined') {
+                        that.Events['media'](that.Media)
                     }
                 } else {
-                    cc.Session = cast.framework.CastContext.getInstance().getCurrentSession()
-                    if (cc.Session) {
-                        var mediaInfo = new chrome.cast.media.MediaInfo(cc.Media.content);
-                        //mediaInfo.contentType = 'video/mp4';
-                        //Do we need to define the contentType? If so, we have to somehow define the mime type from the file name
-                        mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
-
-                        if (cc.Media.subtitles.length > 0) {
-                          mediaInfo.textTrackStyle = textTrackStyle();
-                          mediaInfo.tracks = textTrackCaptions(cc.Media.subtitles)
+                	that.Session = cast.framework.CastContext.getInstance().getCurrentSession()
+					if (that.Session && that.Media.content) {
+                        var mediaInfo 		= new chrome.cast.media.MediaInfo(that.Media.content)
+                        //mediaInfo.contentType = 'video/mp4' ??
+                        mediaInfo.metadata 	= new chrome.cast.media.GenericMediaMetadata()
+                        // The sexy subtitle support function <3
+                        if (that.Media.subtitles.length > 0) {
+                      	 	mediaInfo.textTrackStyle 					= new chrome.cast.media.TextTrackStyle()
+					        mediaInfo.textTrackStyle.fontFamily 		= 'Arial'
+					        mediaInfo.textTrackStyle.foregroundColor 	= '#FFFFFF'
+					        mediaInfo.textTrackStyle.backgroundColor 	= '#00000000'
+					        mediaInfo.textTrackStyle.fontScale 			= '1.1'
+					        mediaInfo.textTrackStyle.edgeColor 			= '#00000099'
+					        mediaInfo.textTrackStyle.edgeType 			= chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
+							var tracks = [];
+							for (var i = 0; i < that.Media.subtitles.length; i++) {
+								var track 				= new chrome.cast.media.Track(i + 1, chrome.cast.media.TrackType.TEXT)
+								track.trackContentId 	= that.Media.subtitles[i].src
+								track.trackContentType 	= 'text/vtt'
+								track.subtype 			= chrome.cast.media.TextTrackType.CAPTIONS
+								track.name 				= that.Media.subtitles[i].label
+								track.language 			= that.Media.subtitles[i].srclang
+								tracks.push(track);
+							}
+                          	mediaInfo.tracks = tracks
                         }
-
-                        if (cc.Media.poster) {
-                            mediaInfo.metadata.images = [{
-                                'url': cc.Media.poster
-                            }];
+                        if (that.Media.poster) {
+                            mediaInfo.metadata.images = [{'url': that.Media.poster}]
                         }
-                        if (cc.Media.title) {
-                            mediaInfo.metadata.title = cc.Media.title;
+                        if (that.Media.title) {
+                            mediaInfo.metadata.title = that.Media.title
                         }
-                        if (cc.Media.description) {
-                            mediaInfo.metadata.subtitle = cc.Media.description
+                        if (that.Media.description) {
+                            mediaInfo.metadata.subtitle = that.Media.description
                         }
-
-                        var request = new chrome.cast.media.LoadRequest(mediaInfo)
-
-                        request.currentTime = cc.Media.time
-                        request.autoplay = !cc.Media.paused
-
-                        if (cc.Media.subtitles.length > 0) {
-                          for (var i = 0; i < cc.Media.subtitles.length; i++) {
-                            if (typeof cc.Media.subtitles[i].active != 'undefined') {
-                              request.activeTrackIds = [i + 1];
-                            }
-                          }
+                        var request 		= new chrome.cast.media.LoadRequest(mediaInfo)
+                        request.currentTime = that.Media.time
+                        request.autoplay 	= !that.Media.paused
+                        if (that.Media.subtitles.length > 0) {
+                          	for (var i = 0; i < that.Media.subtitles.length; i++) {
+                            	if (typeof that.Media.subtitles[i].active != 'undefined') {
+                              		request.activeTrackIds = [i + 1]
+                            	}
+                          	}
                         }
-                        cc.Session.loadMedia(request).then(function() {
-                            if (typeof cc.Events['media'] != 'undefined') {
-                                cc.Events['media'](cc.Media)
+                        that.Session.loadMedia(request).then(function() {
+                            if (typeof that.Events['media'] !== 'undefined') {
+                                that.Events['media'](that.Media)
                             }
                         }, function(e) {
-                            if (typeof cc.Events['error'] != 'undefined') {
-                                cc.Events['error']('loadMedia:', e)
+                            if (typeof that.Events['error'] !== 'undefined') {
+                                that.Events['error']('ChromecastJS.cast():', e)
                             }
                         })
                     }
                 }
-            }
-        }, 0)
+    		}
+    	}, 0)
     }
-
-    function textTrackStyle() {
-        var textTrackStyle = new chrome.cast.media.TextTrackStyle();
-        textTrackStyle.fontFamily = 'Arial';
-        textTrackStyle.foregroundColor = '#FFFFFF';
-        textTrackStyle.backgroundColor = '#00000000';
-        textTrackStyle.fontScale = '1.1';
-        textTrackStyle.edgeColor = '#00000099';
-        textTrackStyle.edgeType = chrome.cast.media.TextTrackEdgeType.DROP_SHADOW;
-      return textTrackStyle;
-    }
-    function textTrackCaptions(subtitles) {
-      var tracks = [];
-      for (var i = 0; i < subtitles.length; i++) {
-          var track = new chrome.cast.media.Track(i + 1, chrome.cast.media.TrackType.TEXT);
-          track.trackContentId = subtitles[i].src;
-          track.trackContentType = 'text/vtt';
-          track.subtype = chrome.cast.media.TextTrackType.CAPTIONS;
-          track.name = subtitles[i].label;
-          track.language = subtitles[i].srclang;
-          tracks.push(track);
-      }
-      return tracks;
-    }
-    function currentTimeChanged() {
-        cc.Media.time = cc.Player.currentTime
-        if (typeof cc.Events['time'] != 'undefined') {
-            cc.Events['time']({
-                progress: cc.Controller.getSeekPosition(cc.Player.currentTime, cc.Player.duration) || 0,
-                time: cc.Controller.getFormattedTime(cc.Player.currentTime),
-                duration: cc.Controller.getFormattedTime(cc.Player.duration)
+    function TimeChanged() {
+		that.Media.time = that.Player.currentTime
+        if (typeof that.Events['time'] !== 'undefined') {
+            that.Events['time']({
+                progress: 	that.Controller.getSeekPosition(that.Player.currentTime, that.Player.duration) || 0,
+                time: 		that.Controller.getFormattedTime(that.Player.currentTime),
+                duration: 	that.Controller.getFormattedTime(that.Player.duration)
             })
         }
     }
-
-    function durationChanged() {
-        cc.Media.duration = cc.Player.duration
-        if (typeof cc.Events['time'] != 'undefined') {
-            cc.Events['time']({
-                progress: cc.Controller.getSeekPosition(cc.Player.currentTime, cc.Player.duration) || 0,
-                time: cc.Controller.getFormattedTime(cc.Player.currentTime),
-                duration: cc.Controller.getFormattedTime(cc.Player.duration)
-            })
+    function VolumeLevelChanged() {
+    	that.Media.volume = that.Player.volumeLevel
+        if (typeof that.Events['volume'] !== 'undefined') {
+            that.Events['volume'](that.Media.volume)
         }
     }
-
-    function volumeLevelChanged() {
-        cc.Media.volume = cc.Player.volumeLevel
-        if (typeof cc.Events['volume'] != 'undefined') {
-            cc.Events['volume'](cc.Media.volume)
+    function IsMutedChanged() {
+    	that.Media.muted = that.Player.isMuted
+        if (typeof that.Events['muteOrUnmute'] !== 'undefined') {
+            that.Events['muteOrUnmute'](that.Media.muted)
         }
     }
-
-    function isMutedChanged() {
-        cc.Media.muted = cc.Player.isMuted
-        if (typeof cc.Events['muteOrUnmute'] != 'undefined') {
-            cc.Events['muteOrUnmute'](cc.Media.muted)
-        }
-    }
-
-    function playerStateChanged() {
-        console.log(cc.Player.playerState)
-        if (cc.Player.playerState) {
-            cc.Media.state = cc.Player.playerState
+    function PlayerStateChanged() {
+    	if (that.Player.playerState) {
+            that.Media.state = that.Player.playerState
         } else {
-            cc.Media = cc.MediaTemplate
             cast.framework.CastContext.getInstance().endCurrentSession()
-            cc.Media = cc.MediaTemplate
-            cc.Media.state = 'DISCONNECTED'
-            if (typeof cc.Events['disconnect'] != 'undefined') {
-                cc.Events['disconnect']()
+            that.Media 			= that.Template
+            that.Media.state 	= 'DISCONNECTED'
+            if (typeof that.Events['disconnect'] !== 'undefined') {
+                that.Events['disconnect']()
             }
         }
-        if (typeof cc.Events['state'] != 'undefined') {
-            cc.Events['state'](cc.Media.state)
+        if (typeof that.Events['state'] !== 'undefined') {
+            that.Events['state'](that.Media.state)
         }
     }
 }
