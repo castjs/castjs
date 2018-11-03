@@ -3,9 +3,9 @@
 <img src="https://i.imgur.com/uI4i1m5.png" align="right"
      title="Chromecast Javascript Wrapper" width="400" height="125">
 
-ChromecastJS is a javascript wrapper arround the complex chromecast SDK.
+ChromecastJS is a javascript wrapper arround the complex chromecast SDK. (6.36 KB minified)!
 This wrapper provides simple events and functions to communicate easily with any chromecast.
-Feel free to take a look at the source code, you can see that is a minimal wrapper that is only 5.51 KB minified!
+Online demo: https://fenny.github.io/ChromecastJS/demo/index.html
 
 ## Initialize
 ```javascript
