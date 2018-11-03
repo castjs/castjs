@@ -1,5 +1,4 @@
 var ChromecastJS = function(scope, reciever) {
-	
 	// Load framework if not exist
 	if (typeof cast === 'undefined') {
         var castFramework = document.createElement('script');
