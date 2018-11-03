@@ -65,45 +65,57 @@ var ChromecastJS = function (scope, reciever) {
     }
     ChromecastJS.prototype.seek = function (percentage) {
         if (!that.Connected || !that.Player.canSeek) {
-            return that
+            if (typeof that.Events['error'] !== 'undefined') {
+                that.Events['error']('ChromecastJS.seek(): Not connected or can\'t seek')
+            }
+            return
         }
         that.Player.currentTime = that.Controller.getSeekTime(percentage, that.Player.duration)
         that.Controller.seek()
-        return that
     }
-    ChromecastJS.prototype.volume = function (volume) {
-        if (!that.Connected || !that.Player.canPause) {
-            return that
+    ChromecastJS.prototype.volume = function (percentage) {
+        if (!that.Connected || !that.Player.canControlVolume) {
+           	if (typeof that.Events['error'] !== 'undefined') {
+                that.Events['error']('ChromecastJS.volume(): Not connected or can\'t control volume')
+            }
+            return
         }
-        that.Player.volumeLevel = volume
+        // Todo ~ Beautify this function (Percentage to leading zero with 2 decimals)
+        percentage = (percentage.toString().length === 1) ? '0' + percentage : percentage
+        percentage = (percentage == '100') ? 1 : parseFloat('0.' + percentage)
+        that.Player.volumeLevel = percentage
         that.Controller.setVolumeLevel()
-        return that
     }
     ChromecastJS.prototype.playOrPause = function () {
         if (!that.Connected || !that.Player.canPause) {
-            return that
+            if (typeof that.Events['error'] !== 'undefined') {
+                that.Events['error']('ChromecastJS.playOrPause(): Not connected or can\'t pause or play')
+            }
+            return
         }
         that.Controller.playOrPause()
-        return that
     }
     ChromecastJS.prototype.muteOrUnmute = function () {
         if (!that.Connected || !that.Player.canControlVolume) {
-            return that
+            if (typeof that.Events['error'] !== 'undefined') {
+                that.Events['error']('ChromecastJS.muteOrUnmute(): Not connected or can\'t control volume')
+            }
+            return
         }
         that.Controller.muteOrUnmute()
-        return that
     }
     ChromecastJS.prototype.changeSubtitle = function (index) {
         if (!that.Connected) {
-            return that
+            if (typeof that.Events['error'] !== 'undefined') {
+                that.Events['error']('ChromecastJS.changeSubtitle(): Not connected')
+            }
+            return
         }
         var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([index])
         cast.framework.CastContext.getInstance().b.getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null)
-        return that
     }
     ChromecastJS.prototype.disconnect = function () {
         cast.framework.CastContext.getInstance().endCurrentSession()
-        return that
     }
     // Check if a chromecast is available, trigger 'Init' event
     var castInterval = setInterval(function () {
@@ -124,7 +136,8 @@ var ChromecastJS = function (scope, reciever) {
         that.Controller.addEventListener('currentTimeChanged', TimeChanged)
         that.Controller.addEventListener('durationChanged', TimeChanged)
         that.Controller.addEventListener('volumeLevelChanged', VolumeLevelChanged)
-        that.Controller.addEventListener('isMutedChanged', IsMutedChanged)
+        that.Controller.addEventListener('isMutedChanged', 	IsMutedChanged)
+        that.Controller.addEventListener('isPausedChanged', IsPausedChanged)
         that.Controller.addEventListener('playerStateChanged', PlayerStateChanged)
         that.Available = true;
         if (typeof that.Events['available'] !== 'undefined') {
@@ -140,7 +153,7 @@ var ChromecastJS = function (scope, reciever) {
                 if (typeof that.Events['connected'] !== 'undefined') {
                     that.Events['connected']()
                 }
-                if (that.Player.isMediaLoaded) {
+                if (that.Player.isMediaLoaded && that.Player.playerState) {
                     that.Media = {
                         content: that.Player.mediaInfo.contentId,
                         poster: that.Player.imageUrl || null,
@@ -183,7 +196,7 @@ var ChromecastJS = function (scope, reciever) {
                             mediaInfo.textTrackStyle.edgeType = chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
                             var tracks = [];
                             for (var i = 0; i < that.Media.subtitles.length; i++) {
-                                var track = new chrome.cast.media.Track(i + 1, chrome.cast.media.TrackType.TEXT)
+                                var track = new chrome.cast.media.Track(i, chrome.cast.media.TrackType.TEXT)
                                 track.trackContentId = that.Media.subtitles[i].src
                                 track.trackContentType = 'text/vtt'
                                 track.subtype = chrome.cast.media.TextTrackType.CAPTIONS
@@ -209,8 +222,8 @@ var ChromecastJS = function (scope, reciever) {
                         request.autoplay = !that.Media.paused
                         if (that.Media.subtitles.length > 0) {
                             for (var i = 0; i < that.Media.subtitles.length; i++) {
-                                if (typeof that.Media.subtitles[i].active != 'undefined') {
-                                    request.activeTrackIds = [i + 1]
+                                if (typeof that.Media.subtitles[i].active != 'undefined' && that.Media.subtitles[i].active) {
+                                    request.activeTrackIds = [i]
                                 }
                             }
                         }
@@ -241,9 +254,10 @@ var ChromecastJS = function (scope, reciever) {
     }
 
     function VolumeLevelChanged() {
-        that.Media.volume = that.Player.volumeLevel
+    	that.Media.volume = that.Player.volumeLevel
         if (typeof that.Events['volume'] !== 'undefined') {
-            that.Events['volume'](that.Media.volume)
+        	var percentage = (that.Media.volume == '1') ? '100' : that.Media.volume.toFixed(2).replace('0.', '').replace('.', '')
+            that.Events['volume'](percentage)
         }
     }
 
@@ -254,12 +268,20 @@ var ChromecastJS = function (scope, reciever) {
         }
     }
 
+    function IsPausedChanged() {
+    	that.Media.paused = that.Player.isPaused
+    	if (typeof that.Events['playOrPause'] !== 'undefined') {
+            that.Events['playOrPause'](that.Media.paused)
+        }
+    }
+
     function PlayerStateChanged() {
         if (that.Player.playerState) {
             that.Media.state = that.Player.playerState
         } else {
             cast.framework.CastContext.getInstance().endCurrentSession()
             that.Media = that.Template
+            that.Player.isMediaLoaded = false
             that.Media.state = 'DISCONNECTED'
             if (typeof that.Events['disconnect'] !== 'undefined') {
                 that.Events['disconnect']()
