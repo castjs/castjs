@@ -5,7 +5,8 @@
 
 ChromecastJS is a javascript wrapper arround the complex chromecast SDK. (6.36 KB minified)!
 This wrapper provides simple events and functions to communicate easily with any chromecast.
-Online demo: https://fenny.github.io/ChromecastJS/demo/index.html
+
+https://fenny.github.io/ChromecastJS/demo/index.html
 
 ## Initialize
 ```javascript
