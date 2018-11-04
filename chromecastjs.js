@@ -59,33 +59,33 @@ var ChromecastJS = function(scope, reciever) {
     }
     ChromecastJS.prototype.seek = function(percentage) {
         if (!that.Connected || !that.Player.canSeek) {
-            return TriggerEvent('error', 'ChromecastJS.changeSubtitle(): Not connected or can\'t seek')
+            return TriggerEvent('error', '.seek(): Not connected or can\'t seek')
         }
         that.Player.currentTime = that.Controller.getSeekTime(percentage, that.Player.duration)
         that.Controller.seek()
     }
     ChromecastJS.prototype.volume = function(percentage) {
         if (!that.Connected || !that.Player.canControlVolume) {
-            return TriggerEvent('error', 'ChromecastJS.changeSubtitle(): Not connected or can\'t control volume')
+            return TriggerEvent('error', '.volume(): Not connected or can\'t control volume')
         }
         that.Player.volumeLevel = percentage / 100
         that.Controller.setVolumeLevel()
     }
     ChromecastJS.prototype.playOrPause = function() {
         if (!that.Connected || !that.Player.canPause) {
-            return TriggerEvent('error', 'ChromecastJS.changeSubtitle(): Not connected or can\'t pause or play')
+            return TriggerEvent('error', '.playOrPause(): Not connected or can\'t pause or play')
         }
         that.Controller.playOrPause()
     }
     ChromecastJS.prototype.muteOrUnmute = function() {
         if (!that.Connected || !that.Player.canControlVolume) {
-            return TriggerEvent('error', 'ChromecastJS.changeSubtitle(): Not connected or can\'t control volume')
+            return TriggerEvent('error', '.muteOrUnmute(): Not connected or can\'t control volume')
         }
         that.Controller.muteOrUnmute()
     }
     ChromecastJS.prototype.changeSubtitle = function(index) {
         if (!that.Connected) {
-            return TriggerEvent('error', 'ChromecastJS.changeSubtitle(): Not connected')
+            return TriggerEvent('error', '.changeSubtitle(): Not connected')
         }
         var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([index])
         cast.framework.CastContext.getInstance().b.getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null)
