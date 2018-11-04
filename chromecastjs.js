@@ -89,6 +89,12 @@ var ChromecastJS = function(scope, reciever) {
         }
         var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([index])
         cast.framework.CastContext.getInstance().b.getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null)
+        for (var i = 0; i < that.Media.subtitles.length; i++) {
+            that.Media.subtitles[i].active = false
+            if (i === index) {
+                that.Media.subtitles[i].active = true
+            }
+        }
     }
     ChromecastJS.prototype.disconnect = function() {
         cast.framework.CastContext.getInstance().endCurrentSession()
@@ -186,11 +192,17 @@ var ChromecastJS = function(scope, reciever) {
                 for (var i = 0; i < that.Player.mediaInfo.tracks.length; i++) {
                     if (that.Player.mediaInfo.tracks[i].type === 'TEXT') {
                         that.Media.subtitles.push({
+                            active: false,
                             label: that.Player.mediaInfo.tracks[i].name,
                             srclang: that.Player.mediaInfo.tracks[i].language,
                             src: that.Player.mediaInfo.tracks[i].trackContentId
                         })
                     }
+                }
+                // Update the active subtitle
+                var activeTrackId = cast.framework.CastContext.getInstance().b.getSessionObj().media[0].activeTrackIds[0]
+                if (activeTrackId && typeof that.Media.subtitles[activeTrackId] !== 'undefined') {
+                    that.Media.subtitles[activeTrackId].active = true
                 }
                 TriggerEvent('media', that.Media)
             } else {
@@ -232,7 +244,6 @@ var ChromecastJS = function(scope, reciever) {
                         mediaInfo.metadata.subtitle = that.Media.description
                     }
                     var request = new chrome.cast.media.LoadRequest(mediaInfo)
-                    console.log(that.Media.time)
                     request.currentTime = that.Media.time
                     request.autoplay = !that.Media.paused
                     if (that.Media.subtitles.length > 0) {
