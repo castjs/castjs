@@ -43,7 +43,7 @@ var media = {
     time:        4.53,
     volume:      0.18,
     muted:       false,
-    paused:      false,
+    paused:      false
 }
 
 // Methods
