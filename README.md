@@ -47,13 +47,13 @@ var media = {
 }
 
 // Methods
-cc.cast(media) 		// Cast media object, only content is required
-cc.seek(25)           	// Seek media 'percentage'
-cc.changeSubtitle(1)  	// Change subtitle 'index'
-cc.volume(50)         	// Change volume 'percentage'
-cc.playOrPause()      	// Toggle play or pause
-cc.muteOrUnmute()	// Toggle mute or unmute
-cc.disconnect()	    	// End session
+cc.cast(media, (err) => {})     // Cast media object, only content is required
+cc.seek(25)           	        // Seek media 'percentage'
+cc.changeSubtitle(1)  	        // Change subtitle 'index'
+cc.volume(50)         	        // Change volume 'percentage'
+cc.playOrPause()      	        // Toggle play or pause
+cc.muteOrUnmute()	        // Toggle mute or unmute
+cc.disconnect()	    	        // End session
 
 // Variables
 cc.Available 		// Boolean, if cast extention is available
