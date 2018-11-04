@@ -7,10 +7,16 @@
 <title>ChromecastJS Demo</title>
 <link href="https://fonts.googleapis.com/css?family=Inconsolata:700" rel="stylesheet">
 <style>
+*, ::after, ::before {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
   body {
     font-family: 'Inconsolata', monospace;
     font-weight: 700;
     font-size: 16px;
+        margin: 0;
+    padding: 0;
   }
   textarea, input, button {
     font-family: 'Inconsolata', monospace;
@@ -51,6 +57,14 @@
   #controls.disconnected > button {
     cursor: not-allowed;
   }
+  .clear  {
+    clear: both;
+  }
+  @media only screen and (max-width : 880px) {
+    .wrap {
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
@@ -81,6 +95,7 @@
       Media:<textarea id="media" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
       Logs:<textarea id="logs" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     </div>
+    <div class="clear"></div>
   </div>
 
 
@@ -94,7 +109,7 @@ function log(msg) {
 var mediaInterval = null
 var cc = new ChromecastJS()
 cc.on('available', function() {
-  log('Available:\tChromecast found on network')
+  log('Available:\tCast framework available')
 })
 cc.on('connected', function() {
   log('Connected:\tWe have a session')
@@ -108,7 +123,7 @@ cc.on('media', function(media) {
   }, 1000)
 })
 cc.on('playOrPause', function(paused) {
-  log('Paused:\t\t' + paused)
+  log('Paused:\t\t' + paused.toString())
   if (paused) {
     document.getElementById('playOrPause').innerHTML = 'Play'
   } else {
@@ -116,7 +131,7 @@ cc.on('playOrPause', function(paused) {
   }
 })
 cc.on('muteOrUnmute', function(muted) {
-  log('Muted:\t\t' + muted)
+  log('Muted:\t\t' + muted.toString())
   if (muted) {
     document.getElementById('muteOrUnmute').innerHTML = 'Unmute'
   } else {
@@ -124,11 +139,11 @@ cc.on('muteOrUnmute', function(muted) {
   }
 })
 cc.on('volume', function(percentage) {
-  log('Volume:\t\t' + percentage)
+  log('Volume:\t\t' + percentage.toString())
   document.getElementById('volume').value = percentage
 })
 cc.on('state', function(state) {
-  log('State:\t\t' + state)
+  log('State:\t\t' + state.toString())
 })
 cc.on('time', function(time) {
   document.getElementById('seek').value = time.progress
