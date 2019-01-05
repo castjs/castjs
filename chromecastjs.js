@@ -1,10 +1,10 @@
 var ChromecastJS = function(scope, reciever) {
     // Load framework if not exist
-    if (typeof window.chrome !== 'undefined' && typeof window.chrome.cast === 'undefined') {
-        var castFramework = document.createElement('script');
-        castFramework.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
-        document.body.appendChild(castFramework)
-    }
+//     if (typeof window.chrome !== 'undefined' && typeof window.chrome.cast === 'undefined') {
+//         var castFramework = document.createElement('script');
+//         castFramework.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
+//         document.body.appendChild(castFramework)
+//     }
     // Define global object
     var that = this
     // Define object variables
