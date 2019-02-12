@@ -58,7 +58,7 @@ cc.playOrPause()      	        // Toggle play or pause
 cc.muteOrUnmute()	        // Toggle mute or unmute
 cc.disconnect()	    	        // End session
 
-// Variables
+// Object Variables
 cc.Available 		// Boolean, if cast extention is available
 cc.Connected 		// Boolean, if connected with receiver
 cc.Media 		// Media object
