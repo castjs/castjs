@@ -91,7 +91,7 @@ var ChromecastJS = function(scope, reciever) {
         }
     }
     ChromecastJS.prototype.disconnect = function() {
-        cast.framework.CastContext.getInstance().endCurrentSession()
+        cast.framework.CastContext.getInstance().endCurrentSession(true)
     }
     // Check if a chromecast is available, trigger 'Init' event
     var castInterval = setInterval(function() {
