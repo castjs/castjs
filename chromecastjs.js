@@ -1,5 +1,5 @@
 var ChromecastJS = function(scope, reciever) {
-    // Define global object
+    // Define global object 
     var that = this
     // Define object variables
     that.Scope = (scope) ? scope : 'tab_and_origin_scoped'
