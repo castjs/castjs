@@ -12,26 +12,19 @@ This wrapper provides simple events and methods to easily communicate with any c
 ```
 
 ```javascript
-// Optional arguments: scope, receiverID
+// Optional arguments: (joinpolicy, receiver)
 var cc = new ChromecastJS()
 
 // Events
-cc.on('available', () => {}) 
-// Casting is available
-cc.on('connected', () => {}) 
-// Connected with cast device
-cc.on('disconnected', () => {}) 
-// Disconnected from cast device
-cc.on('media', (media) => {}) 
-// Media successfully loaded, returns media object
-cc.on('ended', () => {}) 
-// Media ended
-cc.on('timeupdate', (obj) => {}) 
-// { progress: 45, time: '00:03:45', duration: '00:11:23' }
-cc.on('volumechange', (volume) => {}) 
-// Returns volume in percentage 0-100
-cc.on('error', () => {}) 
-// Returns string containing error message
+cc.on('available',    ()    => {}) // Cast device available
+cc.on('connected',    ()    => {}) // Connected
+cc.on('disconnected', ()    => {}) // Disconnected
+cc.on('state',        (str) => {}) // State changed
+cc.on('media',        (obj) => {}) // Media loaded
+cc.on('ended',        ()    => {}) // Media ended
+cc.on('timeupdate',   (obj) => {}) // Time updated
+cc.on('volumechange', (int) => {}) // Volume changed
+cc.on('error',        (str) => {}) // Error
 
 // Media object
 var media = {
@@ -40,46 +33,29 @@ var media = {
   title:       'Sintel',
   description: 'Sample video for chromecast',
   subtitles: [{
-      active:   true,
-      label:    'English',
-      srclang:  'en',
-      src:      'https://fenny.github.io/ChromecastJS/demo/english.vtt'
+      active: true,
+      label:  'English',
+      src:    'https://fenny.github.io/ChromecastJS/demo/english.vtt'
   }, {
-      label:    'Spanish',
-      srclang:  'es',
-      src:      'https://fenny.github.io/ChromecastJS/demo/spanish.vtt'
+      label:  'Spanish',
+      src:    'https://fenny.github.io/ChromecastJS/demo/spanish.vtt'
   }],
   muted:  false,
   paused: false
 }
 
 // Methods
-cc.duration() 
-// { progress: 45, time: '00:03:45', duration: '00:11:23' }
-cc.seek(perecentage) 
-// seek to 0-100 perecentage
-cc.state() 
-// Returns state of media
-cc.pause() 
-// Pauses media
-cc.paused() 
-// Returns boolean (true / false)
-cc.play() 
-// Plays media
-cc.muted() 
-// Returns if media is muted
-cc.muted(true) 
-// If boolean, mute or unmute media
-cc.volume() 
-// Returns volume in percentage
-cc.volume(30) 
-// Change volume to 30%
-cc.subtitles()
-// Returns array of loaded subtitles
-cc.subtitles(1)
-// Changes the active subtitle index on the chromecast 
-cc.disconnect() 
-// Destroy session
+cc.duration()   // Returns Object with time information
+cc.seek(50)     // Seeks to input percentage (0-100)
+cc.state()      // Returns String state of media
+cc.pause()      // Pauses Medi
+cc.paused()     // Returns Boolean
+cc.play()       // Plays media
+cc.muted()      // Returns Boolean
+cc.muted(true)  // Boolean Mutes or Unmutes media
+cc.volume()     // Returns volume percentage (0-100)
+cc.volume(30)   // Change volume percentage (0-100)
+cc.disconnect() // Disconnect and destroy session
 ```
 
 # Bugs, ideas or notes, don't hesitate to open an issue and help us to improve this library!
