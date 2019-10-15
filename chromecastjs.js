@@ -140,7 +140,7 @@ var ChromecastJS = function(scope, receiver) {
           }
         }
         self.Session.loadMedia(request).then(function() {
-          Trigger('loaded', self.Media)
+          Trigger('media', self.Media)
         }, function(e) {
           Trigger('error', 'ChromecastJS.cast():', e)
         })
