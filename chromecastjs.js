@@ -54,98 +54,100 @@ var ChromecastJS = function(scope, receiver) {
   }
   // Controller handlers
   function isConnectedChanged() {
-    if (!self.Player.isConnected) {
-      self.Connected = false
-      return
-    }
-    self.Connected = true
-    Trigger('connected')
-    if (self.Player.isMediaLoaded && self.Player.playerState) {
-      self.Media = {
-        content: self.Player.mediaInfo.contentId,
-        poster: self.Player.imageUrl || null,
-        title: self.Player.title || null,
-        description: self.Player.mediaInfo.metadata.subtitle || null,
-        subtitles: [],
-        progress: self.Controller.getSeekPosition(self.Player.currentTime, self.Player.duration),
-        time: self.Controller.getFormattedTime(self.Player.currentTime),
-        duration: self.Controller.getFormattedTime(self.Player.duration),
-        volume: self.Player.volumeLevel,
-        muted: self.Player.isMuted,
-        state: self.Player.playerState
+    setTimeout(function() {
+      if (!self.Player.isConnected) {
+        self.Connected = false
+        return
       }
-      // Format loaded subtitles
-      for (var i = 0; i < self.Player.mediaInfo.tracks.length; i++) {
-        if (self.Player.mediaInfo.tracks[i].type === 'TEXT') {
-          self.Media.subtitles.push({
-            active: false,
-            label: self.Player.mediaInfo.tracks[i].name,
-            srclang: self.Player.mediaInfo.tracks[i].language,
-            src: self.Player.mediaInfo.tracks[i].trackContentId
+      self.Connected = true
+      Trigger('connected')
+      if (self.Player.isMediaLoaded && self.Player.playerState) {
+        self.Media = {
+          content: self.Player.mediaInfo.contentId,
+          poster: self.Player.imageUrl || null,
+          title: self.Player.title || null,
+          description: self.Player.mediaInfo.metadata.subtitle || null,
+          subtitles: [],
+          progress: self.Controller.getSeekPosition(self.Player.currentTime, self.Player.duration),
+          time: self.Controller.getFormattedTime(self.Player.currentTime),
+          duration: self.Controller.getFormattedTime(self.Player.duration),
+          volume: self.Player.volumeLevel,
+          muted: self.Player.isMuted,
+          state: self.Player.playerState
+        }
+        // Format loaded subtitles
+        for (var i = 0; i < self.Player.mediaInfo.tracks.length; i++) {
+          if (self.Player.mediaInfo.tracks[i].type === 'TEXT') {
+            self.Media.subtitles.push({
+              active: false,
+              label: self.Player.mediaInfo.tracks[i].name,
+              srclang: self.Player.mediaInfo.tracks[i].language,
+              src: self.Player.mediaInfo.tracks[i].trackContentId
+            })
+          }
+        }
+        // Update the active subtitle
+        var activeTrackId = cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].activeTrackIds[0]
+        if (activeTrackId && self.Media.subtitles[activeTrackId]) {
+          self.Media.subtitles[activeTrackId].active = true
+        }
+        Trigger('media', self.Media)
+      } else {
+        self.Session = cast.framework.CastContext.getInstance().getCurrentSession()
+        if (self.Session && self.Media.content) {
+          var mediaInfo = new chrome.cast.media.MediaInfo(self.Media.content)
+          //mediaInfo.contentType = 'video/mp4' ??
+          mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata()
+          // The sexy subtitle support function <3
+          if (self.Media.subtitles.length) {
+            mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle()
+            mediaInfo.textTrackStyle.fontFamily = 'Arial'
+            mediaInfo.textTrackStyle.foregroundColor = '#FFFFFF'
+            mediaInfo.textTrackStyle.backgroundColor = '#00000000'
+            mediaInfo.textTrackStyle.fontScale = '1.1'
+            mediaInfo.textTrackStyle.edgeColor = '#00000099'
+            mediaInfo.textTrackStyle.edgeType = chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
+            var tracks = [];
+            for (var i = 0; i < self.Media.subtitles.length; i++) {
+              var track = new chrome.cast.media.Track(i, chrome.cast.media.TrackType.TEXT)
+              track.trackContentId = self.Media.subtitles[i].src
+              track.trackContentType = 'text/vtt'
+              track.subtype = chrome.cast.media.TextTrackType.CAPTIONS
+              track.name = self.Media.subtitles[i].label
+              track.language = self.Media.subtitles[i].srclang
+              tracks.push(track);
+            }
+            mediaInfo.tracks = tracks
+          }
+          if (self.Media.poster) {
+            mediaInfo.metadata.images = [{
+              'url': self.Media.poster
+            }]
+          }
+          if (self.Media.title) {
+            mediaInfo.metadata.title = self.Media.title
+          }
+          if (self.Media.description) {
+            mediaInfo.metadata.subtitle = self.Media.description
+          }
+          var request = new chrome.cast.media.LoadRequest(mediaInfo)
+          request.currentTime = self.Media.time
+          request.autoplay = !self.Media.paused
+          if (self.Media.subtitles.length > 0) {
+            for (var i = 0; i < self.Media.subtitles.length; i++) {
+              if (self.Media.subtitles[i] && self.Media.subtitles[i].active) {
+                request.activeTrackIds = [i]
+              }
+            }
+          }
+          self.Session.loadMedia(request).then(function() {
+            Trigger('media', self.Media)
+          }, function(e) {
+            Trigger('error', 'ChromecastJS.cast():', e)
           })
         }
       }
-      // Update the active subtitle
-      var activeTrackId = cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].activeTrackIds[0]
-      if (activeTrackId && self.Media.subtitles[activeTrackId]) {
-        self.Media.subtitles[activeTrackId].active = true
-      }
-      Trigger('media', self.Media)
-    } else {
-      self.Session = cast.framework.CastContext.getInstance().getCurrentSession()
-      if (self.Session && self.Media.content) {
-        var mediaInfo = new chrome.cast.media.MediaInfo(self.Media.content)
-        //mediaInfo.contentType = 'video/mp4' ??
-        mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata()
-        // The sexy subtitle support function <3
-        if (self.Media.subtitles.length) {
-          mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle()
-          mediaInfo.textTrackStyle.fontFamily = 'Arial'
-          mediaInfo.textTrackStyle.foregroundColor = '#FFFFFF'
-          mediaInfo.textTrackStyle.backgroundColor = '#00000000'
-          mediaInfo.textTrackStyle.fontScale = '1.1'
-          mediaInfo.textTrackStyle.edgeColor = '#00000099'
-          mediaInfo.textTrackStyle.edgeType = chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
-          var tracks = [];
-          for (var i = 0; i < self.Media.subtitles.length; i++) {
-            var track = new chrome.cast.media.Track(i, chrome.cast.media.TrackType.TEXT)
-            track.trackContentId = self.Media.subtitles[i].src
-            track.trackContentType = 'text/vtt'
-            track.subtype = chrome.cast.media.TextTrackType.CAPTIONS
-            track.name = self.Media.subtitles[i].label
-            track.language = self.Media.subtitles[i].srclang
-            tracks.push(track);
-          }
-          mediaInfo.tracks = tracks
-        }
-        if (self.Media.poster) {
-          mediaInfo.metadata.images = [{
-            'url': self.Media.poster
-          }]
-        }
-        if (self.Media.title) {
-          mediaInfo.metadata.title = self.Media.title
-        }
-        if (self.Media.description) {
-          mediaInfo.metadata.subtitle = self.Media.description
-        }
-        var request = new chrome.cast.media.LoadRequest(mediaInfo)
-        request.currentTime = self.Media.time
-        request.autoplay = !self.Media.paused
-        if (self.Media.subtitles.length > 0) {
-          for (var i = 0; i < self.Media.subtitles.length; i++) {
-            if (self.Media.subtitles[i] && self.Media.subtitles[i].active) {
-              request.activeTrackIds = [i]
-            }
-          }
-        }
-        self.Session.loadMedia(request).then(function() {
-          Trigger('media', self.Media)
-        }, function(e) {
-          Trigger('error', 'ChromecastJS.cast():', e)
-        })
-      }
-    }
+    }, 0)
   }
   function currentTimeChanged() {
     self.Media.progress = self.Controller.getSeekPosition(self.Player.currentTime, self.Player.duration)
