@@ -74,6 +74,10 @@ cc.volume()
 // Returns volume in percentage
 cc.volume(30) 
 // Change volume to 30%
+cc.subtitles()
+// Returns array of loaded subtitles
+cc.subtitles(1)
+// Changes the active subtitle index on the chromecast 
 cc.disconnect() 
 // Destroy session
 ```
