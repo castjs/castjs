@@ -45,6 +45,7 @@ var media = {
 }
 
 // Methods
+cc.cast(media)  // Cast media object
 cc.duration()   // Returns Object with time information
 cc.seek(50)     // Seeks to input percentage (0-100)
 cc.state()      // Returns String state of media
