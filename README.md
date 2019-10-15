@@ -12,67 +12,70 @@ This wrapper provides simple events and functions to communicate easily with any
 ```
 
 ```javascript
-// optional arguments: scope, receiverID
+// Optional arguments: scope, receiverID
 var cc = new ChromecastJS()
 
 // Events
-cc.on('available')      =>  		// cast extention is available
-cc.on('connected')      => 		// connected to receiver
-cc.on('media')          => obj 	        // media changed 
-cc.on('playOrPause')    => boolean      // playing or paused
-cc.on('muteOrUnmute')   => boolean      // mute or unmuted
-cc.on('volume')         => string	// volume changed
-cc.on('state')          => string	// playerstate changed
-cc.on('time')           => obj	        // time changed { progress: 45, time: '00:03:45', duration: '00:11:23' }
-cc.on('disconnect')     => 		// disconnected
-cc.on('error')          => err	        // catch any error
+cc.on('available', () => {}) 
+// Casting is available
+cc.on('connected', () => {}) 
+// Connected with cast device
+cc.on('disconnected', () => {}) 
+// Disconnected from cast device
+cc.on('media', (media) => {}) 
+// Media successfully loaded, returns media object
+cc.on('ended', () => {}) 
+// Media ended
+cc.on('timeupdate', (obj) => {}) 
+// { progress: 45, time: '00:03:45', duration: '00:11:23' }
+cc.on('volumechange', (volume) => {}) 
+// Returns volume in percentage 0-100
+cc.on('error', () => {}) 
+// Returns string containing error message
 
-// Cast object
+// Media object
 var media = {
-    content:     'http://127.0.0.1/video.mp4',
-    poster:      'http://127.0.0.1/poster.jpg',
-    title:       'Video Title',
-    description: 'Me playing with the dog',
-    subtitles: [{
-        active: true,
-        label: 'English',
-        srclang: 'gb',
-        src: 'http://127.0.0.1/gb.vtt'
-    }, {
-        label: 'French',
-        srclang: 'fr',
-        src: 'http://127.0.0.1/fr.vtt'
-    }],
-    time:        4.53,
-    volume:      0.18,
-    muted:       false,
-    paused:      false
+  content:     'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+  poster:      'https://fenny.github.io/ChromecastJS/demo/poster.png',
+  title:       'Sintel',
+  description: 'Sample video for chromecast',
+  subtitles: [{
+      active:   true,
+      label:    'English',
+      srclang:  'en',
+      src:      'https://fenny.github.io/ChromecastJS/demo/english.vtt'
+  }, {
+      label:    'Spanish',
+      srclang:  'es',
+      src:      'https://fenny.github.io/ChromecastJS/demo/spanish.vtt'
+  }],
+  muted:  false,
+  paused: false
 }
 
 // Methods
-cc.cast(media, (err) => {})     // Cast media object, only content is required
-cc.seek(25)           	        // Seek media 'percentage'
-cc.changeSubtitle(1)  	        // Change subtitle 'index'
-cc.volume(50)         	        // Change volume 'percentage'
-cc.playOrPause()      	        // Toggle play or pause
-cc.muteOrUnmute()	        // Toggle mute or unmute
-cc.disconnect()	    	        // End session
-
-// Object Variables
-cc.Available 		// Boolean, if cast extention is available
-cc.Connected 		// Boolean, if connected with receiver
-cc.Media 		// Media object
-cc.Media.content  	// String, content url
-cc.Media.poster  	// String, poster url
-cc.Media.title  	// String, title
-cc.Media.description    // String, description
-cc.Media.subtitles  	// Array, of subtitles
-cc.Media.time  		// Float, current time
-cc.Media.duration  	// Float, duration
-cc.Media.volume  	// Float, volume
-cc.Media.muted  	// Boolean, muted
-cc.Media.paused 	// Boolean, paused
-cc.Media.state  	// String, state of player
+cc.duration() 
+// { progress: 45, time: '00:03:45', duration: '00:11:23' }
+cc.seek(perecentage) 
+// seek to 0-100 perecentage
+cc.state() 
+// Returns state of media
+cc.pause() 
+// Pauses media
+cc.paused() 
+// Returns boolean (true / false)
+cc.play() 
+// Plays media
+cc.muted() 
+// Returns if media is muted
+cc.muted(true) 
+// If boolean, mute or unmute media
+cc.volume() 
+// Returns volume in percentage
+cc.volume(30) 
+// Change volume to 30%
+cc.disconnect() 
+// Destroy session
 ```
 
 # Help us to improve this library and make it a solid wrapper, I respond to issues or pull request within 1 hour!
