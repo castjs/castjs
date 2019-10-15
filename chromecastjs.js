@@ -151,12 +151,13 @@ var ChromecastJS = function(scope, receiver) {
     self.Media.progress = self.Controller.getSeekPosition(self.Player.currentTime, self.Player.duration)
     self.Media.time = self.Controller.getFormattedTime(self.Player.currentTime)
     self.Media.duration = self.Controller.getFormattedTime(self.Player.duration)
-    Trigger('time', {
+    Trigger('timeupdate', {
       progress: self.Media.progress,
       time: self.Media.time,
       duration: self.Media.duration
     })
     if (self.Media.progress >= 100) {
+      Trigger('ended')
       self.disconnect()
     }
   }
@@ -165,7 +166,7 @@ var ChromecastJS = function(scope, receiver) {
   }
   function volumeLevelChanged() {
     self.Media.volume = Math.round(self.Player.volumeLevel * 100)
-    Trigger('volume', self.Media.volume)
+    Trigger('volumechange', self.Media.volume)
   }
   function isMutedChanged() {
     self.Media.muted = self.Player.isMuted
