@@ -1,6 +1,6 @@
 var ChromecastJS = function(scope, receiver) {
   var self = this;
-  self.Scope = scope ? scope : 'tab_and_origin_scoped';
+  self.Scope = scope ? scope : 'origin_scoped';
   self.Receiver = receiver ? receiver : 'CC1AD845';
   self.Events = [];
   self.Available = false;
@@ -79,7 +79,6 @@ var ChromecastJS = function(scope, receiver) {
         for (var i = 0; i < self.Player.mediaInfo.tracks.length; i++) {
           if (self.Player.mediaInfo.tracks[i].type === 'TEXT') {
             self.Media.subtitles.push({
-              active: false,
               label: self.Player.mediaInfo.tracks[i].name,
               srclang: self.Player.mediaInfo.tracks[i].language,
               src: self.Player.mediaInfo.tracks[i].trackContentId
@@ -88,7 +87,7 @@ var ChromecastJS = function(scope, receiver) {
         }
         // Update the active subtitle
         var activeTrackId = cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].activeTrackIds[0]
-        if (activeTrackId && self.Media.subtitles[activeTrackId]) {
+        if (typeof activeTrackId !== 'undefined' && self.Media.subtitles[activeTrackId]) {
           self.Media.subtitles[activeTrackId].active = true
         }
         Trigger('media', self.Media)
@@ -189,11 +188,8 @@ var ChromecastJS = function(scope, receiver) {
   ChromecastJS.prototype.on = function(event, callback) {
     self.Events[event] = callback
   }
-  ChromecastJS.prototype.cast = function(media, callback) {
+  ChromecastJS.prototype.cast = function(media) {
     if (!media || !media.content) {
-      if (callback) {
-        callback('No media content specified.')
-      }
       return Trigger('error', 'No media content specified.')
     }
     for (var key in media) {
@@ -201,16 +197,7 @@ var ChromecastJS = function(scope, receiver) {
         self.Media[key] = media[key]
       }
     }
-    cast.framework.CastContext.getInstance().requestSession().then(function() {
-      if (callback) {
-        callback(null)
-      }
-    }, function(err) {
-      if (callback) {
-        callback(err)
-      }
-      Trigger('error', err)
-    })
+    cast.framework.CastContext.getInstance().requestSession()
   }
   ChromecastJS.prototype.state = function() {
     return self.Media.state
@@ -266,7 +253,7 @@ var ChromecastJS = function(scope, receiver) {
     var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([index])
     cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null)
     for (var i = 0; i < self.Media.subtitles.length; i++) {
-      self.Media.subtitles[i].active = false
+      delete self.Media.subtitles[i].active
       if (i === index) {
         self.Media.subtitles[i].active = true
       }
