@@ -82,4 +82,4 @@ cc.disconnect()
 // Destroy session
 ```
 
-# Help us to improve this library and make it a solid wrapper, I respond to issues or pull request within 1 hour!
+# Bugs, ideas or notes, don't hesitate to open an issue and help us to improve this library!
