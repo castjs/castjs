@@ -1,6 +1,6 @@
-var ChromecastJS = function(scope, receiver) {
+var ChromecastJS = function(joinpolicy, receiver) {
   var self = this;
-  self.Scope = scope ? scope : 'origin_scoped';
+  self.JoinPolicy = joinpolicy ? joinpolicy : 'origin_scoped';
   self.Receiver = receiver ? receiver : 'CC1AD845';
   self.Events = [];
   self.Available = false;
@@ -38,7 +38,7 @@ var ChromecastJS = function(scope, receiver) {
   function Init() {
     cast.framework.CastContext.getInstance().setOptions({
       receiverApplicationId: self.Receiver,
-      autoJoinPolicy: self.Scope
+      autoJoinPolicy: self.JoinPolicy
     });
     self.Player = new cast.framework.RemotePlayer();
     self.Controller = new cast.framework.RemotePlayerController(self.Player);
@@ -80,7 +80,7 @@ var ChromecastJS = function(scope, receiver) {
           if (self.Player.mediaInfo.tracks[i].type === 'TEXT') {
             self.Media.subtitles.push({
               label: self.Player.mediaInfo.tracks[i].name,
-              srclang: self.Player.mediaInfo.tracks[i].language,
+              // srclang: self.Player.mediaInfo.tracks[i].language,
               src: self.Player.mediaInfo.tracks[i].trackContentId
             })
           }
@@ -113,7 +113,7 @@ var ChromecastJS = function(scope, receiver) {
               track.trackContentType = 'text/vtt'
               track.subtype = chrome.cast.media.TextTrackType.CAPTIONS
               track.name = self.Media.subtitles[i].label
-              track.language = self.Media.subtitles[i].srclang
+              // track.language = self.Media.subtitles[i].srclang
               tracks.push(track);
             }
             mediaInfo.tracks = tracks
