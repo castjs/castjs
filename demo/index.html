@@ -5,22 +5,22 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ChromecastJS Demo</title>
-<link href="https://fonts.googleapis.com/css?family=Inconsolata:700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700&display=swap" rel="stylesheet">
 <style>
 *, ::after, ::before {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
-  body {
-    font-family: 'Inconsolata', monospace;
-    font-weight: 700;
-    font-size: 16px;
-        margin: 0;
-    padding: 0;
-  }
+body {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+}
   textarea, input, button {
-    font-family: 'Inconsolata', monospace;
-    font-weight: 700;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 400;
   }
   textarea {
     height: 174px;
@@ -43,6 +43,7 @@
     width: 400px;
     float: left;
     padding: 15px;
+    font-weight: 700;
   }
   #logs {
     color: #ff7b00;
@@ -74,9 +75,9 @@
     <a style="display: block;text-align: center;margin-top: 0px;" href="https://github.com/Fenny/ChromecastJS">https://github.com/Fenny/ChromecastJS</a>
     <div class="wrap">
       Content:<input id="content" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"><br>
-      Poster:<input id="poster" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/poster.png"><br>
-      Title:<input id="title" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Video Title"><br>
-      Description:<input id="description" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Video Description"><br>
+      Poster:<input id="poster" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/poster.jpg"><br>
+      Title:<input id="title" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Sintel"><br>
+      Description:<input id="description" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Demo movie for chromecast"><br>
       Subtitle 1:<input id="subtitle1" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/english.vtt"><br>
       Subtitle 2:<input id="subtitle2" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/spanish.vtt"><br><br>
       <button id="cast">Cast Media to Chromecast</button>
@@ -112,23 +113,16 @@ cc.on('available', function() {
   log('Available:\tCast framework available')
 })
 cc.on('connected', function() {
+  console.log(cc.media())
   log('Connected:\tWe have a session')
+  document.getElementById('controls').classList.remove('disconnected')
 })
 cc.on('media', function(media) {
   log('Media:\t\tNew media detected')
-  document.getElementById('controls').classList.remove('disconnected')
   document.getElementById('media').value = JSON.stringify(media, undefined, 4);
   mediaInterval = setInterval(function() {
     document.getElementById('media').value = JSON.stringify(cc.Media, undefined, 4);
   }, 1000)
-})
-cc.on('playOrPause', function(paused) {
-  log('Paused:\t\t' + paused.toString())
-  if (paused) {
-    document.getElementById('playOrPause').innerHTML = 'Play'
-  } else {
-    document.getElementById('playOrPause').innerHTML = 'Pause'
-  }
 })
 cc.on('muteOrUnmute', function(muted) {
   log('Muted:\t\t' + muted.toString())
@@ -138,14 +132,14 @@ cc.on('muteOrUnmute', function(muted) {
     document.getElementById('muteOrUnmute').innerHTML = 'Mute'
   }
 })
-cc.on('volume', function(percentage) {
+cc.on('volumechange', function(percentage) {
   log('Volume:\t\t' + percentage.toString())
   document.getElementById('volume').value = percentage
 })
-cc.on('state', function(state) {
-  log('State:\t\t' + state.toString())
-})
-cc.on('time', function(time) {
+// cc.on('state', function(state) {
+//   log('State:\t\t' + state.toString())
+// })
+cc.on('timeupdate', function(time) {
   document.getElementById('seek').value = time.progress
 })
 cc.on('disconnect', function() {
@@ -160,25 +154,37 @@ document.getElementById('playOrPause').addEventListener('click', function() {
   if (this.parentNode.classList.value == 'disconnected') {
     return false
   }
-  cc.playOrPause()
+  if (document.getElementById('playOrPause').innerHTML == 'Pause') {
+    document.getElementById('playOrPause').innerHTML = 'Play'
+    cc.pause()
+  } else if (document.getElementById('playOrPause').innerHTML == 'Play') {
+    document.getElementById('playOrPause').innerHTML = 'Pause'
+    cc.play()
+  }
 })
 document.getElementById('muteOrUnmute').addEventListener('click', function() {
   if (this.parentNode.classList.value == 'disconnected') {
     return false
   }
-  cc.muteOrUnmute()
+  if (document.getElementById('muteOrUnmute').innerHTML == 'Mute') {
+    document.getElementById('muteOrUnmute').innerHTML = 'Unmute'
+    cc.muted(true)
+  } else if (document.getElementById('muteOrUnmute').innerHTML == 'Unmute') {
+    document.getElementById('muteOrUnmute').innerHTML = 'Mute'
+    cc.muted(false)
+  }
 })
 document.getElementById('useSubtitle1').addEventListener('click', function() {
   if (this.parentNode.classList.value == 'disconnected') {
     return false
   }
-  cc.changeSubtitle(0)
+  cc.substitles(0)
 })
 document.getElementById('useSubtitle2').addEventListener('click', function() {
   if (this.parentNode.classList.value == 'disconnected') {
     return false
   }
-  cc.changeSubtitle(1)
+  cc.substitles(1)
 })
 document.getElementById('disconnect').addEventListener('click', function() {
   cc.disconnect()
@@ -200,6 +206,7 @@ document.getElementById('volume').addEventListener('click', function(e) {
   var x = e.pageX - this.offsetLeft,
       y = e.pageY - this.offsetTop,
       clickedValue = x * this.max / this.offsetWidth;
+  clickedValue = Math.round(clickedValue)
   cc.volume(clickedValue)
 })
 document.getElementById('cast').addEventListener('click', function() {
