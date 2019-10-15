@@ -49,7 +49,7 @@ cc.cast(media)  // Cast media object
 cc.duration()   // Returns Object with time information
 cc.seek(50)     // Seeks to input percentage (0-100)
 cc.state()      // Returns String state of media
-cc.pause()      // Pauses Medi
+cc.pause()      // Pauses media
 cc.paused()     // Returns Boolean
 cc.play()       // Plays media
 cc.muted()      // Returns Boolean
