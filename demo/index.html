@@ -211,7 +211,9 @@ document.getElementById('volume').addEventListener('click', function(e) {
   cc.volume(clickedValue)
 })
 document.getElementById('cast').addEventListener('click', function() {
-  cc.Receiver = document.getElementById('receiverid').value || cc.Receiver;
+   if (document.getElementById('receiverid').value) {
+      cc = new ChromecastJS('origin_scoped', document.getElementById('receiverid').value)
+   }
   var media = {
     content:      document.getElementById('content').value || null,
     poster:       document.getElementById('poster').value || null,
