@@ -74,6 +74,7 @@ body {
     <p style="text-align: center;margin-top: 0px;">Make sure that all sources have CORS enabled!</p>
     <a style="display: block;text-align: center;margin-top: 0px;" href="https://github.com/Fenny/ChromecastJS">https://github.com/Fenny/ChromecastJS</a>
     <div class="wrap">
+      Receiver ID (Optional):<input id="receiverid" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value=""><br>
       Content:<input id="content" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"><br>
       Poster:<input id="poster" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/poster.jpg"><br>
       Title:<input id="title" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Sintel"><br>
@@ -210,6 +211,7 @@ document.getElementById('volume').addEventListener('click', function(e) {
   cc.volume(clickedValue)
 })
 document.getElementById('cast').addEventListener('click', function() {
+  cc.Receiver = document.getElementById('receiverid').value || cc.Receiver;
   var media = {
     content:      document.getElementById('content').value || null,
     poster:       document.getElementById('poster').value || null,
