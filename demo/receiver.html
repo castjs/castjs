@@ -28,6 +28,18 @@
   <!-- <cast-media-player></cast-media-player> -->
   <script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
   <script type="text/javascript">
+    // To run this receiver local supporting https I use the following node commands:
+    
+    // http-server -c-1 -p 8080 --cors
+    // ngrok http 8080
+    
+    // Then you copy the ngrok url and save it inside your application settings:
+    // https://cast.google.com/publish/#/overview
+    // https://i.imgur.com/nAXFYYO.png
+
+    // If the serviceworker works you will see something like this:
+    // https://i.imgur.com/3GUfKHL.png
+    
     // Logging function
     function log(msg) {
       document.getElementById('logs').innerHTML += msg + '<br>'
