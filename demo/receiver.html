@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+  <meta charset="UTF-8">
+  <title>Demo Receiver</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      background: black;
+      height: 100%;
+    }
+    #logs {
+      display: block;
+      margin: 0 auto;
+      background: white;
+      color: black;
+      height: 100%;
+      width: 100%;
+      font-size: 14px;
+      font-family: 'consolas'
+    }
+  </style>
+</head>
+<body>
+  <div id="logs"></div>
+  <!-- <cast-media-player></cast-media-player> -->
+  <script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+  <script type="text/javascript">
+    // Logging function
+    function log(msg) {
+      document.getElementById('logs').innerHTML += msg + '<br>'
+    }
+    // Start the receiver context
+    log('Starting CastReceiverContext')
+    var ctx = cast.framework.CastReceiverContext.getInstance();
+    ctx.start()
+    // Check if serviceWorkers are supported
+    if ('serviceWorker' in navigator) {
+      log('serviceWorker found in navigator')
+      // Wait for window load event
+      window.addEventListener('load', () => {
+        // Register a service worker
+        log('Registering serviceWorker')
+        navigator.serviceWorker.register('sw.js', { scope: './' }).then((registration) => {
+          // Success
+          log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch((err) => {
+          // Error
+          log('ServiceWorker registration failed: ', err);
+        });
+      })
+    }
+    // Attempt to catch any other errors
+    window.onerror = (message, file, line, col, error) => {
+       log(error.message);
+       return false;
+    };
+    window.addEventListener('error', (e) => {
+       log(e.error.message);
+       return false;
+    })
+    window.addEventListener('unhandledrejection', function (e) {
+      log(e.reason.message);
+    })
+  </script>
+</body>
+</html>
