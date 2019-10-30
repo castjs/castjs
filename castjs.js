@@ -1,4 +1,8 @@
 function CastJS (options = {}) {
+  if (!(this instanceof CastJS)) {
+    console.warn('don\'t invoke CastJS without \'new\'')
+    return new CastJS(options)
+  }
   var self        = this;
   self.receiver   = options.receiver    || 'CC1AD845';
   self.joinpolicy = options.joinpolicy  || 'origin_scoped';
