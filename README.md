@@ -1,14 +1,14 @@
-# ChromecastJS
+# CastJS
 
 <img src="https://i.imgur.com/uI4i1m5.png" align="right"
      title="Chromecast Javascript Wrapper" width="300" height="100">
-DEMO: https://fenny.github.io/ChromecastJS/demo/index.html<br>
+DEMO: https://fenny.github.io/CastJS/demo/index.html<br>
 ChromecastJS is a simple javascript wrapper arround the complex chromecast SDK. (6.21 KB minified)!
 This wrapper provides simple events and methods to easily communicate with any cast device.
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://fenny.github.io/ChromecastJS/chromecastjs.min.js"></script>
+<script src="https://fenny.github.io/CastJS/chromecastjs.min.js"></script>
 ```
 
 ```javascript
@@ -29,16 +29,16 @@ cc.on('error',        (str) => {}) // Error
 // Media object
 var media = {
   content:     'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-  poster:      'https://fenny.github.io/ChromecastJS/demo/poster.png',
+  poster:      'https://fenny.github.io/CastJS/demo/poster.png',
   title:       'Sintel',
   description: 'Sample video for chromecast',
   subtitles: [{
       active: true,
       label:  'English',
-      src:    'https://fenny.github.io/ChromecastJS/demo/english.vtt'
+      src:    'https://fenny.github.io/CastJS/demo/english.vtt'
   }, {
       label:  'Spanish',
-      src:    'https://fenny.github.io/ChromecastJS/demo/spanish.vtt'
+      src:    'https://fenny.github.io/CastJS/demo/spanish.vtt'
   }],
   muted:  false,
   paused: false
