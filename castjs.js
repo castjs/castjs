@@ -12,7 +12,6 @@ function Castjs (options = {}) {
   self.player     = null;
   self.controller = null;
   self.session    = null;
-  self.media      = null;
   self.template   = {
     src:          null,
     poster:       null,
@@ -186,7 +185,6 @@ function Castjs (options = {}) {
         if (self.media.description) {
           mediaInfo.metadata.subtitle = self.media.description
         }
-        console.log(mediaInfo)
         var request         = new chrome.cast.media.LoadRequest(mediaInfo)
         request.currentTime = self.media.time
         request.autoplay    = !self.media.paused
@@ -210,7 +208,7 @@ function Castjs (options = {}) {
   Castjs.prototype.state = function() {
     return self.media.state
   }
-  Castjs.prototype.media = function() {
+  Castjs.prototype.mediainfo = function() {
     return self.media
   }
   Castjs.prototype.time = function(percentage) {
