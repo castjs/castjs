@@ -1,5 +1,4 @@
-## 📺 CastJS
-Javascript Library for the Chromecast Sender
+## 📺 CastJS #### Javascript Library for the Chromecast Sender
 
 <img src="https://i.imgur.com/uI4i1m5.png" align="right"
      title="Chromecast Javascript Wrapper" width="300" height="100">
