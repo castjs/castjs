@@ -1,4 +1,4 @@
-var ChromecastJS = function(joinpolicy, receiver) {
+var CastJS = function(joinpolicy, receiver) {
   var self = this;
   self.JoinPolicy = joinpolicy ? joinpolicy : 'origin_scoped';
   self.Receiver = receiver ? receiver : 'CC1AD845';
@@ -142,7 +142,7 @@ var ChromecastJS = function(joinpolicy, receiver) {
           self.Session.loadMedia(request).then(function() {
             Trigger('media', self.Media)
           }, function(e) {
-            Trigger('error', 'ChromecastJS.cast():', e)
+            Trigger('error', 'CastJS.cast():', e)
           })
         }
       }
@@ -185,10 +185,10 @@ var ChromecastJS = function(joinpolicy, receiver) {
     Trigger('state', self.Media.state);
   }
   // external handlers
-  ChromecastJS.prototype.on = function(event, callback) {
+  CastJS.prototype.on = function(event, callback) {
     self.Events[event] = callback
   }
-  ChromecastJS.prototype.cast = function(media) {
+  CastJS.prototype.cast = function(media) {
     if (!media || !media.content) {
       return Trigger('error', 'No media content specified.')
     }
@@ -199,44 +199,44 @@ var ChromecastJS = function(joinpolicy, receiver) {
     }
     cast.framework.CastContext.getInstance().requestSession()
   }
-  ChromecastJS.prototype.state = function() {
+  CastJS.prototype.state = function() {
     return self.Media.state
   }
-  ChromecastJS.prototype.media = function() {
+  CastJS.prototype.media = function() {
     return self.Media
   }
-  ChromecastJS.prototype.duration = function(percentage) {
+  CastJS.prototype.duration = function(percentage) {
     return {
       progress: self.Media.progress,
       time: self.Media.time,
       duration: self.Media.duration
     }
   }
-  ChromecastJS.prototype.seek = function(percentage) {
+  CastJS.prototype.seek = function(percentage) {
     self.Player.currentTime = self.Controller.getSeekTime(percentage, self.Player.duration)
     self.Controller.seek()
   }
-  ChromecastJS.prototype.volume = function(percentage) {
+  CastJS.prototype.volume = function(percentage) {
     if (typeof percentage === 'undefined') {
       return Math.round(self.Player.volumeLevel * 100)
     }
     self.Player.volumeLevel = percentage / 100
     self.Controller.setVolumeLevel()
   }
-  ChromecastJS.prototype.play = function() {
+  CastJS.prototype.play = function() {
     if (self.Player.isPaused) {
       self.Controller.playOrPause()
     }
   }
-  ChromecastJS.prototype.pause = function() {
+  CastJS.prototype.pause = function() {
     if (!self.Player.isPaused) {
       self.Controller.playOrPause()
     }
   }
-  ChromecastJS.prototype.paused = function() {
+  CastJS.prototype.paused = function() {
     return self.Player.isPaused
   }
-  ChromecastJS.prototype.muted = function(boolean) {
+  CastJS.prototype.muted = function(boolean) {
     if (typeof boolean === 'undefined') {
       return cc.Player.isMuted
     }
@@ -246,7 +246,7 @@ var ChromecastJS = function(joinpolicy, receiver) {
       self.Controller.muteOrUnmute()
     }
   }
-  ChromecastJS.prototype.subtitles = function(index) {
+  CastJS.prototype.subtitles = function(index) {
     if (typeof index === 'undefined') {
       return self.Media.subtitles
     }
@@ -259,7 +259,7 @@ var ChromecastJS = function(joinpolicy, receiver) {
       }
     }
   }
-  ChromecastJS.prototype.disconnect = function() {
+  CastJS.prototype.disconnect = function() {
     cast.framework.CastContext.getInstance().endCurrentSession(true);
     self.Controller.stop();
     self.Media = Object.assign({}, self.Template);
