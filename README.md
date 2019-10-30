@@ -38,16 +38,16 @@ cc.off('event')                    // Removes specific event listener
 
 // Metadata object
 const metadata = {
-  poster:      'https://fenny.github.io/CastJS/demo/poster.png',
+  poster:      'https://fenny.github.io/castjs/demo/poster.png',
   title:       'Sintel',
   description: 'Sample video for chromecast',
   subtitles: [{
       active: true,
       label:  'English',
-      src:    'https://fenny.github.io/CastJS/demo/english.vtt'
+      src:    'https://fenny.github.io/castjs/demo/english.vtt'
   }, {
       label:  'Spanish',
-      src:    'https://fenny.github.io/CastJS/demo/spanish.vtt'
+      src:    'https://fenny.github.io/castjs/demo/spanish.vtt'
   }],
   muted:  false,
   paused: false
