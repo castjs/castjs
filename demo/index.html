@@ -70,17 +70,17 @@ body {
 </head>
 <body>
   <div class="center">
-    <h1 style="text-align: center;margin-bottom: 5px;">CastJS Demo ❤️</h1>
+    <h1 style="text-align: center;margin-bottom: 5px;">Castjs Demo ❤️</h1>
     <p style="text-align: center;margin-top: 0px;">Make sure that all sources have CORS enabled!</p>
     <a style="display: block;text-align: center;margin-top: 0px;" href="https://github.com/fenny/castjs">https://github.com/fenny/castjs</a>
     <div class="wrap">
       Receiver ID (Optional):<input id="receiverid" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value=""><br>
       Content:<input id="content" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"><br>
-      Poster:<input id="poster" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/poster.jpg"><br>
+      Poster:<input id="poster" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/Castjs/demo/poster.jpg"><br>
       Title:<input id="title" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Sintel"><br>
       Description:<input id="description" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="Demo movie for chromecast"><br>
-      Subtitle 1:<input id="subtitle1" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/english.vtt"><br>
-      Subtitle 2:<input id="subtitle2" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/ChromecastJS/demo/spanish.vtt"><br><br>
+      Subtitle 1:<input id="subtitle1" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/Castjs/demo/english.vtt"><br>
+      Subtitle 2:<input id="subtitle2" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="https://fenny.github.io/Castjs/demo/spanish.vtt"><br><br>
       <button id="cast">Cast Media to Chromecast</button>
       <button id="disconnect">Disconnect</button><br><br>
 
@@ -101,7 +101,7 @@ body {
   </div>
 
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://fenny.github.io/castjs/castjs.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@latest/castjs.min.js"></script>
 <script>
 function log(msg) {
   document.getElementById('logs').value += msg + '\n'
@@ -109,7 +109,7 @@ function log(msg) {
   textarea.scrollTop = textarea.scrollHeight;
 }
 var mediaInterval = null
-var cc = new CastJS()
+var cc = new Castjs()
 cc.on('available', function() {
   log('Available:\tCast framework available')
 })
@@ -125,7 +125,7 @@ cc.on('media', function(media) {
     document.getElementById('media').value = JSON.stringify(cc.Media, undefined, 4);
   }, 1000)
 })
-cc.on('muteOrUnmute', function(muted) {
+cc.on('muted', function(muted) {
   log('Muted:\t\t' + muted.toString())
   if (muted) {
     document.getElementById('muteOrUnmute').innerHTML = 'Unmute'
@@ -133,14 +133,14 @@ cc.on('muteOrUnmute', function(muted) {
     document.getElementById('muteOrUnmute').innerHTML = 'Mute'
   }
 })
-cc.on('volumechange', function(percentage) {
+cc.on('volume', function(percentage) {
   log('Volume:\t\t' + percentage.toString())
   document.getElementById('volume').value = percentage
 })
 // cc.on('state', function(state) {
 //   log('State:\t\t' + state.toString())
 // })
-cc.on('timeupdate', function(time) {
+cc.on('time', function(time) {
   document.getElementById('seek').value = time.progress
 })
 cc.on('disconnect', function() {
@@ -212,31 +212,31 @@ document.getElementById('volume').addEventListener('click', function(e) {
 })
 document.getElementById('cast').addEventListener('click', function() {
    if (document.getElementById('receiverid').value) {
-      cc = new ChromecastJS('origin_scoped', document.getElementById('receiverid').value)
+      cc = new Castjs({
+        receiver: document.getElementById('receiverid').value,
+        joinpolicy: 'origin_scoped'
+      })
    }
-  var media = {
-    content:      document.getElementById('content').value || null,
+  var metadata = {
     poster:       document.getElementById('poster').value || null,
     title:        document.getElementById('title').value || null,
     description:  document.getElementById('description').value || null,
     subtitles: []
   }
   if (document.getElementById('subtitle1').value) {
-    media.subtitles.push({
+    metadata.subtitles.push({
       active: true,
       label: 'Subtitle 1',
-      srclang: 'en',
       src: document.getElementById('subtitle1').value
     })
   }
   if (document.getElementById('subtitle2').value) {
-    media.subtitles.push({
+    metadata.subtitles.push({
       label: 'Subtitle 2',
-      srclang: 'en',
       src: document.getElementById('subtitle2').value
     })
   }
-  cc.cast(media)
+  cc.cast(document.getElementById('content').value, metadata)
 })
 </script>
 </body>
