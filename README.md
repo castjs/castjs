@@ -2,33 +2,42 @@
 
 <img src="https://i.imgur.com/uI4i1m5.png" align="right"
      title="Chromecast Javascript Wrapper" width="300" height="100">
-DEMO: https://fenny.github.io/CastJS/demo/index.html<br>
-ChromecastJS is a simple javascript wrapper arround the complex chromecast SDK. (6.21 KB minified)!
+DEMO: https://fenny.github.io/castjs/demo/index.html<br>
+CastJS is a simple javascript wrapper arround the complex chromecast SDK. (6.21 KB minified)!
 This wrapper provides simple events and methods to easily communicate with any cast device.
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://fenny.github.io/castjs/castjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@latest/castjs.min.js"></script>
 ```
 
 ```javascript
-// Optional arguments: (joinpolicy, receiver)
+// Invoke CastJS
 const cc = new CastJS()
-
+// Optional arguments
+const cc = new CastJS({
+     receiver:   'CC1AD845',
+     joinpolicy: 'origin_scoped'
+})
 // Events
 cc.on('available',    ()    => {}) // Cast device available
 cc.on('connected',    ()    => {}) // Connected
-cc.on('disconnected', ()    => {}) // Disconnected
 cc.on('state',        (str) => {}) // State changed
-cc.on('media',        (obj) => {}) // Media loaded
-cc.on('ended',        ()    => {}) // Media ended
-cc.on('timeupdate',   (obj) => {}) // Time updated
-cc.on('volumechange', (int) => {}) // Volume changed
+cc.on('media',        (obj) => {}) // Media changed
+cc.on('time',         (obj) => {}) // Time changed
+cc.on('volume',       (int) => {}) // Volume changed
+cc.on('muted',        (obj) => {}) // Muted changed
+cc.on('paused',       (obj) => {}) // Paused changed
+cc.on('ended',        (int) => {}) // Media ended
+cc.on('disconnected', ()    => {}) // Disconnected
 cc.on('error',        (str) => {}) // Error
 
-// Media object
-const media = {
-  content:     'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+// Remove events
+cc.off()                           // Removes all event listeners
+cc.off('event')                    // Removes specific event listener
+
+// Metadata object
+const metadata = {
   poster:      'https://fenny.github.io/CastJS/demo/poster.png',
   title:       'Sintel',
   description: 'Sample video for chromecast',
@@ -45,7 +54,9 @@ const media = {
 }
 
 // Methods
-cc.cast(media)  // Cast media object
+cc.cast('https://example.com/video.mp4')            // Cast media url
+cc.cast('https://example.com/video.mp4', metadata)  // Cast media url with metadata
+
 cc.duration()   // Returns Object with time information
 cc.seek(50)     // Seeks to input percentage (0-100)
 cc.state()      // Returns String state of media
