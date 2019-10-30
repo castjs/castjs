@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CastJS Demo</title>
+<title>Castjs Demo</title>
 <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700&display=swap" rel="stylesheet">
 <style>
 *, ::after, ::before {
@@ -114,7 +114,7 @@ cc.on('available', function() {
   log('Available:\tCast framework available')
 })
 cc.on('connected', function() {
-  console.log(cc.media())
+  console.log(cc.mediainfo())
   log('Connected:\tWe have a session')
   document.getElementById('controls').classList.remove('disconnected')
 })
@@ -122,7 +122,7 @@ cc.on('media', function(media) {
   log('Media:\t\tNew media detected')
   document.getElementById('media').value = JSON.stringify(media, undefined, 4);
   mediaInterval = setInterval(function() {
-    document.getElementById('media').value = JSON.stringify(cc.Media, undefined, 4);
+    document.getElementById('media').value = JSON.stringify(cc.mediainfo(), undefined, 4);
   }, 1000)
 })
 cc.on('muted', function(muted) {
@@ -137,9 +137,9 @@ cc.on('volume', function(percentage) {
   log('Volume:\t\t' + percentage.toString())
   document.getElementById('volume').value = percentage
 })
-// cc.on('state', function(state) {
-//   log('State:\t\t' + state.toString())
-// })
+cc.on('state', function(state) {
+  log('State:\t\t' + state.toString())
+})
 cc.on('time', function(time) {
   document.getElementById('seek').value = time.progress
 })
