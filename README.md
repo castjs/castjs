@@ -59,6 +59,7 @@ cc.cast('https://example.com/video.mp4', metadata)  // Cast media url with metad
 
 cc.duration()   // Returns Object with time information
 cc.seek(50)     // Seeks to input percentage (0-100)
+cc.mediainfo()  // Returns media object
 cc.state()      // Returns String state of media
 cc.pause()      // Pauses media
 cc.paused()     // Returns Boolean
