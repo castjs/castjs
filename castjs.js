@@ -1,7 +1,7 @@
-function CastJS (options = {}) {
-  if (!(this instanceof CastJS)) {
-    console.warn('don\'t invoke CastJS without \'new\'')
-    return new CastJS(options)
+function Castjs (options = {}) {
+  if (!(this instanceof Castjs)) {
+    console.warn('don\'t invoke Castjs without \'new\'')
+    return new Castjs(options)
   }
   var self        = this;
   self.receiver   = options.receiver    || 'CC1AD845';
@@ -134,13 +134,13 @@ function CastJS (options = {}) {
     Trigger('state', self.media.state);
   }
   // external handlers
-  CastJS.prototype.on = function(event, callback) {
+  Castjs.prototype.on = function(event, callback) {
     self.events[event] = callback
   }
-  CastJS.prototype.off = function(event) {
+  Castjs.prototype.off = function(event) {
     delete self.events[event]
   }
-  CastJS.prototype.cast = function(src, options = {}) {
+  Castjs.prototype.cast = function(src, options = {}) {
     if (!src) {
       return Trigger('error', 'No media source specified.')
     }
@@ -207,44 +207,44 @@ function CastJS (options = {}) {
       Trigger('error', 'Cast error: ' + err)
     })
   }
-  CastJS.prototype.state = function() {
+  Castjs.prototype.state = function() {
     return self.media.state
   }
-  CastJS.prototype.media = function() {
+  Castjs.prototype.media = function() {
     return self.media
   }
-  CastJS.prototype.time = function(percentage) {
+  Castjs.prototype.time = function(percentage) {
     return {
       progress: self.media.progress,
       time:     self.media.time,
       duration: self.media.duration
     }
   }
-  CastJS.prototype.seek = function(percentage) {
+  Castjs.prototype.seek = function(percentage) {
     self.player.currentTime = self.controller.getSeekTime(percentage, self.player.duration)
     self.controller.seek()
   }
-  CastJS.prototype.volume = function(percentage) {
+  Castjs.prototype.volume = function(percentage) {
     if (typeof percentage === 'undefined') {
       return Math.round(self.player.volumeLevel * 100)
     }
     self.player.volumeLevel = percentage / 100
     self.controller.setVolumeLevel()
   }
-  CastJS.prototype.play = function() {
+  Castjs.prototype.play = function() {
     if (self.player.isPaused) {
       self.controller.playOrPause()
     }
   }
-  CastJS.prototype.pause = function() {
+  Castjs.prototype.pause = function() {
     if (!self.player.isPaused) {
       self.controller.playOrPause()
     }
   }
-  CastJS.prototype.paused = function() {
+  Castjs.prototype.paused = function() {
     return self.player.isPaused
   }
-  CastJS.prototype.muted = function(boolean) {
+  Castjs.prototype.muted = function(boolean) {
     if (typeof boolean === 'undefined') {
       return self.player.isMuted
     }
@@ -254,7 +254,7 @@ function CastJS (options = {}) {
       self.controller.muteOrUnmute()
     }
   }
-  CastJS.prototype.subtitles = function(index) {
+  Castjs.prototype.subtitles = function(index) {
     if (typeof index === 'undefined') {
       return self.media.subtitles
     }
@@ -267,7 +267,7 @@ function CastJS (options = {}) {
       }
     }
   }
-  CastJS.prototype.disconnect = function() {
+  Castjs.prototype.disconnect = function() {
     cast.framework.CastContext.getInstance().endCurrentSession(true);
     self.controller.stop();
     self.media = Object.assign({}, self.template);
