@@ -1,4 +1,5 @@
-# CastJS 📺 Javascript Library for the Chromecast Sender
+## CastJS 📺 
+Javascript Library for the Chromecast Sender
 
 <img src="https://i.imgur.com/uI4i1m5.png" align="right"
      title="Chromecast Javascript Wrapper" width="300" height="100">
@@ -70,4 +71,4 @@ cc.volume(30)   // Change volume percentage (0-100)
 cc.disconnect() // Disconnect and destroy session
 ```
 
-# Bugs, ideas or notes, don't hesitate to open an issue and help us to improve this library!
+### Bugs, ideas or notes, don't hesitate to open an issue and help us to improve this library!
