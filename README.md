@@ -1,4 +1,4 @@
-## 📺 CastJS - Javascript Library for the Chromecast Sender
+## 📺 Castjs
 
 <img src="https://i.imgur.com/uI4i1m5.png" align="right"
      title="Chromecast Javascript Wrapper" width="300" height="100">
@@ -13,9 +13,9 @@ This wrapper provides simple events and methods to easily communicate with any c
 
 ```javascript
 // Invoke CastJS
-const cc = new CastJS()
+const cc = new Castjs()
 // Optional arguments
-const cc = new CastJS({
+const cc = new Castjs({
      receiver:   'CC1AD845',
      joinpolicy: 'origin_scoped'
 })
@@ -38,16 +38,16 @@ cc.off('event')                    // Removes specific event listener
 
 // Metadata object
 const metadata = {
-  poster:      'https://fenny.github.io/castjs/demo/poster.png',
+  poster:      'https://fenny.github.io/Castjs/demo/poster.png',
   title:       'Sintel',
   description: 'Sample video for chromecast',
   subtitles: [{
       active: true,
       label:  'English',
-      src:    'https://fenny.github.io/castjs/demo/english.vtt'
+      src:    'https://fenny.github.io/Castjs/demo/english.vtt'
   }, {
       label:  'Spanish',
-      src:    'https://fenny.github.io/castjs/demo/spanish.vtt'
+      src:    'https://fenny.github.io/Castjs/demo/spanish.vtt'
   }],
   muted:  false,
   paused: false
