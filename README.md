@@ -8,12 +8,12 @@ This wrapper provides simple events and methods to easily communicate with any c
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://fenny.github.io/CastJS/chromecastjs.min.js"></script>
+<script src="https://fenny.github.io/castjs/castjs.min.js"></script>
 ```
 
 ```javascript
 // Optional arguments: (joinpolicy, receiver)
-const cc = new ChromecastJS()
+const cc = new CastJS()
 
 // Events
 cc.on('available',    ()    => {}) // Cast device available
