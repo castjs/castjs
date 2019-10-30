@@ -13,7 +13,7 @@ This wrapper provides simple events and methods to easily communicate with any c
 
 ```javascript
 // Optional arguments: (joinpolicy, receiver)
-var cc = new ChromecastJS()
+const cc = new ChromecastJS()
 
 // Events
 cc.on('available',    ()    => {}) // Cast device available
@@ -27,7 +27,7 @@ cc.on('volumechange', (int) => {}) // Volume changed
 cc.on('error',        (str) => {}) // Error
 
 // Media object
-var media = {
+const media = {
   content:     'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
   poster:      'https://fenny.github.io/CastJS/demo/poster.png',
   title:       'Sintel',
