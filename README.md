@@ -20,17 +20,17 @@ const cc = new CastJS({
      joinpolicy: 'origin_scoped'
 })
 // Events
-cc.on('available',    ()    => {}) // Cast device available
-cc.on('connected',    ()    => {}) // Connected
-cc.on('state',        (str) => {}) // State changed
-cc.on('media',        (obj) => {}) // Media changed
-cc.on('time',         (obj) => {}) // Time changed
-cc.on('volume',       (int) => {}) // Volume changed
-cc.on('muted',        (obj) => {}) // Muted changed
-cc.on('paused',       (obj) => {}) // Paused changed
-cc.on('ended',        (int) => {}) // Media ended
-cc.on('disconnected', ()    => {}) // Disconnected
-cc.on('error',        (str) => {}) // Error
+cc.on('available',    ()           => {}) // Cast device available
+cc.on('connected',    ()           => {}) // Connected
+cc.on('state',        (str)        => {}) // State changed
+cc.on('media',        (obj)        => {}) // Media changed
+cc.on('time',         (obj)        => {}) // Time changed
+cc.on('volume',       (int)        => {}) // Volume changed
+cc.on('muted',        (boolean)    => {}) // Muted changed
+cc.on('paused',       (boolean)    => {}) // Paused changed
+cc.on('ended',        ()           => {}) // Media ended
+cc.on('disconnected', ()           => {}) // Disconnected
+cc.on('error',        (str)        => {}) // Error
 
 // Remove events
 cc.off()                           // Removes all event listeners
