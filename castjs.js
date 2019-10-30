@@ -1,270 +1,274 @@
-var CastJS = function(joinpolicy, receiver) {
-  var self = this;
-  self.JoinPolicy = joinpolicy ? joinpolicy : 'origin_scoped';
-  self.Receiver = receiver ? receiver : 'CC1AD845';
-  self.Events = [];
-  self.Available = false;
-  self.Connected = false;
-  self.Player = null;
-  self.Controller = null;
-  self.Session = null;
-  self.Template = {
-    content: null,
-    poster: null,
-    title: null,
-    description: null,
-    subtitles: [],
-    progress: 0,
-    time: 0,
-    duration: 0,
-    volume: 0.3,
-    muted: false,
-    paused: false,
-    state: 'DISCONNECTED'
+function CastJS (options = {}) {
+  var self        = this;
+  self.receiver   = options.receiver    || 'CC1AD845';
+  self.joinpolicy = options.joinpolicy  || 'origin_scoped';
+  self.events     = [];
+  self.available  = false;
+  self.connected  = false;
+  self.player     = null;
+  self.controller = null;
+  self.session    = null;
+  self.media      = null;
+  self.template   = {
+    src:          null,
+    poster:       null,
+    title:        null,
+    description:  null,
+    subtitles:    [],
+    progress:     0,
+    time:         0,
+    duration:     0,
+    volume:       30,
+    muted:        false,
+    paused:       false
   }
-  self.Media = Object.assign({}, self.Template)
-  // internal handlers
-  var Availability = setInterval(function() {
-    if (window.chrome && window.chrome.cast && window.chrome.cast.isAvailable) {
-      clearInterval(Availability);
-      Init();
-    }
-  }, 250)
+  self.media      = Object.assign({}, self.template)
+  self.state      = 'DISCONNECTED'
+  if (window.chrome) {
+    var interval = setInterval(function() {
+      if (window.chrome.cast && window.chrome.cast.isAvailable) {
+        clearInterval(interval);
+        Init();
+      }
+    }, 250)
+  }
   function Trigger(event, args) {
-    if (self.Events[event]) {
-      self.Events[event](args)
+    if (self.events[event]) {
+      self.events[event](args)
     }
   }
   function Init() {
     cast.framework.CastContext.getInstance().setOptions({
-      receiverApplicationId: self.Receiver,
-      autoJoinPolicy: self.JoinPolicy
+      receiverApplicationId:  self.receiver,
+      autoJoinPolicy:         self.joinpolicy
     });
-    self.Player = new cast.framework.RemotePlayer();
-    self.Controller = new cast.framework.RemotePlayerController(self.Player);
-    self.Controller.addEventListener('isConnectedChanged', isConnectedChanged);
-    self.Controller.addEventListener('currentTimeChanged', currentTimeChanged);
-    self.Controller.addEventListener('durationChanged', durationChanged);
-    self.Controller.addEventListener('volumeLevelChanged', volumeLevelChanged);
-    self.Controller.addEventListener('isMutedChanged', isMutedChanged);
-    self.Controller.addEventListener('isPausedChanged', isPausedChanged);
-    self.Controller.addEventListener('playerStateChanged', playerStateChanged);
-    self.Available = true;
+    self.player     = new cast.framework.RemotePlayer();
+    self.controller = new cast.framework.RemotePlayerController(self.player);
+    self.controller.addEventListener('isConnectedChanged',  isConnectedChanged);
+    self.controller.addEventListener('currentTimeChanged',  currentTimeChanged);
+    self.controller.addEventListener('durationChanged',     durationChanged);
+    self.controller.addEventListener('volumeLevelChanged',  volumeLevelChanged);
+    self.controller.addEventListener('isMutedChanged',      isMutedChanged);
+    self.controller.addEventListener('isPausedChanged',     isPausedChanged);
+    self.controller.addEventListener('playerStateChanged',  playerStateChanged);
+    self.available = true;
     Trigger('available');
   }
-  // Controller handlers
   function isConnectedChanged() {
     setTimeout(function() {
-      if (!self.Player.isConnected) {
-        self.Connected = false
-        return
+      if (!self.player.isConnected) {
+        return self.connected = false
       }
-      self.Connected = true
+      self.connected = true
       Trigger('connected')
-      if (self.Player.isMediaLoaded && self.Player.playerState) {
-        self.Media = {
-          content: self.Player.mediaInfo.contentId,
-          poster: self.Player.imageUrl || null,
-          title: self.Player.title || null,
-          description: self.Player.mediaInfo.metadata.subtitle || null,
-          subtitles: [],
-          progress: self.Controller.getSeekPosition(self.Player.currentTime, self.Player.duration),
-          time: self.Controller.getFormattedTime(self.Player.currentTime),
-          duration: self.Controller.getFormattedTime(self.Player.duration),
-          volume: self.Player.volumeLevel,
-          muted: self.Player.isMuted,
-          state: self.Player.playerState
+      if (self.player.isMediaLoaded && self.player.playerState) {
+        self.media = {
+          src:          self.player.mediaInfo.contentId,
+          poster:       self.player.imageUrl || null,
+          title:        self.player.title || null,
+          description:  self.player.mediaInfo.metadata.subtitle || null,
+          subtitles:    [],
+          progress:     self.controller.getSeekPosition(self.player.currentTime, self.player.duration),
+          time:         self.controller.getFormattedTime(self.player.currentTime),
+          duration:     self.controller.getFormattedTime(self.player.duration),
+          volume:       self.player.volumeLevel,
+          muted:        self.player.isMuted,
+          state:        self.player.playerState
         }
         // Format loaded subtitles
-        for (var i = 0; i < self.Player.mediaInfo.tracks.length; i++) {
-          if (self.Player.mediaInfo.tracks[i].type === 'TEXT') {
-            self.Media.subtitles.push({
-              label: self.Player.mediaInfo.tracks[i].name,
-              // srclang: self.Player.mediaInfo.tracks[i].language,
-              src: self.Player.mediaInfo.tracks[i].trackContentId
+        for (var i = 0; i < self.player.mediaInfo.tracks.length; i++) {
+          if (self.player.mediaInfo.tracks[i].type === 'TEXT') {
+            self.media.subtitles.push({
+              label:  self.player.mediaInfo.tracks[i].name,
+              src:    self.player.mediaInfo.tracks[i].trackContentId
             })
           }
         }
         // Update the active subtitle
         var activeTrackId = cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].activeTrackIds[0]
-        if (typeof activeTrackId !== 'undefined' && self.Media.subtitles[activeTrackId]) {
-          self.Media.subtitles[activeTrackId].active = true
+        if (typeof activeTrackId !== 'undefined' && self.media.subtitles[activeTrackId]) {
+          self.media.subtitles[activeTrackId].active = true
         }
-        Trigger('media', self.Media)
-      } else {
-        self.Session = cast.framework.CastContext.getInstance().getCurrentSession()
-        if (self.Session && self.Media.content) {
-          var mediaInfo = new chrome.cast.media.MediaInfo(self.Media.content)
-          //mediaInfo.contentType = 'video/mp4' ??
-          mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata()
-          // The sexy subtitle support function <3
-          if (self.Media.subtitles.length) {
-            mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle()
-            mediaInfo.textTrackStyle.fontFamily = 'Arial'
-            mediaInfo.textTrackStyle.foregroundColor = '#FFFFFF'
-            mediaInfo.textTrackStyle.backgroundColor = '#00000000'
-            mediaInfo.textTrackStyle.fontScale = '1.1'
-            mediaInfo.textTrackStyle.edgeColor = '#00000099'
-            mediaInfo.textTrackStyle.edgeType = chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
-            var tracks = [];
-            for (var i = 0; i < self.Media.subtitles.length; i++) {
-              var track = new chrome.cast.media.Track(i, chrome.cast.media.TrackType.TEXT)
-              track.trackContentId = self.Media.subtitles[i].src
-              track.trackContentType = 'text/vtt'
-              track.subtype = chrome.cast.media.TextTrackType.CAPTIONS
-              track.name = self.Media.subtitles[i].label
-              // track.language = self.Media.subtitles[i].srclang
-              tracks.push(track);
-            }
-            mediaInfo.tracks = tracks
-          }
-          if (self.Media.poster) {
-            mediaInfo.metadata.images = [{
-              'url': self.Media.poster
-            }]
-          }
-          if (self.Media.title) {
-            mediaInfo.metadata.title = self.Media.title
-          }
-          if (self.Media.description) {
-            mediaInfo.metadata.subtitle = self.Media.description
-          }
-          var request = new chrome.cast.media.LoadRequest(mediaInfo)
-          request.currentTime = self.Media.time
-          request.autoplay = !self.Media.paused
-          if (self.Media.subtitles.length > 0) {
-            for (var i = 0; i < self.Media.subtitles.length; i++) {
-              if (self.Media.subtitles[i] && self.Media.subtitles[i].active) {
-                request.activeTrackIds = [i]
-              }
-            }
-          }
-          self.Session.loadMedia(request).then(function() {
-            Trigger('media', self.Media)
-          }, function(e) {
-            Trigger('error', 'CastJS.cast():', e)
-          })
-        }
+        Trigger('media', self.media)
       }
     }, 0)
   }
   function currentTimeChanged() {
-    self.Media.progress = self.Controller.getSeekPosition(self.Player.currentTime, self.Player.duration)
-    self.Media.time = self.Controller.getFormattedTime(self.Player.currentTime)
-    self.Media.duration = self.Controller.getFormattedTime(self.Player.duration)
-    Trigger('timeupdate', {
-      progress: self.Media.progress,
-      time: self.Media.time,
-      duration: self.Media.duration
+    self.media.progress = self.controller.getSeekPosition(self.player.currentTime, self.player.duration)
+    self.media.time     = self.controller.getFormattedTime(self.player.currentTime)
+    self.media.duration = self.controller.getFormattedTime(self.player.duration)
+    Trigger('time', {
+      progress: self.media.progress,
+      time:     self.media.time,
+      duration: self.media.duration
     })
-    if (self.Media.progress >= 100) {
+    if (self.media.progress >= 100) {
       Trigger('ended')
       self.disconnect()
     }
   }
   function durationChanged() {
-    self.Media.duration = self.Player.duration
+    self.media.duration = self.player.duration
   }
   function volumeLevelChanged() {
-    self.Media.volume = Math.round(self.Player.volumeLevel * 100)
-    Trigger('volumechange', self.Media.volume)
+    self.media.volume = Math.round(self.player.volumeLevel * 100)
+    Trigger('volume', self.media.volume)
   }
   function isMutedChanged() {
-    self.Media.muted = self.Player.isMuted
-    Trigger('muteOrUnmute', self.Media.muted)
+    self.media.muted = self.player.isMuted
+    Trigger('muted', self.media.muted)
   }
   function isPausedChanged() {
-    self.Media.paused = self.Player.isPaused
-    Trigger('playOrPause', self.Media.paused)
+    self.media.paused = self.player.isPaused
+    Trigger('paused', self.media.paused)
   }
   function playerStateChanged() {
-    if (!self.Player.playerState) {
+    if (!self.player.playerState) {
       return self.disconnect()
     }
-    self.Media.state = self.Player.playerState === 'IDLE' ? 'DISCONNECTED' : self.Player.playerState;
-    Trigger('state', self.Media.state);
+    self.media.state = self.player.playerState === 'IDLE' ? 'DISCONNECTED' : self.player.playerState;
+    Trigger('state', self.media.state);
   }
   // external handlers
   CastJS.prototype.on = function(event, callback) {
-    self.Events[event] = callback
+    self.events[event] = callback
   }
-  CastJS.prototype.cast = function(media) {
-    if (!media || !media.content) {
-      return Trigger('error', 'No media content specified.')
+  CastJS.prototype.off = function(event) {
+    delete self.events[event]
+  }
+  CastJS.prototype.cast = function(src, options = {}) {
+    if (!src) {
+      return Trigger('error', 'No media source specified.')
     }
-    for (var key in media) {
-      if (media.hasOwnProperty(key)) {
-        self.Media[key] = media[key]
+    options.src = src
+    for (var key in options) {
+      if (options.hasOwnProperty(key)) {
+        self.media[key] = options[key]
       }
     }
-    cast.framework.CastContext.getInstance().requestSession()
+    cast.framework.CastContext.getInstance().requestSession().then(function() {
+      self.session = cast.framework.CastContext.getInstance().getCurrentSession()
+      if (self.session && self.media.src) {
+        var mediaInfo       = new chrome.cast.media.MediaInfo(self.media.src)
+        mediaInfo.metadata  = new chrome.cast.media.GenericMediaMetadata()
+        // The sexy subtitle support function <3
+        if (self.media.subtitles.length) {
+          mediaInfo.textTrackStyle                  = new chrome.cast.media.TextTrackStyle()
+          mediaInfo.textTrackStyle.fontFamily       = 'Arial'
+          mediaInfo.textTrackStyle.foregroundColor  = '#FFFFFF'
+          mediaInfo.textTrackStyle.backgroundColor  = '#00000000'
+          mediaInfo.textTrackStyle.fontScale        = '1.1'
+          mediaInfo.textTrackStyle.edgeColor        = '#00000099'
+          mediaInfo.textTrackStyle.edgeType         = chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
+          var tracks = [];
+          for (var i = 0; i < self.media.subtitles.length; i++) {
+            var track                = new chrome.cast.media.Track(i, chrome.cast.media.TrackType.TEXT)
+            track.trackContentId    = self.media.subtitles[i].src
+            track.trackContentType  = 'text/vtt'
+            track.subtype           = chrome.cast.media.TextTrackType.CAPTIONS
+            track.name              = self.media.subtitles[i].label
+            tracks.push(track);
+          }
+          mediaInfo.tracks = tracks
+        }
+        if (self.media.poster) {
+          mediaInfo.metadata.images = [{
+            'url': self.media.poster
+          }]
+        }
+        if (self.media.title) {
+          mediaInfo.metadata.title = self.media.title
+        }
+        if (self.media.description) {
+          mediaInfo.metadata.subtitle = self.media.description
+        }
+        console.log(mediaInfo)
+        var request         = new chrome.cast.media.LoadRequest(mediaInfo)
+        request.currentTime = self.media.time
+        request.autoplay    = !self.media.paused
+        if (self.media.subtitles.length > 0) {
+          for (var i = 0; i < self.media.subtitles.length; i++) {
+            if (self.media.subtitles[i] && self.media.subtitles[i].active) {
+              request.activeTrackIds = [i]
+            }
+          }
+        }
+        self.session.loadMedia(request).then(function() {
+          Trigger('media', self.media)
+        }, function(err) {
+          Trigger('error', 'Cast error: ' + err)
+        })
+      }
+    }, function(err) {
+      Trigger('error', 'Cast error: ' + err)
+    })
   }
   CastJS.prototype.state = function() {
-    return self.Media.state
+    return self.media.state
   }
   CastJS.prototype.media = function() {
-    return self.Media
+    return self.media
   }
-  CastJS.prototype.duration = function(percentage) {
+  CastJS.prototype.time = function(percentage) {
     return {
-      progress: self.Media.progress,
-      time: self.Media.time,
-      duration: self.Media.duration
+      progress: self.media.progress,
+      time:     self.media.time,
+      duration: self.media.duration
     }
   }
   CastJS.prototype.seek = function(percentage) {
-    self.Player.currentTime = self.Controller.getSeekTime(percentage, self.Player.duration)
-    self.Controller.seek()
+    self.player.currentTime = self.controller.getSeekTime(percentage, self.player.duration)
+    self.controller.seek()
   }
   CastJS.prototype.volume = function(percentage) {
     if (typeof percentage === 'undefined') {
-      return Math.round(self.Player.volumeLevel * 100)
+      return Math.round(self.player.volumeLevel * 100)
     }
-    self.Player.volumeLevel = percentage / 100
-    self.Controller.setVolumeLevel()
+    self.player.volumeLevel = percentage / 100
+    self.controller.setVolumeLevel()
   }
   CastJS.prototype.play = function() {
-    if (self.Player.isPaused) {
-      self.Controller.playOrPause()
+    if (self.player.isPaused) {
+      self.controller.playOrPause()
     }
   }
   CastJS.prototype.pause = function() {
-    if (!self.Player.isPaused) {
-      self.Controller.playOrPause()
+    if (!self.player.isPaused) {
+      self.controller.playOrPause()
     }
   }
   CastJS.prototype.paused = function() {
-    return self.Player.isPaused
+    return self.player.isPaused
   }
   CastJS.prototype.muted = function(boolean) {
     if (typeof boolean === 'undefined') {
-      return cc.Player.isMuted
+      return self.player.isMuted
     }
-    if (boolean && !self.Player.isMuted) {
-      self.Controller.muteOrUnmute()
-    } else if (!boolean && self.Player.isMuted) {
-      self.Controller.muteOrUnmute()
+    if (boolean && !self.player.isMuted) {
+      self.controller.muteOrUnmute()
+    } else if (!boolean && self.player.isMuted) {
+      self.controller.muteOrUnmute()
     }
   }
   CastJS.prototype.subtitles = function(index) {
     if (typeof index === 'undefined') {
-      return self.Media.subtitles
+      return self.media.subtitles
     }
     var tracksInfoRequest = new chrome.cast.media.EditTracksInfoRequest([index])
     cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].editTracksInfo(tracksInfoRequest, null, null)
-    for (var i = 0; i < self.Media.subtitles.length; i++) {
-      delete self.Media.subtitles[i].active
+    for (var i = 0; i < self.media.subtitles.length; i++) {
+      delete self.media.subtitles[i].active
       if (i === index) {
-        self.Media.subtitles[i].active = true
+        self.media.subtitles[i].active = true
       }
     }
   }
   CastJS.prototype.disconnect = function() {
     cast.framework.CastContext.getInstance().endCurrentSession(true);
-    self.Controller.stop();
-    self.Media = Object.assign({}, self.Template);
-    self.Player.isMediaLoaded = false;
-    self.Media.state = 'DISCONNECTED';
+    self.controller.stop();
+    self.media = Object.assign({}, self.template);
+    self.player.isMediaLoaded = false;
+    self.media.state = 'DISCONNECTED';
     Trigger('disconnected');
   }
 }
