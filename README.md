@@ -2,7 +2,7 @@
 
 <img src="https://i.imgur.com/uI4i1m5.png" align="right"
      title="Chromecast Javascript Wrapper" width="300" height="100">
-DEMO: https://fenny.github.io/Castjs/demo/index.html<br>
+DEMO: [https://fenny.github.io/Castjs/demo/](https://fenny.github.io/Castjs/demo/)<br>
 CastJS is a simple javascript wrapper arround the complex chromecast SDK. (6.08 KB minified)!
 This wrapper provides simple events and methods to easily communicate with any cast device.
 
