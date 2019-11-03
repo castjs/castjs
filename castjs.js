@@ -90,6 +90,7 @@ class Castjs {
         duration:     this.controller.getFormattedTime(this.player.duration),
         volume:       this.player.volumeLevel,
         muted:        this.player.isMuted,
+        paused:       this.player.isPaused,
         state:        this.player.playerState.toLowerCase()
       }
       // Loop over the subtitle tracks
@@ -122,7 +123,7 @@ class Castjs {
       duration: this.media.duration
     })
     if (this.media.progress >= 100) {
-      this.trigger('ended');
+      this.trigger('end');
       this.disconnect();
     }
   };
@@ -139,7 +140,7 @@ class Castjs {
   };
   isPausedChanged = () => {
     this.media.paused = this.player.isPaused;
-    this.this('paused', this.media.paused);
+    this.trigger('pause', this.media.paused);
   };
   playerStateChanged = () => {
     this.media.state = this.player.playerState.toLowerCase();
@@ -263,12 +264,12 @@ class Castjs {
     this.controller.setVolumeLevel();
   };
   play = () => {
-    if (this.player.isPaused) {
+    if (this.media.paused) {
       this.controller.playOrPause();
     }
   };
   pause = () => {
-    if (!this.player.isPaused) {
+    if (!this.media.paused) {
       this.controller.playOrPause();
     }
   };
