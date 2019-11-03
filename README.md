@@ -2,7 +2,7 @@
   <br>
   <img src="https://i.imgur.com/elCjMDx.png" alt="Castjs" width="150">
   <br>
-  Castjs v1.0
+  Castjs v1
   <br>
   <br>
 </h1>
