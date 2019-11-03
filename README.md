@@ -1,15 +1,53 @@
-## 📺 Castjs v1.0
+<h1 align="center">
+  <br>
+  <img src="https://i.imgur.com/elCjMDx.png" alt="WebTorrent" width="200">
+  <br>
+  Castjs
+  <br>
+  <br>
+</h1>
 
-DEMO: [https://fenny.github.io/Castjs/demo/](https://fenny.github.io/Castjs/demo/)<br>
-<br>
-CastJS is a simple javascript wrapper arround the complex chromecast SDK ( 7.2Kb minified ).<br>
-This library provides simple events and methods to easily communicate with any cast device.<br><br>
-Browser support: chrome, opera, brave and vivaldi.
+<h4 align="center">Javascript library for the complex chromecast SDK</h4>
+
+<p align="center">
+  <b>Castjs</b> provides simple events and functions to communicate with any cast device from the browser.
+  <br>
+  This library works in chrome, opera, brave and vivaldi.
+</p>
+
+##### Getting started
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@2.0/castjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@1.0/castjs.min.js"></script>
 ```
+
+##### Casting a video is simple:
+
+```js
+// Invoke Castjs
+var cc = new Castjs()
+
+$('#cast').on('click', () => {
+  // Check if a cast device is available
+  if (cc.available) {
+    // Cast media
+    cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')
+  }
+})
+```
+
+##### Adding some metadata is simple too:
+
+```js
+cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
+  title:       'Sintel',
+  description: 'Third Open Movie by Blender Foundation',
+  poster:      'https://fenny.github.io/Castjs/demo/poster.png',
+})
+```
+
+##### Documentation:
 
 ```javascript
 // Invoke CastJS
