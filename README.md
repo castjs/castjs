@@ -1,43 +1,41 @@
-## 📺 Castjs
+## 📺 Castjs 1.9.9
 
-<img src="https://i.imgur.com/uI4i1m5.png" align="right"
-     title="Chromecast Javascript Wrapper" width="300" height="100">
 DEMO: [https://fenny.github.io/Castjs/demo/](https://fenny.github.io/Castjs/demo/)<br>
-CastJS is a simple javascript wrapper arround the complex chromecast SDK. (6.08 KB minified)!
-This wrapper provides simple events and methods to easily communicate with any cast device.
+CastJS is a simple javascript wrapper arround the complex chromecast SDK.
+This library provides simple events and methods to easily communicate with any cast device.  
+We support the following browsers: chrome, opera, brave and vivaldi.
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@latest/castjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@1.9.9/castjs.min.js"></script>
 ```
 
 ```javascript
 // Invoke CastJS
 const cc = new Castjs()
 // Optional arguments
-const cc = new Castjs({
-     receiver:   'CC1AD845',
-     joinpolicy: 'origin_scoped'
-})
-// Events
+const cc = new Castjs({ receiver: 'CC1AD845', joinpolicy: 'origin_scoped' })
+
+// Create events
 cc.on('available',    ()           => {}) // Cast device available
-cc.on('connected',    ()           => {}) // Connected
-cc.on('state',        (str)        => {}) // State changed
-cc.on('media',        (obj)        => {}) // Media changed
+cc.on('state',        (str)        => {}) // Media state changed
+cc.on('session',      (media)      => {}) // Connected
 cc.on('time',         (obj)        => {}) // Time changed
-cc.on('volume',       (int)        => {}) // Volume changed
-cc.on('muted',        (boolean)    => {}) // Muted changed
-cc.on('paused',       (boolean)    => {}) // Paused changed
-cc.on('ended',        ()           => {}) // Media ended
+cc.on('volume',       (float)      => {}) // Volume changed
+cc.on('mute',         (bool)       => {}) // Muted or Unmuted
+cc.on('pause',        (bool)       => {}) // Pause event
+cc.on('end',          ()           => {}) // Media ended
 cc.on('disconnected', ()           => {}) // Disconnected
 cc.on('error',        (str)        => {}) // Error
 
 // Remove events
-cc.off()                           // Removes all event listeners
-cc.off('event')                    // Removes specific event listener
+cc.off()                           // Removes all callbacks
+cc.off('event')                    // Removes all callbacks for event
+cc.off('event', fn)                // Removes specific callback for event
 
-// Metadata object
-const metadata = {
+// Casting media
+cc.cast('https://example.com/video.mp4') // Cast media url
+cc.cast('https://example.com/video.mp4', {
   poster:      'https://fenny.github.io/Castjs/demo/poster.png',
   title:       'Sintel',
   description: 'Sample video for chromecast',
@@ -51,24 +49,16 @@ const metadata = {
   }],
   muted:  false,
   paused: false
-}
+})  // Cast media url with metadata
 
-// Methods
-cc.cast('https://example.com/video.mp4')            // Cast media url
-cc.cast('https://example.com/video.mp4', metadata)  // Cast media url with metadata
-
-cc.duration()   // Returns Object with time information
-cc.seek(50)     // Seeks to input percentage (0-100)
-cc.mediainfo()  // Returns media object
-cc.state()      // Returns String state of media
-cc.pause()      // Pauses media
-cc.paused()     // Returns Boolean
-cc.play()       // Plays media
-cc.muted()      // Returns Boolean
-cc.muted(true)  // Boolean Mutes or Unmutes media
-cc.volume()     // Returns volume percentage (0-100)
-cc.volume(30)   // Change volume percentage (0-100)
-cc.disconnect() // Disconnect and destroy session
+// Cast controllers
+cc.seek(50)        // Seeks to input percentage (0 - 100)
+cc.volume(0.2)     // Change volume percentage (0 - 1.0)
+cc.play()          // Plays media
+cc.pause()         // Pauses media
+cc.mute(bool)      // Boolean to mute or unmute
+cc.subtitle(index) // Make subtitle track active
+cc.disconnect()    // Disconnect session
 ```
 
 ### Bugs, ideas or notes, don't hesitate to open an issue and help us to improve this library!
