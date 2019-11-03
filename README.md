@@ -1,4 +1,4 @@
-## 📺 Castjs 2.0
+## 📺 Castjs v1.0
 
 DEMO: [https://fenny.github.io/Castjs/demo/](https://fenny.github.io/Castjs/demo/)<br>
 <br>
