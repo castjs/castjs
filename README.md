@@ -10,7 +10,7 @@
 <h4 align="center">Javascript library for the complex chromecast SDK</h4>
 
 <p align="center">
-  <b>Castjs</b> provides simple events and functions to communicate with any cast device from the browser.
+  <b>Castjs</b> provides simple events and functions to communicate with chromecast devices from the browser.
   <br>
   This library works in chrome, opera, brave and vivaldi.
 </p>
