@@ -38,7 +38,7 @@ cc.cast('https://example.com/video.mp4') // Cast media url
 cc.cast('https://example.com/video.mp4', {
   poster:      'https://fenny.github.io/Castjs/demo/poster.png',
   title:       'Sintel',
-  description: 'Sample video for chromecast',
+  description: 'Third Open Movie by Blender Foundation',
   subtitles: [{
       active: true,
       label:  'English',
