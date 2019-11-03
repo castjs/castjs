@@ -1,8 +1,8 @@
 ## 📺 Castjs 2.0
 
 DEMO: [https://fenny.github.io/Castjs/demo/](https://fenny.github.io/Castjs/demo/)<br>
-CastJS is a simple javascript wrapper arround the complex chromecast SDK.
-This library provides simple events and methods to easily communicate with any cast device.    
+CastJS is a simple javascript wrapper arround the complex chromecast SDK ( 7.2Kb minified ).  
+This library provides simple events and methods to easily communicate with any cast device.  
 Browser support: chrome, opera, brave and vivaldi.
 
 ```html
