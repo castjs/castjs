@@ -2,8 +2,8 @@
 
 DEMO: [https://fenny.github.io/Castjs/demo/](https://fenny.github.io/Castjs/demo/)<br>
 CastJS is a simple javascript wrapper arround the complex chromecast SDK.
-This library provides simple events and methods to easily communicate with any cast device.  
-We support the following browsers: chrome, opera, brave and vivaldi.
+This library provides simple events and methods to easily communicate with any cast device.    
+Browser support: chrome, opera, brave and vivaldi.
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
@@ -52,6 +52,7 @@ cc.cast('https://example.com/video.mp4', {
 })  // Cast media url with metadata
 
 // Cast controllers
+cc.media           // Media object with information
 cc.seek(50)        // Seeks to input percentage (0 - 100)
 cc.volume(0.2)     // Change volume percentage (0 - 1.0)
 cc.play()          // Plays media
