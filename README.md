@@ -29,9 +29,9 @@ cc.on('disconnected', ()           => {}) // Disconnected
 cc.on('error',        (str)        => {}) // Error
 
 // Remove events
-cc.off()                           // Removes all callbacks
-cc.off('event')                    // Removes all callbacks for event
-cc.off('event', fn)                // Removes specific callback for event
+cc.off()            // Removes all callbacks
+cc.off('event')     // Removes all callbacks for event
+cc.off('event', fn) // Removes specific callback for event
 
 // Casting media
 cc.cast('https://example.com/video.mp4') // Cast media url
