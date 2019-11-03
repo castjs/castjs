@@ -13,7 +13,7 @@ class Castjs {
     this.player     = null;
     this.controller = null;
     this.events     = {};
-    self.template   = {
+    this.template   = {
       source:       null,
       poster:       null,
       title:        null,
@@ -27,7 +27,7 @@ class Castjs {
       paused:       false,
       state:        'disconnected'
     };
-    this.media = Object.assign({}, self.template);
+    this.media = Object.assign({}, this.template);
     this.scanner();
   };
   // Init functions
@@ -297,7 +297,7 @@ class Castjs {
     cast.framework.CastContext.getInstance().endCurrentSession(true);
     this.controller.stop();
     // Reset some variables
-    this.media                = Object.assign({}, self.template);
+    this.media                = Object.assign({}, this.template);
     this.connected            = false;
     this.media.state          = 'disconnected';
     this.trigger('disconnected');
