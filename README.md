@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://i.imgur.com/elCjMDx.png" alt="WebTorrent" width="200">
+  <img src="https://i.imgur.com/elCjMDx.png" alt="Castjs" width="150">
   <br>
   Castjs
   <br>
