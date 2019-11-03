@@ -1,5 +1,5 @@
 'use strict';
-
+// v1.0
 class Castjs {
   constructor(options = {}) {
     if (!(this instanceof Castjs)) {
