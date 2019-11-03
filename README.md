@@ -1,4 +1,4 @@
-## 📺 Castjs 1.9.9
+## 📺 Castjs 2.0
 
 DEMO: [https://fenny.github.io/Castjs/demo/](https://fenny.github.io/Castjs/demo/)<br>
 CastJS is a simple javascript wrapper arround the complex chromecast SDK.
@@ -7,7 +7,7 @@ Browser support: chrome, opera, brave and vivaldi.
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@1.9.9/castjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@2.0/castjs.min.js"></script>
 ```
 
 ```javascript
