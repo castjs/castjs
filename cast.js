@@ -1,15 +1,23 @@
 class Castjs {
   // Main variables
-  constructor(options = {}) {
+  constructor(receiver, options = {}) {
     // Casting only works on chrome, opera, brave and vivaldi
     if (!window.chrome) {
       return console.warn('Castjs: Casting is not supported in this browser');
     }
+    // If no receiver is specified
+    if (typeof receiver === 'object') {
+      options = receiver;
+      receiver = null;
+    }
     // Set main variables
-    this.receiver   = options.receiver   || 'CC1AD845';
-    this.joinpolicy = options.joinpolicy || 'origin_scoped';
+    this.receiver   = receiver            || 'CC1AD845';
+    this.joinpolicy = options.joinpolicy  || 'origin_scoped';
+    this.language   = options.language    || null;
+    this.resume     = options.resume      || true;
     this.available  = false;
     this.session    = null;
+    this.device     = null;
     this.player     = null;
     this.controller = null;
     this.events     = {};
@@ -35,7 +43,9 @@ class Castjs {
         // Set cast options
         cast.framework.CastContext.getInstance().setOptions({
           receiverApplicationId:  this.receiver,
-          autoJoinPolicy:         this.joinpolicy
+          autoJoinPolicy:         this.joinpolicy,
+          language:               this.language,
+          resumeSavedSession:     this.resume
         });
         // Create controller
         this.player     = new cast.framework.RemotePlayer();
@@ -66,6 +76,8 @@ class Castjs {
       if (!this.player.isMediaLoaded) {
         return;
       }
+      // Set device name
+      this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName;
       // Update media object
       this.media = {
         src:          this.player.mediaInfo.contentId,
@@ -234,7 +246,8 @@ class Castjs {
       }
       // Here we go!
       cast.framework.CastContext.getInstance().getCurrentSession().loadMedia(request).then(() => {
-        this.trigger('connected');
+        // Set device name
+        this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName;
         this.trigger('session', this.media);
         return this;
       }, (err) => {
