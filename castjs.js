@@ -1,15 +1,15 @@
-'use strict';
-// v1.0
 class Castjs {
+  // Main variables
   constructor(options = {}) {
-    if (!(this instanceof Castjs)) {
-      console.warn('Castjs: don\'t invoke Castjs without \'new\'');
-      return new Castjs(options);
+    // Casting only works on chrome, opera, brave and vivaldi
+    if (!window.chrome) {
+      return console.warn('Castjs: Casting is not supported in this browser');
     }
+    // Set main variables
     this.receiver   = options.receiver   || 'CC1AD845';
     this.joinpolicy = options.joinpolicy || 'origin_scoped';
     this.available  = false;
-    this.connected  = false;
+    this.session    = null;
     this.player     = null;
     this.controller = null;
     this.events     = {};
@@ -19,61 +19,49 @@ class Castjs {
       title:        null,
       description:  null,
       subtitles:    [],
-      progress:     0,
-      time:         0,
-      duration:     0,
-      volume:       0.3,
+      volume:       1,
       muted:        false,
       paused:       false,
+      progress:     0,
+      time:         '00:00:00',
+      duration:     '00:00:00',
       state:        'disconnected'
     };
     this.media = Object.assign({}, this.template);
-    this.scanner();
-  };
-  // Init functions
-  scanner = () => {
-    // Casting only works on chrome, opera, brave and vivaldi
-    if (!window.chrome) {
-      return console.warn('Castjs: Casting is not supported in this browser')
-    }
-    // Check if sender SDK is loaded and if there is a receiver available
+    // Wait for sender SDK
     var interval = setInterval(() => {
       if (window.chrome.cast && window.chrome.cast.isAvailable) {
         clearInterval(interval);
-        this.init();
+        // Set cast options
+        cast.framework.CastContext.getInstance().setOptions({
+          receiverApplicationId:  this.receiver,
+          autoJoinPolicy:         this.joinpolicy
+        });
+        // Create controller
+        this.player     = new cast.framework.RemotePlayer();
+        this.controller = new cast.framework.RemotePlayerController(this.player);
+        // Register callback events
+        this.controller.addEventListener('isConnectedChanged',  this.controller_isConnectedChanged.bind(this));
+        this.controller.addEventListener('currentTimeChanged',  this.controller_currentTimeChanged.bind(this));
+        this.controller.addEventListener('durationChanged',     this.controller_durationChanged.bind(this));
+        this.controller.addEventListener('volumeLevelChanged',  this.controller_volumeLevelChanged.bind(this));
+        this.controller.addEventListener('isMutedChanged',      this.controller_isMutedChanged.bind(this));
+        this.controller.addEventListener('isPausedChanged',     this.controller_isPausedChanged.bind(this));
+        this.controller.addEventListener('playerStateChanged',  this.controller_playerStateChanged.bind(this));
+        this.available = true;
+        this.trigger('available')
       }
-    }, 250)
+    }, 250);
   };
-  init = () => {
-    // Set cast options
-    cast.framework.CastContext.getInstance().setOptions({
-      receiverApplicationId:  this.receiver,
-      autoJoinPolicy:         this.joinpolicy
-    });
-    // Create controller
-    this.player     = new cast.framework.RemotePlayer();
-    this.controller = new cast.framework.RemotePlayerController(this.player);
-    // Register callback events
-    this.controller.addEventListener('isConnectedChanged',  this.isConnectedChanged);
-    this.controller.addEventListener('currentTimeChanged',  this.currentTimeChanged);
-    this.controller.addEventListener('durationChanged',     this.durationChanged);
-    this.controller.addEventListener('volumeLevelChanged',  this.volumeLevelChanged);
-    this.controller.addEventListener('isMutedChanged',      this.isMutedChanged);
-    this.controller.addEventListener('isPausedChanged',     this.isPausedChanged);
-    this.controller.addEventListener('playerStateChanged',  this.playerStateChanged);
-    this.available = true;
-    this.trigger('available')
-  };
-  // Controller events
-  isConnectedChanged  = () => {
+  // Player controller events
+  controller_isConnectedChanged() {
     // Weird bug, need to skip a tick...
     setTimeout(() => {
-      // Check if we are connected
-      this.connected = this.player.isConnected
-      if (!this.connected) {
+      // Check if we have a running session
+      this.session = this.player.isConnected
+      if (!this.session) {
         return;
       }
-      this.trigger('connected')
       // Return if no media is loaded, nothing to update
       if (!this.player.isMediaLoaded) {
         return;
@@ -113,7 +101,7 @@ class Castjs {
       this.trigger('session', this.media)
     })
   };
-  currentTimeChanged = () => {
+  controller_currentTimeChanged() {
     this.media.progress = this.controller.getSeekPosition(this.player.currentTime, this.player.duration);
     this.media.time     = this.controller.getFormattedTime(this.player.currentTime);
     this.media.duration = this.controller.getFormattedTime(this.player.duration);
@@ -127,30 +115,30 @@ class Castjs {
       this.disconnect();
     }
   };
-  durationChanged = () => {
+  controller_durationChanged() {
     this.media.duration = this.player.duration;
   };
-  volumeLevelChanged = () => {
+  controller_volumeLevelChanged() {
     this.media.volume = this.player.volumeLevel;
     this.trigger('volume', this.media.volume);
   };
-  isMutedChanged = () => {
+  controller_isMutedChanged() {
     this.media.muted = this.player.isMuted;
     this.trigger('muted', this.media.muted);
   };
-  isPausedChanged = () => {
+  controller_isPausedChanged() {
     this.media.paused = this.player.isPaused;
     this.trigger('pause', this.media.paused);
   };
-  playerStateChanged = () => {
+  controller_playerStateChanged(){
     this.media.state = this.player.playerState.toLowerCase();
     if (this.media.state === 'idle') {
       this.media.state = 'disconnected';
     }
     this.trigger('state', this.media.state);
   };
-  // Castjs methods
-  on = (event, fn) => {
+  // Class functions
+  on(event, fn) {
     // If event is not registered, create array to store callbacks
     if (!this.events[event]) {
       this.events[event] = [];
@@ -158,8 +146,8 @@ class Castjs {
     // Push callback into event array
     this.events[event].push(fn);
   };
-  off = (event, fn) => {
-    // If wildcard was given, reset all events
+  off(event, fn) {
+    // If no event name was given, reset all events
     if (!event) {
       return this.events = {}
     }
@@ -167,11 +155,11 @@ class Castjs {
     if (!this.events[event]) {
       return;
     }
-    // If no function or wildcard was given, we remove all callbacks for this event
-    if (typeof fn === 'undefined' || fn === '*') {
+    // If no function exist, remove all callbacks f event
+    if (typeof fn === 'undefined') {
       return this.events[event] = [];
     }
-    // If event and function exist, remove it
+    // If event name and function exist, remove callback
     for (var i in this.events[event]) {
       if (this.events[event][i] === fn) {
         this.events[event].splice(i, 1);
@@ -179,13 +167,13 @@ class Castjs {
       }
     }
   };
-  trigger = (event, data) => {
+  trigger(event, data) {
     // If event exist, call callback with callback data
     for (var i in this.events[event]) {
       this.events[event][i](data);
     }
   };
-  cast = (source, metadata = {}) => {
+  cast(source, metadata = {}) {
     // We need a source! Don't forget to enable CORS
     if (!source) {
       return this.trigger('error', 'No media source specified.');
@@ -248,40 +236,48 @@ class Castjs {
       cast.framework.CastContext.getInstance().getCurrentSession().loadMedia(request).then(() => {
         this.trigger('connected');
         this.trigger('session', this.media);
+        return this;
       }, (err) => {
         this.trigger('error', err);
+        return this;
       })
     }, (err) => {
       this.trigger('error', err)
+      return this;
     })
   };
-  seek = (percentage) => {
+  seek(percentage) {
     this.player.currentTime = this.controller.getSeekTime(percentage, this.player.duration);
     this.controller.seek();
+    return this;
   };
-  volume = (float) => {
+  volume(float) {
     this.player.volumeLevel = float;
     this.controller.setVolumeLevel();
+    return this;
   };
-  play = () => {
+  play() {
     if (this.media.paused) {
       this.controller.playOrPause();
     }
+    return this;
   };
-  pause = () => {
+  pause() {
     if (!this.media.paused) {
       this.controller.playOrPause();
     }
+    return this;
   };
-  mute = (bool) => {
+  mute(bool) {
     // Brainfart, this could be cleaner code
     if (bool === true && this.media.muted === false) {
       this.controller.muteOrUnmute();
     } else if (bool === false && this.media.muted === true) {
       this.controller.muteOrUnmute();
     }
+    return this;
   };
-  subtitle = (index) => {
+  subtitle(index) {
     // Another function why people love this library <3
     var request = new chrome.cast.media.EditTracksInfoRequest([index]);
     cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].editTracksInfo(request, null, null);
@@ -291,16 +287,18 @@ class Castjs {
         this.media.subtitles[i].active = true;
       }
     }
+    return this;
   };
-  disconnect = () => {
+  disconnect() {
     // Terminate session
     cast.framework.CastContext.getInstance().endCurrentSession(true);
     this.controller.stop();
     // Reset some variables
     this.media                = Object.assign({}, this.template);
-    this.connected            = false;
+    this.session              = false;
     this.media.state          = 'disconnected';
     this.trigger('disconnected');
+    return this;
   };
   // Todo: custom receiver messaging
   // message = () => {};
