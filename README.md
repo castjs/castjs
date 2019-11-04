@@ -90,7 +90,7 @@ cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sinte
 // Cast controllers
 cc.media           // Media object with information
 cc.seek(50)        // Seeks to input percentage (0 - 100)
-cc.volume(0.2)     // Change volume percentage (0 - 1.0)
+cc.volume(0.2)     // Change volume float (0 - 1)
 cc.play()          // Plays media
 cc.pause()         // Pauses media
 cc.mute(bool)      // Boolean to mute or unmute
