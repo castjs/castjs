@@ -19,7 +19,7 @@
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://cdn.jsdelivr.net/gh/fenny/castjs/castjs.min.js"></script>
+<script src="https://fenny.github.io/Castjs/cast.min.js"></script>
 ```
 
 ##### Casting a video is simple:
