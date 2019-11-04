@@ -73,8 +73,8 @@ cc.off('event')     // Removes all callbacks for event
 cc.off('event', fn) // Removes specific callback for event
 
 // Casting media
-cc.cast('https://example.com/video.mp4') // Cast media source
-cc.cast('https://example.com/video.mp4', {
+cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4') // Cast media source
+cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
   poster:      'https://fenny.github.io/Castjs/demo/poster.png',
   title:       'Sintel',
   description: 'Third Open Movie by Blender Foundation',
