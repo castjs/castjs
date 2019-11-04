@@ -25,13 +25,10 @@
 ##### Casting a video is simple:
 
 ```js
-// Invoke Castjs
 var cc = new Castjs()
 
 $('#cast').on('click', () => {
-  // Check if a cast device is available
   if (cc.available) {
-    // Cast media
     cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')
   }
 })
