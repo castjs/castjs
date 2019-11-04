@@ -50,7 +50,12 @@ cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sinte
 // Invoke CastJS
 const cc = new Castjs()
 // Optional arguments
-const cc = new Castjs({ receiver: 'CC1AD845', joinpolicy: 'origin_scoped' })
+const cc = new Castjs({ 
+  receiver: 'CC1AD845', 
+  joinpolicy: 'origin_scoped',
+  language: null,
+  resume: true
+})
 
 // Create events
 cc.on('available',    ()           => {}) // Cast device available
