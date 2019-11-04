@@ -53,8 +53,7 @@ const cc = new Castjs()
 // Optional arguments
 const cc = new Castjs({ 
   receiver:   'CC1AD845',       // Cast application id.
-  joinpolicy: 'origin_scoped',  // Indicates if to join a running session on initialization.
-                                // https://developers.google.com/cast/docs/reference/chrome/chrome.cast.html#.AutoJoinPolicy
+  joinpolicy: 'origin_scoped',  // https://developers.google.com/cast/docs/reference/chrome/chrome.cast.html#.AutoJoinPolicy
   language:   null,             // Language to use.
   resume:     true              // If true, a session will be re-joined without reloading the page.
 })
