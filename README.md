@@ -52,7 +52,7 @@ cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sinte
 const cc = new Castjs()
 // Optional arguments
 const cc = new Castjs({ 
-  receiver:   'CC1AD845',       // Cast application id.
+  receiver:   'CC1AD845',       // Custom cast application id.
   joinpolicy: 'origin_scoped',  // https://developers.google.com/cast/docs/reference/chrome/chrome.cast.html#.AutoJoinPolicy
   language:   null,             // Language to use.
   resume:     true              // If true, a session will be re-joined without reloading the page.
