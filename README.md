@@ -27,7 +27,7 @@
 ```js
 var cc = new Castjs()
 
-$('#cast').on('click', () => {
+$('button').on('click', () => {
   if (cc.available) {
     cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4')
   }
