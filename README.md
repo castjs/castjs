@@ -105,6 +105,16 @@ cc.subtitle(index) // Make subtitle track active
 cc.disconnect()    // Disconnect session
 ```
 
+
+##### Todo so I won't forget
+
+```javascript
+- Rewrite event handler to accept multiple arguments
+- Add the 'any' event inside the event handler instead
+- Add local media and stream support after google fixes service worker crash
+- Add name space messaging support for custom receivers
+- Maybe add video element support new Castjs($('#video'))
+```
 <p align="center">
   <br>
   <br>
