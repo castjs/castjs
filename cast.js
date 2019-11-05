@@ -60,6 +60,7 @@ class Castjs {
         this.controller.addEventListener('playerStateChanged',  this.controller_playerStateChanged.bind(this));
         this.available = true;
         this.trigger('available')
+        this.trigger('any', 'available')
       }
     }, 250);
   };
@@ -109,8 +110,9 @@ class Castjs {
       if (active.length && this.media.subtitles[active[0]]) {
         this.media.subtitles[active[0]].active = true;
       }
-      // Trigger session event with media object
-      this.trigger('session', this.media)
+      // Trigger session event
+      this.trigger('session');
+      this.trigger('any', 'session');
     })
   };
   controller_currentTimeChanged() {
@@ -122,6 +124,7 @@ class Castjs {
       time:     this.media.time,
       duration: this.media.duration
     })
+    this.trigger('any', 'time');
     if (this.media.progress >= 100) {
       this.trigger('end');
       this.disconnect();
@@ -133,14 +136,17 @@ class Castjs {
   controller_volumeLevelChanged() {
     this.media.volume = this.player.volumeLevel;
     this.trigger('volume', this.media.volume);
+    this.trigger('any', 'volume');
   };
   controller_isMutedChanged() {
     this.media.muted = this.player.isMuted;
     this.trigger('muted', this.media.muted);
+    this.trigger('any', 'muted');
   };
   controller_isPausedChanged() {
     this.media.paused = this.player.isPaused;
     this.trigger('pause', this.media.paused);
+    this.trigger('any', 'pause');
   };
   controller_playerStateChanged(){
     this.media.state = this.player.playerState.toLowerCase();
@@ -148,6 +154,7 @@ class Castjs {
       this.media.state = 'disconnected';
     }
     this.trigger('state', this.media.state);
+    this.trigger('any', 'state');
   };
   // Class functions
   on(event, fn) {
@@ -248,7 +255,8 @@ class Castjs {
       cast.framework.CastContext.getInstance().getCurrentSession().loadMedia(request).then(() => {
         // Set device name
         this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName;
-        this.trigger('session', this.media);
+        this.trigger('session');
+        this.trigger('any', 'session');
         return this;
       }, (err) => {
         this.trigger('error', err);
@@ -311,6 +319,7 @@ class Castjs {
     this.session              = false;
     this.media.state          = 'disconnected';
     this.trigger('disconnected');
+    this.trigger('any', 'disconnected');
     return this;
   };
   // Todo: custom receiver messaging
