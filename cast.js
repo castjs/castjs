@@ -12,7 +12,7 @@ class Castjs {
     }
     // Set main variables
     this.receiver   = receiver            || 'CC1AD845';
-    this.joinpolicy = options.joinpolicy  || 'origin_scoped';
+    this.joinpolicy = options.joinpolicy  || 'tab_and_origin_scoped';
     this.language   = options.language    || null;
     this.resume     = options.resume      || true;
     this.available  = false;
@@ -59,8 +59,7 @@ class Castjs {
         this.controller.addEventListener('isPausedChanged',     this.controller_isPausedChanged.bind(this));
         this.controller.addEventListener('playerStateChanged',  this.controller_playerStateChanged.bind(this));
         this.available = true;
-        this.trigger('available')
-        this.trigger('any', 'available')
+        this.trigger('available');
       }
     }, 250);
   };
@@ -112,7 +111,6 @@ class Castjs {
       }
       // Trigger session event
       this.trigger('session');
-      this.trigger('any', 'session');
     })
   };
   controller_currentTimeChanged() {
@@ -123,8 +121,7 @@ class Castjs {
       progress: this.media.progress,
       time:     this.media.time,
       duration: this.media.duration
-    })
-    this.trigger('any', 'time');
+    });
     if (this.media.progress >= 100) {
       this.trigger('end');
       this.disconnect();
@@ -136,17 +133,14 @@ class Castjs {
   controller_volumeLevelChanged() {
     this.media.volume = this.player.volumeLevel;
     this.trigger('volume', this.media.volume);
-    this.trigger('any', 'volume');
   };
   controller_isMutedChanged() {
     this.media.muted = this.player.isMuted;
     this.trigger('muted', this.media.muted);
-    this.trigger('any', 'muted');
   };
   controller_isPausedChanged() {
     this.media.paused = this.player.isPaused;
     this.trigger('pause', this.media.paused);
-    this.trigger('any', 'pause');
   };
   controller_playerStateChanged(){
     this.media.state = this.player.playerState.toLowerCase();
@@ -154,7 +148,6 @@ class Castjs {
       this.media.state = 'disconnected';
     }
     this.trigger('state', this.media.state);
-    this.trigger('any', 'state');
   };
   // Class functions
   on(event, fn) {
@@ -190,6 +183,10 @@ class Castjs {
     // If event exist, call callback with callback data
     for (var i in this.events[event]) {
       this.events[event][i](data);
+    }
+    // any callback
+    for (var i in this.events['any']) {
+      this.events['any'][i](event);
     }
   };
   cast(source, metadata = {}) {
@@ -256,7 +253,6 @@ class Castjs {
         // Set device name
         this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName;
         this.trigger('session');
-        this.trigger('any', 'session');
         return this;
       }, (err) => {
         this.trigger('error', err);
@@ -319,7 +315,6 @@ class Castjs {
     this.session              = false;
     this.media.state          = 'disconnected';
     this.trigger('disconnected');
-    this.trigger('any', 'disconnected');
     return this;
   };
   // Todo: custom receiver messaging
