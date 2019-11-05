@@ -2,7 +2,7 @@
   <br>
   <img src="https://i.imgur.com/elCjMDx.png" alt="Castjs" width="150">
   <br>
-  Castjs v1
+  Castjs v1.1.0
   <br>
   <br>
 </h1>
@@ -19,7 +19,7 @@
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@1.0.1/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@1.1.0/cast.min.js"></script>
 ```
 
 ##### Casting a video is simple:
