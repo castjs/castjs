@@ -80,7 +80,7 @@ class Castjs {
       this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName;
       // Update media object
       this.media = {
-        src:          this.player.mediaInfo.contentId,
+        source:       this.player.mediaInfo.contentId,
         poster:       this.player.imageUrl || null,
         title:        this.player.title || null,
         description:  this.player.mediaInfo.metadata.subtitle || null,
