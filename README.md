@@ -1,8 +1,8 @@
 <h1 align="center">
   <br>
-  <img src="https://i.imgur.com/elCjMDx.png" alt="Castjs" width="150">
+  <img src="https://i.imgur.com/elCjMDx.png" alt="Castjs" width="100">
   <br>
-  Castjs v1.1.0
+  Castjs
   <br>
   <br>
 </h1>
