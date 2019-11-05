@@ -58,7 +58,7 @@ const cc = new Castjs({
 })
 
 // Create events
-cc.on('any',    (str)              => {}) // Any event except error
+cc.on('any',          (str)        => {}) // Any event except error
 cc.on('available',    ()           => {}) // Cast device available
 cc.on('state',        (str)        => {}) // Media state changed
 cc.on('session',      ()           => {}) // Connected
