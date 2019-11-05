@@ -114,6 +114,8 @@ cc.disconnect()    // Disconnect session
 - Add local media and stream support after google fixes service worker crash
 - Add name space messaging support for custom receivers
 - Maybe add video element support new Castjs($('#video'))
+
+// Suggestions? Let me know!
 ```
 <p align="center">
   <br>
