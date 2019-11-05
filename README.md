@@ -58,9 +58,10 @@ const cc = new Castjs({
 })
 
 // Create events
+cc.on('any',    (str)              => {}) // Any event except error
 cc.on('available',    ()           => {}) // Cast device available
 cc.on('state',        (str)        => {}) // Media state changed
-cc.on('session',      (media)      => {}) // Connected
+cc.on('session',      ()           => {}) // Connected
 cc.on('time',         (obj)        => {}) // Time changed
 cc.on('volume',       (float)      => {}) // Volume changed
 cc.on('mute',         (bool)       => {}) // Muted or Unmuted
