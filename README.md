@@ -25,7 +25,7 @@
 ##### Casting a video is simple:
 
 ```js
-var cc = new Castjs()
+const cc = new Castjs()
 
 $('button').on('click', () => {
   if (cc.available) {
