@@ -3,43 +3,48 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://fonts.googleapis.com/css?family=Inconsolata:400,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.css">
+    <link rel="stylesheet" href="style.css">
     <title>Castjs 📺 Demo</title>
   </head>
-  <body
+  <body>
     <div class="wrapper">
-      <h1>Castjs 📺 Demo</h1>
-      <div class="link">
-        Full documentation: <a href="https://github.com/fenny/castjs">https://github.com/fenny/castjs</a>
-      </div>
-      <div class="column">
-        <label for="source">Source</label>
-        <input id="source" type="text" value="">
-        <label for="poster">Poster</label>
-        <input id="poster" type="text" value="">
-        <label for="title">Title</label>
-        <input id="title" type="text" value="">
-        <label for="description">Description</label>
-        <input id="description" type="text" value="">Subtitle Track 1</label>
-        <input id="subtitle-1" type="text" value="">
-        <label for="subtitle-2">Subtitle Track 2</label>
-        <input id="subtitle-2" type="text" value="">
-        <div class="actions">
-          <button id="cast" class="disabled"><img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Chromecast_cast_button_icon.svg">Cast Media</button>
-          <button id="disconnect"><img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Chromecast_cast_button_icon.svg">Disconnect</button>
+      <h1>Demo</h1>
+      <a class="link" href="https://github.com/fenny/castjs">https://github.com/fenny/castjs</a>
+      <img class="poster" src="https://fenny.github.io/Castjs/demo/poster.jpg">
+      <div class="settings">
+        <i id="captions" data-jq-dropdown="#jq-dropdown-1" class="fas fa-closed-captioning"></i>
+        <div id="jq-dropdown-1" class="jq-dropdown jq-dropdown-tip">
+          <ul class="jq-dropdown-menu">
+            <li><a class="active" href="0">English</a></li>
+            <li><a href="1">Spanish</a></li>
+          </ul>
         </div>
+        <i id="mute" class="fas fa-volume-up"></i>
+        <i id="cast" class="fab fa-chromecast disabled"></i>
       </div>
-      <div class="column">
-        <label for="source">Controller</label>
-        <video id="video" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" autoplay muted controls disableRemotePlayback disablePictureInPicture controlsList="nodownload"></video>
-        <label for="source">Cast Debugger</label>
-        <pre id="debug"></pre>
+      <div class="timeline">
+        <div class="time">00:00:00</div>
+        <input type="range" min="0" max="100" step="1" value="0">
+        <div class="duration">00:00:00</div>
       </div>
+      <div class="controls">
+        <i id="back" class="fas fa-history"></i>
+        <i id="play" class="fas fa-play"></i>
+        <i id="stop" class="fas fa-stop"></i>
+      </div>
+      <div class="title">Sintel</div>
+      <div class="description">Third Open Movie by Blender Foundation</div>
+      <div class="state">Disconnected</div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.js"></script>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-    <script src="https://cdn.jsdelivr.net/gh/fenny/castjs@1.0.0/cast.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/fenny/castjs@2.0.0/cast.min.js"></script>
     <script src="main.js" crossorigin="anonymous"></script>
   </body>
 </html>
