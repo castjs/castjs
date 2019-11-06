@@ -16,10 +16,11 @@
 </p>
 
 ##### Getting started
+Include the Cast sender and Castjs in your html page, Castjs is hosted on jsDelivr CDN for easy inclusion on your site.
 
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@1.1.9/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@latest/cast.min.js"></script>
 ```
 
 ##### Casting a video is simple:
