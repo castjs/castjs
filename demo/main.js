@@ -15,8 +15,7 @@ cc.on('disconnect', () => {
   $('#cast').removeClass('session')
 })
 cc.on('state', (state) => {
-  console.log(state)
-  $('.state').text(state)
+  $('.state').text(cc.device + ': ' + state)
 })
 cc.on('pause', () => {
   if (cc.media.paused) {
