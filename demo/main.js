@@ -1,126 +1,113 @@
 var cc = new Castjs();
-var $debug    = $('#debug');
-
-var $metadata = {
-  source:      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-  poster:      'https://fenny.github.io/Castjs/demo/poster.png',
-  title:       'Sintel',
-  description: 'Third Open Movie by Blender Foundation',
-  subtitles: [{
-      active: true,
-      label:  'English',
-      src:    'https://fenny.github.io/Castjs/demo/english.vtt'
-  }, {
-      label:  'Spanish',
-      src:    'https://fenny.github.io/Castjs/demo/spanish.vtt'
-  }]
-};
-$('#video').on('seeked', () => {
-  if (cc.session) {
-    cc.seek(Math.floor(($('#video')[0].currentTime/$('#video')[0].duration) * 100))
-  }
-})
-$('#video').on('pause', () => {
-  if (cc.session) {
-    cc.pause()
-  }
-})
-$('#video').on('play', () => {
-  if (cc.session) {
-    cc.play()
-  }
-})
-$('#video').on('volumechange', () => {
-  if (cc.session) {
-    cc.volume($('#video')[0].volume)
-  }
-})
-updateUI()
-$('#cast').on('click', () => {
-  $metadata.source = $('#source').val()
-  $metadata.poster = $('#poster').val()
-  $metadata.title = $('#title').val()
-  $metadata.description = $('#description').val()
-  $metadata.subtitles = []
-  if ($('#subtitle-1').val()) {
-    $metadata.subtitles.push({
-      active: true,
-      label:  $('#subtitle-1').val().substring($('#subtitle-1').val().lastIndexOf('/')+1).split('.')[0],
-      src:    $('#subtitle-1').val()
-    })
-  }
-  if ($('#subtitle-2').val()) {
-    $metadata.subtitles.push({
-      label:  $('#subtitle-2').val().substring($('#subtitle-2').val().lastIndexOf('/')+1).split('.')[0],
-      src:    $('#subtitle-2').val()
-    })
-  }
-  updateUI()
-  cc.cast($metadata.source, $metadata);
-})
-$('#disconnect').on('click', () => {
-  if (cc.session) {
-    cc.disconnect();
-    $('#video')[0].currentTime = 0;
-    $('#video')[0].pause()
-  }
-})
-function updateUI() {
-  $('#source').val($metadata.source || $metadata.src);
-  $('#poster').val($metadata.poster);
-  $('#title').val($metadata.title);
-  $('#description').val($metadata.description)
-  for (var i = 0; i < 2; i++) {
-    $('#subtitle-' + (i + 1)).val($metadata.subtitles[i].src);
-  }
-  $('#video').attr('src', $metadata.source || $metadata.src)
-  if ($metadata.paused) {
-    $('#video')[0].pause()
-  } else {
-    $('#video')[0].play()
-  }
-  $('#video').on('loadedmetadata', () => {
-    try {
-      $('#video')[0].currentTime = ($('#video')[0].duration / 100) * $metadata.progress;
-    } catch (err) {
-
-    }
-  })
-}
-
 cc.on('available', () => {
   $('#cast').removeClass('disabled')
-});
+})
 cc.on('session', () => {
-  $('#cast').hide()
-  $('#disconnect').show();
-  $metadata = cc.media;
-  updateUI()
-  $debug.html(JSON.stringify(cc.media, undefined, 2));
+  $('#cast').removeClass('disabled')
+  $('#cast').addClass('session')
+  if (cc.media.paused) {
+    $('#play').removeClass('fa-pause').addClass('fa-play')
+  } else {
+    $('#play').removeClass('fa-play').addClass('fa-pause')
+  }
 })
-cc.on('state', () => {
-  $debug.html(JSON.stringify(cc.media, undefined, 2));
+cc.on('disconnect', () => {
+  $('#cast').removeClass('session')
 })
-cc.on('time', () => {
-  $debug.html(JSON.stringify(cc.media, undefined, 2));
-})
-cc.on('volume', () => {
-  $debug.html(JSON.stringify(cc.media, undefined, 2));
-})
-cc.on('mute', () => {
-  $debug.html(JSON.stringify(cc.media, undefined, 2));
+cc.on('state', (state) => {
+  console.log(state)
+  $('.state').text(state)
 })
 cc.on('pause', () => {
-  $debug.html(JSON.stringify(cc.media, undefined, 2));
+  if (cc.media.paused) {
+    $('#play').removeClass('fa-pause').addClass('fa-play')
+  } else {
+    $('#play').removeClass('fa-play').addClass('fa-pause')
+  }
 })
-cc.on('end', () => {
-  $debug.html(JSON.stringify(cc.media, undefined, 2));
+cc.on('mute', () => {
+  if (cc.media.muted) {
+    $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
+  } else {
+    $('#mute').removeClass('fa-volume-mute').addClass('fa-volume-up')
+  }
 })
-cc.on('disconnected', () => {
-  $('#cast').show();
-  $('#disconnect').hide();
-  $debug.html('Disconnected');
+cc.on('time', (obj) => {
+  $('.time').text(obj.time);
+  $('.duration').text(obj.duration);
+  $('input[type="range"]').attr('value', obj.progress);
+  $('input[type="range"]').rangeslider('update', true);
 })
-cc.on('error', (err) => {
-  $debug.html(err);
+$('#cast').on('click', () => {
+  if (cc.available) {
+    cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
+      poster:      'https://fenny.github.io/Castjs/demo/poster.jpg',
+      title:       'Sintel',
+      description: 'Third Open Movie by Blender Foundation',
+      subtitles: [{
+          active: true,
+          label:  'English',
+          src:    'https://fenny.github.io/Castjs/demo/english.vtt'
+      }, {
+          label:  'Spanish',
+          src:    'https://fenny.github.io/Castjs/demo/spanish.vtt'
+      }],
+      muted:  false,
+      paused: false
+    })
+  }
 })
+$('.jq-dropdown-menu').on('click', 'a', function(e) {
+  e.preventDefault();
+  var index = $(this).attr('href')
+  if (cc.session) {
+    cc.subtitle(index)
+  }
+  $('.jq-dropdown-menu a').removeClass('active')
+  $(this).addClass('active')
+})
+$('#mute').on('click', () => {
+  if (cc.session) {
+    if ($('#mute').hasClass('fa-volume-up')) {
+      cc.mute(true);
+      $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
+    } else {
+      cc.mute(false);
+      $('#mute').removeClass('fa-volume-mute').addClass('fa-volume-up')
+    }
+  }
+})
+$('#play').on('click', () => {
+  if (cc.session) {
+    if ($('#play').hasClass('fa-play')) {
+      cc.play();
+      $('#play').removeClass('fa-play').addClass('fa-pause')
+    } else {
+      cc.pause();
+      $('#play').removeClass('fa-pause').addClass('fa-play')
+    }
+  }
+})
+$('#stop').on('click', () => {
+  if (cc.session) {
+    cc.disconnect();
+    $('#cast').removeClass('session');
+  }
+})
+$('#back').on('click', () => {
+  if (cc.session) {
+    var goback = cc.media.progress - 1;
+    if (goback <= 0) {
+      goback = 0;
+    }
+    cc.seek(goback)
+  }
+})
+var slider = $('input[type="range"]').rangeslider({
+  polyfill: false,
+  onSlideEnd: function(pos, val) {
+    if (cc.session) {
+      cc.seek(val)
+    }
+  }
+});
