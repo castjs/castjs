@@ -314,7 +314,7 @@ class Castjs {
     this.media                = Object.assign({}, this.template);
     this.session              = false;
     this.media.state          = 'disconnected';
-    this.trigger('disconnected');
+    this.trigger('disconnect');
     return this;
   };
   // Todo: custom receiver messaging
