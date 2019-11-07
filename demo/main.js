@@ -106,7 +106,7 @@ var slider = $('input[type="range"]').rangeslider({
   polyfill: false,
   onSlideEnd: function(pos, val) {
     if (cc.session) {
-      cc.seek(val)
+      cc.seek(val, true);
     }
   }
 });
