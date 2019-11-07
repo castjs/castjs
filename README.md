@@ -38,8 +38,8 @@ $('button').on('click', () => {
 ##### Adding some metadata is simple too:
 
 ```js
-var device = new Castjs();
-var source = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4';
+var device   = new Castjs();
+var source   = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4';
 var metadata = {
   title:       'Sintel',
   description: 'Third Open Movie by Blender Foundation',
