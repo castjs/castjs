@@ -12,7 +12,7 @@
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with chromecast devices from the browser.
   <br>
-  This library works in chrome, opera, brave and vivaldi, see it in action and check out the <a href="https://fenny.github.io/Castjs/demo/">demo v2.0.0</a>.
+  This library works in chrome, opera, brave and vivaldi, see it in action and check out the <a href="https://fenny.github.io/Castjs/demo/">online demo</a>.
 </p>
 
 ##### Getting started
