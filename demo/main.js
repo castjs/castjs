@@ -5,7 +5,7 @@ cc.on('available', () => {
 cc.on('session', () => {
   $('#cast').removeClass('disabled')
   $('#cast').addClass('session')
-  if (cc.media.paused) {
+  if (cc.paused) {
     $('#play').removeClass('fa-pause').addClass('fa-play')
   } else {
     $('#play').removeClass('fa-play').addClass('fa-pause')
@@ -17,24 +17,24 @@ cc.on('disconnect', () => {
 cc.on('state', (state) => {
   $('.state').text(cc.device + ': ' + state)
 })
-cc.on('pause', () => {
-  if (cc.media.paused) {
+cc.on('paused', () => {
+  if (cc.paused) {
     $('#play').removeClass('fa-pause').addClass('fa-play')
   } else {
     $('#play').removeClass('fa-play').addClass('fa-pause')
   }
 })
-cc.on('mute', () => {
-  if (cc.media.muted) {
+cc.on('muted', () => {
+  if (cc.muted) {
     $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
   } else {
     $('#mute').removeClass('fa-volume-mute').addClass('fa-volume-up')
   }
 })
-cc.on('time', (obj) => {
-  $('.time').text(obj.time);
-  $('.duration').text(obj.duration);
-  $('input[type="range"]').attr('value', obj.progress);
+cc.on('timeupdate', () => {
+  $('.time').text(cc.timePretty);
+  $('.duration').text(cc.durationPretty);
+  $('input[type="range"]').attr('value', cc.progress);
   $('input[type="range"]').rangeslider('update', true);
 })
 $('#cast').on('click', () => {
@@ -46,10 +46,10 @@ $('#cast').on('click', () => {
       subtitles: [{
           active: true,
           label:  'English',
-          src:    'https://fenny.github.io/Castjs/demo/english.vtt'
+          source: 'https://fenny.github.io/Castjs/demo/english.vtt'
       }, {
           label:  'Spanish',
-          src:    'https://fenny.github.io/Castjs/demo/spanish.vtt'
+          source:    'https://fenny.github.io/Castjs/demo/spanish.vtt'
       }],
       muted:  false,
       paused: false
@@ -95,7 +95,7 @@ $('#stop').on('click', () => {
 })
 $('#back').on('click', () => {
   if (cc.session) {
-    var goback = cc.media.progress - 1;
+    var goback = cc.progress - 1;
     if (goback <= 0) {
       goback = 0;
     }
