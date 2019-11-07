@@ -16,8 +16,6 @@
 </p>
 
 ##### Getting started
-Include the Cast sender and Castjs in your html page, Castjs is hosted on jsDelivr CDN for easy inclusion on your site.
-
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 <script src="https://cdn.jsdelivr.net/gh/fenny/castjs@3.0.0/cast.min.js"></script>
@@ -89,9 +87,9 @@ device.pause();                 // Pause media
 device.mute();                  // Mutes media
 device.unmute();                // Unmutes media
 device.subtitle(2);             // Change active subtitle index
-device.disconnect();            // Disconnect session
 device.seek(seconds);           // Seek with seconds
 device.seek(percentage, true);  // Seek with percentages
+device.disconnect();            // Disconnect session
 
 // Castjs properties
 device.receiver         // Returns receiver id
