@@ -131,5 +131,5 @@ const device = new Castjs(joinpolicy, receiver);
 ```
 
 <p align="center">
-  Do you want to support my work, feel free to donate a [+ ☕ Hot Beverage](https://www.buymeacoffee.com/fenny)
+  Do you want to support my work, feel free to donate a <a href="https://www.buymeacoffee.com/fenny" target="_blank">☕ Hot Beverage</a>
 </p.
