@@ -1,10 +1,6 @@
 class Castjs {
   // Main variables
   constructor(receiver, joinpolicy) {
-    // Casting only works on chrome, opera, brave and vivaldi
-    if (!window.chrome) {
-      return console.warn('Castjs: Casting is not supported in this browser');
-    }
     var joinpolicies = [
       'tab_and_origin_scoped',
       'origin_scoped',
@@ -40,8 +36,12 @@ class Castjs {
     this.durationPretty = '00:00:00';
     this.progress       = 0;
     this.state          = 'disconnected';
-
     var interval = setInterval(() => {
+      // Casting only works on chrome, opera, brave and vivaldi
+      if (!window.chrome) {
+        clearInterval(interval);
+        return this.trigger('error', 'Casting is not available');
+      }
       if (window.chrome.cast && window.chrome.cast.isAvailable) {
         clearInterval(interval);
         // Set cast options
@@ -307,7 +307,7 @@ class Castjs {
   };
   subtitle(index) {
     // Another function why people love this library <3
-    var request = new chrome.cast.media.EditTracksInfoRequest([index]);
+    var request = new chrome.cast.media.EditTracksInfoRequest([parseInt(index)]);
     cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].editTracksInfo(request, () => {
       for (var i in this.subtitles) {
         delete this.subtitles[i].active;
