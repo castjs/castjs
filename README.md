@@ -51,7 +51,8 @@ var metadata = {
     source: 'https://fenny.github.io/Castjs/demo/spanish.vtt'
   }],
   muted:  false,
-  paused: false
+  paused: false,
+  time:   35
 }
 $('button').on('click', () => {
   if (device.available) {
