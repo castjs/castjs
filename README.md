@@ -122,7 +122,7 @@ const device = new Castjs(joinpolicy, receiver);
 
 ##### Todo so I won't forget
 
-```javascript
+```
 - Add local media and stream support after google fixes service worker crash
 - Add name space messaging support for custom receivers
 - Maybe add video element support: new Castjs($('#video'))
