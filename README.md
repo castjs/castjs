@@ -45,12 +45,12 @@ var metadata = {
   description: 'Third Open Movie by Blender Foundation',
   poster:      'https://fenny.github.io/Castjs/demo/poster.jpg',
   subtitles: [{
-      active: true,
-      label:  'English',
-      src:    'https://fenny.github.io/Castjs/demo/english.vtt'
+    active: true,
+    label:  'English',
+    source: 'https://fenny.github.io/Castjs/demo/english.vtt'
   }, {
-      label:  'Spanish',
-      src:    'https://fenny.github.io/Castjs/demo/spanish.vtt'
+    label:  'Spanish',
+    source: 'https://fenny.github.io/Castjs/demo/spanish.vtt'
   }],
   muted:  false,
   paused: false
