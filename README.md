@@ -129,8 +129,7 @@ const device = new Castjs(joinpolicy, receiver);
 
 // Suggestions? Let me know!
 ```
+
 <p align="center">
-  <br>
-  <br>
-  <a href="https://www.buymeacoffee.com/fenny" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
-<p align="center">
+  Do you want to support my work, feel free to donate a [☕ Hot Beverage](https://www.buymeacoffee.com/fenny)
+</p.
