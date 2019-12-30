@@ -68,10 +68,10 @@ $('.jq-dropdown-menu').on('click', 'a', function(e) {
 $('#mute').on('click', () => {
   if (cc.session) {
     if ($('#mute').hasClass('fa-volume-up')) {
-      cc.mute(true);
+      cc.mute();
       $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
     } else {
-      cc.mute(false);
+      cc.unmute();
       $('#mute').removeClass('fa-volume-mute').addClass('fa-volume-up')
     }
   }
