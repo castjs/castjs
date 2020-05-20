@@ -7,7 +7,7 @@ class Castjs {
       'page_scoped'
     ];
     // Doesn't matter in what order arguments are given
-    if (receiver && receiver.indexOf(joinpolicies) === -1) {
+    if (receiver && joinpolicies.indexOf(receiver) !== -1) {
       var tmp     = joinpolicy;
       joinpolicy  = receiver;
       receiver    = tmp;
