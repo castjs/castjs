@@ -12,13 +12,13 @@
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with chromecast devices from the browser.
   <br>
-  This library works in chrome, opera, brave and vivaldi, see it in action and check out the <a href="https://fenny.github.io/Castjs/demo/">online demo</a>.
+  This library works in chrome, opera, brave and vivaldi, see it in action and check out the <a href="https://castjs.github.io/castjs/demo/">online demo</a>.
 </p>
 
 ##### Getting started
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://cdn.jsdelivr.net/gh/fenny/castjs@3.0.1/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@3.0.1/cast.min.js"></script>
 ```
 
 ##### Casting a video is simple:
@@ -41,14 +41,14 @@ var source   = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sampl
 var metadata = {
   title:       'Sintel',
   description: 'Third Open Movie by Blender Foundation',
-  poster:      'https://fenny.github.io/Castjs/demo/poster.jpg',
+  poster:      'https://castjs.github.io/castjs/demo/poster.jpg',
   subtitles: [{
     active: true,
     label:  'English',
-    source: 'https://fenny.github.io/Castjs/demo/english.vtt'
+    source: 'https://castjs.github.io/castjs/demo/english.vtt'
   }, {
     label:  'Spanish',
-    source: 'https://fenny.github.io/Castjs/demo/spanish.vtt'
+    source: 'https://castjs.github.io/castjs/demo/spanish.vtt'
   }],
   muted:  false,
   paused: false,
