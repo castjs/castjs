@@ -27,8 +27,8 @@
 var device = new Castjs();
 var source = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4';
 $('button').on('click', () => {
-  if (device.available) {
-    device.cast(source);
+  if (cc.available) {
+    cc.cast(source);
   }
 });
 ```
@@ -55,8 +55,8 @@ var metadata = {
   time:   35
 }
 $('button').on('click', () => {
-  if (device.available) {
-    device.cast(source, metadata);
+  if (cc.available) {
+    cc.cast(source, metadata);
   }
 });
 ```
@@ -64,60 +64,64 @@ $('button').on('click', () => {
 ##### Documentation:
 
 ```javascript
-// Invoke Castjs (See bottom for optional arguments)
-const device = new Castjs();
+// New Castjs instance wiht optional opt
+const cc = new Castjs();
+const cc = new Castjs({
+    receiver  : 'CC1AD845',              // default receiver
+    joinpolicy: 'tab_and_origin_scoped', // default joinpolicy
+    // custom_controller_scoped
+    // origin_scoped
+    // page_scoped
+});
 
 // Castjs Events
-device.on('available',    ()  => {});  // Casting is available
-device.on('session',      ()  => {});  // Casting session detected
-device.on('statechange',  ()  => {});  // Casting state changed
-device.on('timeupdate',   ()  => {});  // Current time changed
-device.on('volumechange', ()  => {});  // Volume changed
-device.on('muted',        ()  => {});  // Muted changed
-device.on('paused',       ()  => {});  // Paused changed
-device.on('ended',        ()  => {});  // Media ended
-device.on('disconnect',   ()  => {});  // Session disconnected
-device.on('error',        (e) => {});  // Error event
-device.on('any',          (e) => {});  // Any event
+cc.on('available',    ()  => {});  // Casting is available
+cc.on('search',       ()  => {});  // Searching devices
+cc.on('cancel',       ()  => {});  // Cancelled the device selection
+cc.on('connect',      ()  => {});  // Connected with device
+cc.on('disconnect',   ()  => {});  // Disconnected with device
+cc.on('statechange',  ()  => {});  // Device state
+cc.on('timeupdate',   ()  => {});  // Current time changed
+cc.on('volumechange', ()  => {});  // Volume changed
+cc.on('mute',         ()  => {});  // Muted state changed
+cc.on('playing',      ()  => {});  // Media is playing
+cc.on('pause',        ()  => {});  // Media is paused
+cc.on('end',          ()  => {});  // Media ended
+cc.on('buffering',    ()  => {});  // Media is buffering / seeking
+cc.on('event',        (e) => {});  // Catch all events except 'error'
+cc.on('error',        (e) => {});  // Catch any errors
 
 // Castjs functions
-device.cast(source, metadata);  // Create session with media
-device.volume(1.0);             // Change volume
-device.play();                  // Play media
-device.pause();                 // Pause media
-device.mute();                  // Mutes media
-device.unmute();                // Unmutes media
-device.subtitle(2);             // Change active subtitle index
-device.seek(seconds);           // Seek with seconds
-device.seek(percentage, true);  // Seek with percentages
-device.disconnect();            // Disconnect session
+cc.cast(source, [metadata]);  // Create session with media
+cc.volume(0.7);              // Change volume
+cc.play();                   // Play media
+cc.pause();                  // Pause media
+cc.mute();                   // Mutes media
+cc.unmute();                 // Unmutes media
+cc.subtitles(2);             // Change active subtitle index
+cc.seek(seconds);            // Seek with seconds
+cc.seek(percentage, [true]); // Seek with percentages
+cc.disconnect();             // Disconnect session
 
 // Castjs properties
-device.receiver         // Returns receiver id
-device.available        // Returns available true or false
-device.session          // Returns session true or false
-device.device           // Returns cast device name
-device.source           // Returns media source
-device.title            // Returns media title
-device.description      // Returns media description
-device.poster           // Returns media poster image
-device.subtitles        // Returns subtitle array
-device.volumeLevel      // Returns volume 0 - 1
-device.muted            // Returns muted true or false
-device.paused           // Returns paused true or false
-device.time             // Returns duration in seconds
-device.timePretty       // Returns formatted current time hh:mm:ss
-device.duration         // Returns duration in seconds
-device.durationPretty   // Returns formatted duration hh:mm:ss
-device.progress         // Returns time progress 0 - 100
-
-// Optional Castjs arguments, order does not matter
-// receiver ~ custom receiver id
-// joinpolicy ~ tab_and_origin_scoped, origin_scoped, page_scoped
-const device = new Castjs(receiver);
-const device = new Castjs(joinpolicy);
-const device = new Castjs(receiver, joinpolicy);
-const device = new Castjs(joinpolicy, receiver);
+cc.receiver         // Receiver ID
+cc.available        // Casting is available
+cc.connected        // Connected with cast device
+cc.device           // Cast device name
+cc.src              // Media source
+cc.title            // Media title
+cc.description      // Media description
+cc.poster           // Media poster image
+cc.subtitles        // Media subtitles
+cc.volumeLevel      // Volume level
+cc.muted            // If muted
+cc.paused           // If paused
+cc.time             // Time in seconds
+cc.timePretty       // Time formatted in time hh:mm:ss
+cc.duration         // Duration in seconds
+cc.durationPretty   // Duration formatted in hh:mm:ss
+cc.progress         // Progress in percentage 0 - 100
+cc.state            // State of cast device
 ```
 
 ##### Todo so I won't forget

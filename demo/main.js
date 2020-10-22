@@ -1,8 +1,11 @@
+
 var cc = new Castjs();
+
 cc.on('available', () => {
   $('#cast').removeClass('disabled')
 })
-cc.on('session', () => {
+
+cc.on('connect', () => {
   $('#cast').removeClass('disabled')
   $('#cast').addClass('session')
   if (cc.paused) {
@@ -11,73 +14,75 @@ cc.on('session', () => {
     $('#play').removeClass('fa-play').addClass('fa-pause')
   }
 })
+
 cc.on('disconnect', () => {
   $('#cast').removeClass('session')
 })
-cc.on('state', (state) => {
-  $('.state').text(cc.device + ': ' + state)
+
+cc.on('statechange', () => {
+  $('#state').text(cc.device + ': ' + cc.state)
 })
-cc.on('paused', () => {
+
+cc.on('pause', () => {
   if (cc.paused) {
     $('#play').removeClass('fa-pause').addClass('fa-play')
   } else {
     $('#play').removeClass('fa-play').addClass('fa-pause')
   }
 })
-cc.on('muted', () => {
-  if (cc.muted) {
+
+cc.on('volumechange', () => {
+  if (cc.volumeLevel == 0) {
     $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
   } else {
     $('#mute').removeClass('fa-volume-mute').addClass('fa-volume-up')
   }
 })
+
 cc.on('timeupdate', () => {
-  $('.time').text(cc.timePretty);
-  $('.duration').text(cc.durationPretty);
-  $('input[type="range"]').attr('value', cc.progress);
-  $('input[type="range"]').rangeslider('update', true);
+  $('#time').text(cc.timePretty);
+  $('#duration').text(cc.durationPretty);
+  $('#range').attr('value', cc.progress);
+  $('#range').rangeslider('update', true);
 })
+
 $('#cast').on('click', () => {
   if (cc.available) {
     cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
-      poster:      'https://fenny.github.io/Castjs/demo/poster.jpg',
-      title:       'Sintel',
+      poster     : 'https://castjs.github.io/castjs/demo/poster.jpg',
+      title      : 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
       subtitles: [{
           active: true,
-          label:  'English',
-          source: 'https://fenny.github.io/Castjs/demo/english.vtt'
+          label : 'English',
+          src   : 'https://castjs.github.io/castjs/demo/english.vtt'
       }, {
-          label:  'Spanish',
-          source:    'https://fenny.github.io/Castjs/demo/spanish.vtt'
+          label : 'Spanish',
+          src   : 'https://castjs.github.io/castjs/demo/spanish.vtt'
       }],
-      muted:  false,
-      paused: false
     })
   }
 })
+
 $('.jq-dropdown-menu').on('click', 'a', function(e) {
   e.preventDefault();
   var index = $(this).attr('href')
-  if (cc.session) {
-    cc.subtitle(index)
-  }
+  cc.subtitle(index)
   $('.jq-dropdown-menu a').removeClass('active')
   $(this).addClass('active')
 })
+
 $('#mute').on('click', () => {
-  if (cc.session) {
     if ($('#mute').hasClass('fa-volume-up')) {
-      cc.mute();
+      cc.mute()
       $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
     } else {
-      cc.unmute();
+      cc.unmute()
       $('#mute').removeClass('fa-volume-mute').addClass('fa-volume-up')
     }
-  }
 })
+
 $('#play').on('click', () => {
-  if (cc.session) {
     if ($('#play').hasClass('fa-play')) {
       cc.play();
       $('#play').removeClass('fa-play').addClass('fa-pause')
@@ -85,28 +90,88 @@ $('#play').on('click', () => {
       cc.pause();
       $('#play').removeClass('fa-pause').addClass('fa-play')
     }
-  }
 })
+
 $('#stop').on('click', () => {
-  if (cc.session) {
     cc.disconnect();
     $('#cast').removeClass('session');
-  }
 })
+
 $('#back').on('click', () => {
-  if (cc.session) {
     var goback = cc.progress - 1;
     if (goback <= 0) {
       goback = 0;
     }
     cc.seek(goback)
-  }
 })
+
 var slider = $('input[type="range"]').rangeslider({
   polyfill: false,
   onSlideEnd: function(pos, val) {
-    if (cc.session) {
+    if (cc.connected) {
       cc.seek(val, true);
     }
   }
 });
+
+
+cc.on('event', (event) => {
+  //console.log('event:', event)
+})
+
+cc.on('available', () => {
+  console.log('available')
+})
+
+cc.on('search', () => {
+  console.log('searching')
+})
+
+cc.on('connect', () => {
+  console.log('connected')
+})
+
+cc.on('disconnect', () => {
+  console.log('disconnected')
+})
+
+
+cc.on('playing', () => {
+  console.log('playing')
+})
+
+cc.on('pause', () => {
+  console.log('paused')
+})
+
+cc.on('timeupdate', () => {
+  //console.log('timeupdate:', cc.time, cc.timePretty, cc.duration, cc.durationPretty, cc.progress)
+})
+
+cc.on('volumechange', () => {
+  console.log('volumechange:', cc.volumeLevel)
+})
+
+cc.on('end', () => {
+  console.log('ended')
+})
+
+cc.on('buffering', () => {
+  console.log('buffering')
+})
+
+cc.on('statechange', () => {
+  console.log('statechange:', cc.state)
+})
+
+cc.on('mute', () => {
+  console.log('muted', cc.muted)
+})
+
+cc.on('cancel', () => {
+  console.log('canceled')
+})
+
+cc.on('error', (err) => {
+  console.log('error:', err)
+})

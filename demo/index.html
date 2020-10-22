@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/demo/style.css">
     <title>Castjs 📺 Demo</title>
   </head>
   <body>
     <div class="wrapper">
       <h1>Demo</h1>
-      <a class="link" href="https://github.com/castjs/castjs">https://github.com/fenny/castjs</a>
-      <img class="poster" src="https://castjs.github.io/castjs/demo/poster.jpg">
+      <a class="link" href="https://github.com/castjs/castjs">https://github.com/castjs/castjs</a>
+      <img id="poster" src="/demo/poster.jpg">
       <div class="settings">
         <i id="captions" data-jq-dropdown="#jq-dropdown-1" class="fas fa-closed-captioning"></i>
         <div id="jq-dropdown-1" class="jq-dropdown jq-dropdown-tip">
@@ -27,24 +27,24 @@
         <i id="cast" class="fab fa-chromecast disabled"></i>
       </div>
       <div class="timeline">
-        <div class="time">00:00:00</div>
-        <input type="range" min="0" max="100" step="1" value="0">
-        <div class="duration">00:00:00</div>
+        <div id="time">00:00:00</div>
+        <input id="range" type="range" min="0" max="100" step="1" value="0">
+        <div id="duration">00:00:00</div>
       </div>
       <div class="controls">
         <i id="back" class="fas fa-history"></i>
         <i id="play" class="fas fa-play"></i>
         <i id="stop" class="fas fa-stop"></i>
       </div>
-      <div class="title">Sintel</div>
-      <div class="description">Third Open Movie by Blender Foundation</div>
-      <div class="state">Disconnected</div>
+      <div id="title">Sintel</div>
+      <div id="description">Third Open Movie by Blender Foundation</div>
+      <div id="state">Disconnected</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.js"></script>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-    <script src="https://cdn.jsdelivr.net/gh/fenny/castjs@3.0.1/cast.min.js"></script>
-    <script src="main.js" crossorigin="anonymous"></script>
+    <script src="/cast.js"></script>
+    <script src="/demo/main.js" crossorigin="anonymous"></script>
   </body>
 </html>

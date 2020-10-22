@@ -31,7 +31,7 @@ h1 {
   opacity: .5;
   pointer-events: none;
 }
-#cast.session {
+#cast.connected {
   color: #33B5E5;
 }
 .wrapper {
@@ -42,7 +42,7 @@ h1 {
   text-align: center;
   padding: 10px;
 }
-.poster {
+#poster {
   width: 100%;
   max-width: 175px;
   box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
@@ -64,18 +64,18 @@ h1 {
   padding-top: 4px;
   margin-bottom: 45px;
 }
-.timeline > .time,
-.timeline > .duration {
+#time,
+#duration {
   color: #ABABAB;
   font-size: 12px;
   position: absolute;
   top: 0px;
 }
-.timeline > .time {
+#time {
   text-align: left;
   left: -50px;
 }
-.timeline > .duration {
+#duration {
   text-align: right;
   right: -50px;
 }
@@ -86,11 +86,11 @@ h1 {
   float: left;
   width: 33.33333333333333%;
 }
-.title {
+#title {
   margin-top: 50px;
   color: #D3D3D3;
 }
-.description {
+#description {
   color: #ABABAB;
   font-size: 12px;
 }
@@ -102,7 +102,7 @@ h1 {
 .jq-dropdown.jq-dropdown-tip:after {
   display: none;
 }
-.state {
+#state {
   text-transform: capitalize;
   font-family: monospace;
   font-size: 12px;
