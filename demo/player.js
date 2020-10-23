@@ -19,7 +19,7 @@ cc.on('connect', () => {
 
 cc.on('disconnect', () => {
   console.log('[DEBUG] disconnected')
-  $('#cast').removeClass('session')
+  $('#cast').removeClass('connected')
 })
 
 cc.on('statechange', () => {
