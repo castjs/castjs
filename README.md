@@ -13,7 +13,7 @@
 ##### Import library
 
 ```html
-<script src="https://castjs.io/cast.min.js@latest"></script> --> <!-- latest version -->
+<script src="https://castjs.io/cast.min.js"></script> -->        <!-- latest version -->
 <script src="https://castjs.io/cast.min.js@v4.1.0"></script> --> <!-- locked version -->
 <script src="https://castjs.io/cast.min.js@master"></script>     <!-- master version -->
 ```
