@@ -13,7 +13,7 @@ class Castjs {
 
         // only allow valid join policy
         if (!opt.joinpolicies || joinpolicies.indexOf(opt.joinpolicy) === -1) {
-            opt.joinpolicy = 'origin_scoped';
+            opt.joinpolicy = 'tab_and_origin_scoped';
         }
 
         // set default receiver ID if none provided
@@ -66,7 +66,7 @@ class Castjs {
                     receiverApplicationId:      this.receiver,
                     autoJoinPolicy:             this.joinpolicy,
                     language:                   this.language,
-                    resumeSavedSession:         this.resume,
+                    resumeSavedSession:         true,
                     androidReceiverCompatible:  this.androidReceiverCompatible
                 });
                 // create remote player controller
@@ -76,11 +76,11 @@ class Castjs {
                 // register callback events
                 this.controller.addEventListener('isConnectedChanged',  this.controller_isConnectedChanged.bind(this));
                 this.controller.addEventListener('isMediaLoadedChanged',this.controller_isMediaLoadedChanged.bind(this));
+                this.controller.addEventListener('isMutedChanged',      this.controller_isMutedChanged.bind(this));
+                this.controller.addEventListener('isPausedChanged',     this.controller_isPausedChanged.bind(this));
                 this.controller.addEventListener('currentTimeChanged',  this.controller_currentTimeChanged.bind(this));
                 this.controller.addEventListener('durationChanged',     this.controller_durationChanged.bind(this));
                 this.controller.addEventListener('volumeLevelChanged',  this.controller_volumeLevelChanged.bind(this));
-                this.controller.addEventListener('isMutedChanged',      this.controller_isMutedChanged.bind(this));
-                this.controller.addEventListener('isPausedChanged',     this.controller_isPausedChanged.bind(this));
                 this.controller.addEventListener('playerStateChanged',  this.controller_playerStateChanged.bind(this));
                 this.available = true;
                 this.trigger('available');
@@ -97,7 +97,7 @@ class Castjs {
             if (!this.connected) {
                 return;
             }
-            
+
             // Set device name
             this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || 'Chromecast'
    
