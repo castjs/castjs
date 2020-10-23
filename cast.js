@@ -2,7 +2,7 @@
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
-        console.log('[DEBUG] v12.1')
+        console.log('[DEBUG] v13.1')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
@@ -99,6 +99,7 @@ class Castjs {
             
             // return if no media is loaded, nothing to update
             if (!this.player.isMediaLoaded) {
+                this.trigger('error', 'Media is not loaded', this.player)
                 return;
             }
 
