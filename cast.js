@@ -13,7 +13,7 @@ class Castjs {
 
         // only allow valid join policy
         if (!opt.joinpolicies || joinpolicies.indexOf(opt.joinpolicy) === -1) {
-            opt.joinpolicy = 'tab_and_origin_scoped';
+            opt.joinpolicy = 'custom_controller_scoped';
         }
 
         // set default receiver ID if none provided
