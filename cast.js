@@ -75,6 +75,7 @@ class Castjs {
 
                 // register callback events
                 this.controller.addEventListener('isConnectedChanged',  this.controller_isConnectedChanged.bind(this));
+                this.controller.addEventListener('isMediaLoadedChanged',this.controller_isMediaLoadedChanged.bind(this));
                 this.controller.addEventListener('currentTimeChanged',  this.controller_currentTimeChanged.bind(this));
                 this.controller.addEventListener('durationChanged',     this.controller_durationChanged.bind(this));
                 this.controller.addEventListener('volumeLevelChanged',  this.controller_volumeLevelChanged.bind(this));
@@ -87,40 +88,19 @@ class Castjs {
         }, 250); // update every 250ms
     }
 
-    // Player controller events
-    controller_isConnectedChanged() {
-        // check if we have a running session
-        this.connected = this.player.isConnected;
-        if (!this.connected) {
-            return;
-        }
-        // trigger connect event
-        this.trigger('connect')
-
-        // Weird bug, need to skip a tick...
+    controller_isMediaLoadedChanged() {
+        console.log('isMediaLoadedChanged')
+        console.log(this.player)
         setTimeout(() => {
-            // // return if no media is loaded, nothing to update
-            // if (!this.player.isMediaLoaded) {
-            //     this.trigger('error', 'Media is not loaded')
-            //     console.log(this.player)
-            //     setTimeout(() => {
-            //         console.log(this.player)
-            //     }, 250)
-            //     setTimeout(() => {
-            //         console.log(this.player)
-            //     }, 1000)
-            //     setTimeout(() => {
-            //         console.log(this.player)
-            //     }, 2000)
-            //     setTimeout(() => {
-            //         console.log(this.player)
-            //     }, 3000)
-            //     return;
-            // }
-
+            // check if we have a running session
+            this.connected = this.player.isConnected;
+            if (!this.connected) {
+                return;
+            }
+            
             // Set device name
             this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || 'Chromecast'
-
+   
             // Update media variables
             this.src                = this.player.mediaInfo.contentId;
             this.title              = this.player.mediaInfo.metadata.title || null;
@@ -136,7 +116,7 @@ class Castjs {
             this.durationPretty     = this.controller.getFormattedTime(this.player.duration);
             this.progress           = this.controller.getSeekPosition(this.player.currentTime, this.player.duration);
             this.state              = this.player.playerState.toLowerCase();
-
+   
             // Loop over the subtitle tracks
             for (var i in this.player.mediaInfo.tracks) {
                 // Check for subtitle
@@ -153,18 +133,28 @@ class Castjs {
             if (active.length && this.subtitles[active[0]]) {
                 this.subtitles[active[0]].active = true;
             }
-
-            // check when connection drops
-            this.intervalIsConnected = setInterval(() => {
-                this.connected = this.player.isConnected
-                if (!this.connected) {
-                    clearInterval(this.intervalIsConnected);
-                    this.state = 'disconnected'
-                    this.trigger('disconnect')
-                    this.trigger('statechange')
-                }
-            }, 1000);
         })
+    }
+    // Player controller events
+    controller_isConnectedChanged() {
+        // check if we have a running session
+        this.connected = this.player.isConnected;
+        if (!this.connected) {
+            return;
+        }
+        // trigger connect event
+        this.trigger('connect')
+
+        // check when connection drops
+        this.intervalIsConnected = setInterval(() => {
+            this.connected = this.player.isConnected
+            if (!this.connected) {
+                clearInterval(this.intervalIsConnected);
+                this.state = 'disconnected'
+                this.trigger('disconnect')
+                this.trigger('statechange')
+            }
+        }, 1000);
     }
     controller_currentTimeChanged() {
         this.time           = this.player.currentTime;
