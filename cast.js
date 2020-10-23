@@ -1,10 +1,3 @@
-// load chromecast SDK
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1'
-script.async = true
-document.getElementsByTagName('head')[0].appendChild(script);
-
 // castjs class
 class Castjs {
     // constructor takes optional options
