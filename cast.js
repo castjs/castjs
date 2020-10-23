@@ -8,7 +8,7 @@ document.getElementsByTagName('head')[0].appendChild(script);
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
-        console.log('[DEBUG] v4.1.0')
+        console.log('[DEBUG] v4.1.1')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
