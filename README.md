@@ -1,11 +1,6 @@
-<h1 align="center">
-  <br>
-  <img src="https://i.imgur.com/elCjMDx.png" alt="Castjs" width="100">
-  <br>
-  Castjs
-  <br>
-  <br>
-</h1>
+<p align="center">
+  <img src="https://i.imgur.com/SE0fwqV.jpg" alt="Castjs" width="100">
+</p>
 
 <h4 align="center">Javascript library for the complex chromecast SDK</h4>
 
