@@ -46,7 +46,7 @@ cc.on('volumechange', () => {
 })
 
 cc.on('timeupdate', () => {
-  console.log('[DEBUG] timeupdate', cc.progress)
+  // console.log('[DEBUG] timeupdate', cc.progress)
   $('#time').text(cc.timePretty);
   $('#duration').text(cc.durationPretty);
   $('#range').attr('value', cc.progress);
