@@ -13,7 +13,7 @@ class Castjs {
 
         // only allow valid join policy
         if (!opt.joinpolicies || joinpolicies.indexOf(opt.joinpolicy) === -1) {
-            opt.joinpolicy = 'custom_controller_scoped';
+            opt.joinpolicy = 'origin_scoped';
         }
 
         // set default receiver ID if none provided
@@ -89,8 +89,10 @@ class Castjs {
     }
 
     controller_isMediaLoadedChanged() {
-        console.log('isMediaLoadedChanged')
-        console.log(this.player)
+        // don't update media info if not available
+        if (!this.player.isMediaLoaded || !this.player.mediaInfo) {
+            return
+        }
         setTimeout(() => {
             // check if we have a running session
             this.connected = this.player.isConnected;
@@ -100,8 +102,9 @@ class Castjs {
 
             // Set device name
             this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || 'Chromecast'
-   
+
             // Update media variables
+            console.log(this.player.mediaInfo)
             this.src                = this.player.mediaInfo.contentId;
             this.title              = this.player.mediaInfo.metadata.title || null;
             this.description        = this.player.mediaInfo.metadata.subtitle || null;
@@ -116,7 +119,7 @@ class Castjs {
             this.durationPretty     = this.controller.getFormattedTime(this.player.duration);
             this.progress           = this.controller.getSeekPosition(this.player.currentTime, this.player.duration);
             this.state              = this.player.playerState.toLowerCase();
-   
+
             // Loop over the subtitle tracks
             for (var i in this.player.mediaInfo.tracks) {
                 // Check for subtitle
