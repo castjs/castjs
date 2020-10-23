@@ -2,7 +2,7 @@
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
-        console.log('[DEBUG] v10.33')
+        console.log('[DEBUG] v10.333')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
