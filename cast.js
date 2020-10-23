@@ -8,7 +8,7 @@ document.getElementsByTagName('head')[0].appendChild(script);
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
-        console.log('[DEBUG] v4.1.1')
+        console.log('[DEBUG] v10.23')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
@@ -59,7 +59,7 @@ class Castjs {
             // casting only works on chrome, opera, brave and vivaldi
             if (!window.chrome) {
                 clearInterval(this.intervalIsAvailable);
-                return this.trigger('error', 'Casting is not available');
+                return this.trigger('error', 'Casting is not supported in this browser');
             }
 
             // wait for isAvailable boolean
@@ -71,8 +71,9 @@ class Castjs {
                 cast.framework.CastContext.getInstance().setOptions({
                     receiverApplicationId:      this.receiver,
                     autoJoinPolicy:             this.joinpolicy,
-                    resumeSavedSession:         true,
-                    androidReceiverCompatible:  true,
+                    language:                   this.language,
+                    resumeSavedSession:         this.resume,
+                    androidReceiverCompatible:  this.androidReceiverCompatible
                 });
                 // create remote player controller
                 this.player = new cast.framework.RemotePlayer();
@@ -101,9 +102,6 @@ class Castjs {
             if (!this.connected) {
                 return;
             }
-
-            // trigger connect event
-            this.trigger('connect');
             
             // return if no media is loaded, nothing to update
             if (!this.player.isMediaLoaded) {
@@ -156,7 +154,10 @@ class Castjs {
                     this.trigger('statechange')
                 }
             }, 1000)
-        }, 0);
+
+            // trigger connect event
+            this.trigger('connect');
+        });
     }
     controller_currentTimeChanged() {
         this.time           = this.player.currentTime;
