@@ -2,10 +2,12 @@
 var cc = new Castjs();
 
 cc.on('available', () => {
+  console.log('[DEBUG] available')
   $('#cast').removeClass('disabled')
 })
 
 cc.on('connect', () => {
+  console.log('[DEBUG] connected')
   $('#cast').removeClass('disabled')
   $('#cast').addClass('connected')
   if (cc.paused) {
@@ -16,14 +18,17 @@ cc.on('connect', () => {
 })
 
 cc.on('disconnect', () => {
+  console.log('[DEBUG] disconnected')
   $('#cast').removeClass('session')
 })
 
 cc.on('statechange', () => {
+  console.log('[DEBUG] statechange', cc.device + ': ' + cc.state)
   $('#state').text(cc.device + ': ' + cc.state)
 })
 
 cc.on('pause', () => {
+  console.log('[DEBUG] paused')
   if (cc.paused) {
     $('#play').removeClass('fa-pause').addClass('fa-play')
   } else {
@@ -32,6 +37,7 @@ cc.on('pause', () => {
 })
 
 cc.on('volumechange', () => {
+  console.log('[DEBUG] volumechange', cc.volumeLevel)
   if (cc.volumeLevel == 0) {
     $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
   } else {
@@ -40,6 +46,7 @@ cc.on('volumechange', () => {
 })
 
 cc.on('timeupdate', () => {
+  console.log('[DEBUG] timeupdate', cc.progress)
   $('#time').text(cc.timePretty);
   $('#duration').text(cc.durationPretty);
   $('#range').attr('value', cc.progress);
