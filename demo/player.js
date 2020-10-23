@@ -53,6 +53,10 @@ cc.on('timeupdate', () => {
   $('#range').rangeslider('update', true);
 })
 
+cc.on('error', (err) => {
+  console.log('[DEBUG] error', err)
+})
+
 $('#cast').on('click', () => {
   if (cc.available) {
     cc.cast('https://castjs.io/demo/sintel.mp4', {
