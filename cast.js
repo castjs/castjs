@@ -60,14 +60,14 @@ class Castjs {
             if (window.chrome.cast && window.chrome.cast.isAvailable) {
                 // terminate loop
                 clearInterval(this.intervalIsAvailable);
-
+                console.log(this.receiver, this.joinpolicy)
                 // initialize cast API
                 cast.framework.CastContext.getInstance().setOptions({
                     receiverApplicationId:      this.receiver,
                     autoJoinPolicy:             this.joinpolicy,
-                    language:                   this.language,
+                    // language:                   this.language,
                     resumeSavedSession:         true,
-                    androidReceiverCompatible:  this.androidReceiverCompatible
+                    androidReceiverCompatible:  true
                 });
                 // create remote player controller
                 this.player = new cast.framework.RemotePlayer();
