@@ -107,6 +107,12 @@ class Castjs {
                 setTimeout(() => {
                     console.log(this.player)
                 }, 1000)
+                setTimeout(() => {
+                    console.log(this.player)
+                }, 2000)
+                setTimeout(() => {
+                    console.log(this.player)
+                }, 3000)
                 return;
             }
 
