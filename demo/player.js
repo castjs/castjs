@@ -59,7 +59,7 @@ cc.on('error', (err) => {
 
 $('#cast').on('click', () => {
   if (cc.available) {
-    cc.cast('https://castjs.io/demo/sintel.mp4', {
+    cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
       poster     : 'https://castjs.io/demo/poster.jpg',
       title      : 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
