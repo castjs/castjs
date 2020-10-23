@@ -2,7 +2,7 @@
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
-        console.log('[DEBUG] v14.1')
+        console.log('[DEBUG] v15.1')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
@@ -152,6 +152,7 @@ class Castjs {
                 clearInterval(this.intervalIsConnected);
                 this.state = 'disconnected'
                 this.trigger('disconnect')
+                console.log('disconnect from connectedchanged')
                 this.trigger('statechange')
             }
         }, 1000);
@@ -314,6 +315,7 @@ class Castjs {
                         clearInterval(this.intervalIsConnected);
                         this.state = 'disconnected'
                         this.trigger('disconnect')
+                        console.log('disconnect from cast')
                         this.trigger('statechange')
                     }
                 }, 1000)
