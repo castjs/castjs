@@ -89,32 +89,34 @@ class Castjs {
 
     // Player controller events
     controller_isConnectedChanged() {
+        // check if we have a running session
+        this.connected = this.player.isConnected;
+        if (!this.connected) {
+            return;
+        }
+        // trigger connect event
+        this.trigger('connect')
+
         // Weird bug, need to skip a tick...
         setTimeout(() => {
-            // check if we have a running session
-            this.connected = this.player.isConnected;
-            if (!this.connected) {
-                return;
-            }
-            
-            // return if no media is loaded, nothing to update
-            if (!this.player.isMediaLoaded) {
-                this.trigger('error', 'Media is not loaded')
-                console.log(this.player)
-                setTimeout(() => {
-                    console.log(this.player)
-                }, 250)
-                setTimeout(() => {
-                    console.log(this.player)
-                }, 1000)
-                setTimeout(() => {
-                    console.log(this.player)
-                }, 2000)
-                setTimeout(() => {
-                    console.log(this.player)
-                }, 3000)
-                return;
-            }
+            // // return if no media is loaded, nothing to update
+            // if (!this.player.isMediaLoaded) {
+            //     this.trigger('error', 'Media is not loaded')
+            //     console.log(this.player)
+            //     setTimeout(() => {
+            //         console.log(this.player)
+            //     }, 250)
+            //     setTimeout(() => {
+            //         console.log(this.player)
+            //     }, 1000)
+            //     setTimeout(() => {
+            //         console.log(this.player)
+            //     }, 2000)
+            //     setTimeout(() => {
+            //         console.log(this.player)
+            //     }, 3000)
+            //     return;
+            // }
 
             // Set device name
             this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || 'Chromecast'
@@ -161,11 +163,8 @@ class Castjs {
                     this.trigger('disconnect')
                     this.trigger('statechange')
                 }
-            }, 1000)
-
-            // trigger connect event
-            this.trigger('connect');
-        }, 250);
+            }, 1000);
+        })
     }
     controller_currentTimeChanged() {
         this.time           = this.player.currentTime;
