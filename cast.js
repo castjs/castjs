@@ -2,7 +2,7 @@
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
-        console.log('[DEBUG] v13.1')
+        console.log('[DEBUG] v14.1')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
@@ -152,7 +152,7 @@ class Castjs {
 
             // trigger connect event
             this.trigger('connect');
-        });
+        }, 250);
     }
     controller_currentTimeChanged() {
         this.time           = this.player.currentTime;
