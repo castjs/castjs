@@ -2,7 +2,7 @@
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
-        console.log('[DEBUG] v11.1')
+        console.log('[DEBUG] v12.1')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
@@ -13,7 +13,7 @@ class Castjs {
 
         // only allow valid join policy
         if (!opt.joinpolicies || joinpolicies.indexOf(opt.joinpolicy) === -1) {
-            opt.joinpolicy = 'tab_and_origin_scoped';
+            opt.joinpolicy = 'origin_scoped';
         }
 
         // set default receiver ID if none provided
