@@ -18,7 +18,10 @@
 ##### Getting started
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://castjs.io/cast.min.js"></script>
+<script src="https://castjs.io/cast.min.js"></script> <!-- master -->
+<!-- <script src="https://cdn.jsdelivr.net/gh/castjs/castjs@latest/cast.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v4.0.0/cast.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/gh/castjs/castjs@master/cast.min.js"></script> -->
 ```
 
 ##### Casting a video is simple:
