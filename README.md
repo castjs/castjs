@@ -13,10 +13,9 @@
 ##### Import library
 
 ```html
-<script src="https://castjs.io/cast.min.js"></script>             <!-- master  -->
-<script src="https://castjs.io/cast.min.js@latest"></script> --> <!-- latest  -->
-<script src="https://castjs.io/cast.min.js@v4.0.2"></script> --> <!-- version -->
-<script src="https://castjs.io/cast.min.js@master"></script>     <!-- master  -->
+<script src="https://castjs.io/cast.min.js@latest"></script> --> <!-- latest version -->
+<script src="https://castjs.io/cast.min.js@v4.0.2"></script> --> <!-- locked version -->
+<script src="https://castjs.io/cast.min.js@master"></script>     <!-- master version -->
 ```
 
 ##### Casting a media source
