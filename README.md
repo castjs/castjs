@@ -1,11 +1,6 @@
-<h1 align="center">
-  <br>
-  <img src="https://i.imgur.com/elCjMDx.png" alt="Castjs" width="100">
-  <br>
-  Castjs
-  <br>
-  <br>
-</h1>
+<p align="center">
+  <img src="https://i.imgur.com/SE0fwqV.jpg" alt="Castjs" width="100%">
+</p>
 
 <h4 align="center">Javascript library for the complex chromecast SDK</h4>
 
@@ -26,40 +21,38 @@
 ##### Casting a video is simple:
 
 ```js
-var device = new Castjs();
-var source = 'https://castjs.io/demo/sintel.mp4';
+var cc = new Castjs();
 $('button').on('click', () => {
-  if (cc.available) {
-    cc.cast(source);
-  }
+    if (cc.available) {
+        cc.cast('https://castjs.io/demo/sintel.mp4');
+    }
 });
 ```
 
 ##### Adding some metadata is simple too:
 
 ```js
-var device   = new Castjs();
-var source   = 'https://castjs.io/demo/sintel.mp4';
+var cc = new Castjs();
 var metadata = {
-  title:       'Sintel',
-  description: 'Third Open Movie by Blender Foundation',
-  poster:      'https://castjs.io/demo/poster.jpg',
-  subtitles: [{
-    active: true,
-    label:  'English',
-    source: 'https://castjs.io/demo/english.vtt'
-  }, {
-    label:  'Spanish',
-    source: 'https://castjs.io/demo/spanish.vtt'
-  }],
-  muted:  false,
-  paused: false,
-  time:   35
+    title      : 'Sintel',
+    description: 'Third Open Movie by Blender Foundation',
+    poster     : 'https://castjs.io/demo/poster.jpg',
+    muted      : false,
+    paused     : false,
+    time       :   35,
+    subtitles: [{
+        active: true,
+        label:  'English',
+        source: 'https://castjs.io/demo/english.vtt'
+    }, {
+        label:  'Spanish',
+        source: 'https://castjs.io/demo/spanish.vtt'
+  }]
 }
 $('button').on('click', () => {
-  if (cc.available) {
-    cc.cast(source, metadata);
-  }
+    if (cc.available) {
+        cc.cast('https://castjs.io/demo/sintel.mp4', metadata);
+    }
 });
 ```
 
@@ -124,7 +117,7 @@ cc.progress         // Progress in percentage 0 - 100
 cc.state            // State of cast device
 ```
 
-##### Todo so I won't forget
+##### TODO
 
 ```
 - Add local media and stream support after google fixes service worker crash
