@@ -10,15 +10,17 @@
   This library works in chrome, opera, brave and vivaldi, see it in action and check out the <a href="https://castjs.io/demo/">online demo</a>.
 </p>
 
-##### Getting started
+##### Import library
+
 ```html
-<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://castjs.io/cast.min.js"></script>                  <!-- master  -->
-<!-- <script src="https://castjs.io/@v4.0.1/cast.min.js"></script> --> <!-- version -->
-<!-- <script src="https://castjs.io/@latest/cast.min.js"></script> --> <!-- latest  -->
+<script src="https://castjs.io/cast.min.js"></script>             <!-- master  -->
+
+<script src="https://castjs.io/@latest/cast.min.js"></script> --> <!-- latest  -->
+<script src="https://castjs.io/@v4.0.2/cast.min.js"></script> --> <!-- version -->
+<script src="https://castjs.io/@master/cast.min.js"></script>     <!-- master  -->
 ```
 
-##### Casting a video is simple:
+##### Casting a media source
 
 ```js
 var cc = new Castjs();
@@ -29,7 +31,7 @@ $('button').on('click', () => {
 });
 ```
 
-##### Adding some metadata is simple too:
+##### Adding metadata to media source
 
 ```js
 var cc = new Castjs();
@@ -39,7 +41,7 @@ var metadata = {
     poster     : 'https://castjs.io/demo/poster.jpg',
     muted      : false,
     paused     : false,
-    time       :   35,
+    time       : 35,
     subtitles: [{
         active: true,
         label:  'English',
@@ -59,14 +61,16 @@ $('button').on('click', () => {
 ##### Documentation:
 
 ```javascript
-// New Castjs instance wiht optional opt
+// Default instance
 const cc = new Castjs();
+
+// Custom receiver or joinpolicy
 const cc = new Castjs({
-    receiver  : 'CC1AD845',              // default receiver
-    joinpolicy: 'tab_and_origin_scoped', // default joinpolicy
-    // custom_controller_scoped
-    // origin_scoped
-    // page_scoped
+    receiver  : 'CC1AD845',              // default
+    joinpolicy: 'tab_and_origin_scoped', // default
+//  joinpolicy: 'custom_controller_scoped',
+//  joinpolicy: 'origin_scoped',
+//  joinpolicy: 'page_scoped',
 });
 
 // Castjs Events

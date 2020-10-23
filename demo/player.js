@@ -7,7 +7,7 @@ cc.on('available', () => {
 
 cc.on('connect', () => {
   $('#cast').removeClass('disabled')
-  $('#cast').addClass('session')
+  $('#cast').addClass('connected')
   if (cc.paused) {
     $('#play').removeClass('fa-pause').addClass('fa-play')
   } else {
@@ -49,7 +49,7 @@ cc.on('timeupdate', () => {
 $('#cast').on('click', () => {
   if (cc.available) {
     cc.cast('https://castjs.io/demo/sintel.mp4', {
-      poster     : 'https://castjs.io/poster.jpg',
+      poster     : 'https://castjs.io/demo/poster.jpg',
       title      : 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
       subtitles: [{
