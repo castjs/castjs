@@ -8,6 +8,7 @@ document.getElementsByTagName('head')[0].appendChild(script);
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
+        console.log('[DEBUG] v4.1.0')
         // valid join policies
         var joinpolicies = [
             'custom_controller_scoped',
@@ -68,9 +69,10 @@ class Castjs {
 
                 // initialize cast API
                 cast.framework.CastContext.getInstance().setOptions({
-                    receiverApplicationId:  this.receiver,
-                    autoJoinPolicy:         this.joinpolicy,
-                    resumeSavedSession:     false,
+                    receiverApplicationId:      this.receiver,
+                    autoJoinPolicy:             this.joinpolicy,
+                    resumeSavedSession:         false,
+                    androidReceiverCompatible:  false,
                 });
                 // create remote player controller
                 this.player = new cast.framework.RemotePlayer();
