@@ -99,7 +99,14 @@ class Castjs {
             
             // return if no media is loaded, nothing to update
             if (!this.player.isMediaLoaded) {
-                this.trigger('error', 'Media is not loaded', this.player)
+                this.trigger('error', 'Media is not loaded')
+                console.log(this.player)
+                setTimeout(() => {
+                    console.log(this.player)
+                }, 250)
+                setTimeout(() => {
+                    console.log(this.player)
+                }, 1000)
                 return;
             }
 
