@@ -14,10 +14,9 @@
 
 ```html
 <script src="https://castjs.io/cast.min.js"></script>             <!-- master  -->
-
-<script src="https://castjs.io/@latest/cast.min.js"></script> --> <!-- latest  -->
-<script src="https://castjs.io/@v4.0.2/cast.min.js"></script> --> <!-- version -->
-<script src="https://castjs.io/@master/cast.min.js"></script>     <!-- master  -->
+<script src="https://castjs.io/cast.min.js@latest"></script> --> <!-- latest  -->
+<script src="https://castjs.io/cast.min.js@v4.0.2"></script> --> <!-- version -->
+<script src="https://castjs.io/cast.min.js@master"></script>     <!-- master  -->
 ```
 
 ##### Casting a media source
@@ -133,4 +132,4 @@ cc.state            // State of cast device
 
 <p align="center">
   Do you want to support my work, feel free to donate a <a href="https://www.buymeacoffee.com/fenny" target="_blank">☕ Hot Beverage</a>
-</p.
+</p>
