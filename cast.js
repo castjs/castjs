@@ -91,16 +91,17 @@ class Castjs {
 
     // Player controller events
     controller_isConnectedChanged() {
-        // check if we have a running session
-        this.connected = this.player.isConnected;
-        if (!this.connected) {
-            return;
-        }
-        // trigger connect event
-        this.trigger('connect');
-
         // Weird bug, need to skip a tick...
         setTimeout(() => {
+            // check if we have a running session
+            this.connected = this.player.isConnected;
+            if (!this.connected) {
+                return;
+            }
+
+            // trigger connect event
+            this.trigger('connect');
+            
             // return if no media is loaded, nothing to update
             if (!this.player.isMediaLoaded) {
                 return;
