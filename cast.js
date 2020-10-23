@@ -240,9 +240,6 @@ class Castjs {
             }
         }
         // Time to request a session!
-        this.state = 'searching'
-        this.trigger('search')
-        this.trigger('statechange')
         cast.framework.CastContext.getInstance().requestSession().then(() => {
             if (!cast.framework.CastContext.getInstance().getCurrentSession()) {
                 return this.trigger('error', 'Could not connect with the cast device');
@@ -319,9 +316,7 @@ class Castjs {
                 return this;
             });
         }, (err) => {
-            if (err === 'cancel') {
-                this.trigger('cancel');
-            } else {
+            if (err !== 'cancel') {
                 this.trigger('error', err);
             }
             return this;

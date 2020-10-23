@@ -19,7 +19,7 @@
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 <script src="https://castjs.io/cast.min.js"></script>                  <!-- master  -->
-<!-- <script src="https://castjs.io/@v4.0.0/cast.min.js"></script> --> <!-- version -->
+<!-- <script src="https://castjs.io/@v4.0.1/cast.min.js"></script> --> <!-- version -->
 <!-- <script src="https://castjs.io/@latest/cast.min.js"></script> --> <!-- latest  -->
 ```
 
@@ -78,8 +78,6 @@ const cc = new Castjs({
 
 // Castjs Events
 cc.on('available',    ()  => {});  // Casting is available
-cc.on('search',       ()  => {});  // Searching devices
-cc.on('cancel',       ()  => {});  // Cancelled the device selection
 cc.on('connect',      ()  => {});  // Connected with device
 cc.on('disconnect',   ()  => {});  // Disconnected with device
 cc.on('statechange',  ()  => {});  // Device state
