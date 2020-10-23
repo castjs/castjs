@@ -78,7 +78,7 @@ $('#cast').on('click', () => {
 $('.jq-dropdown-menu').on('click', 'a', function(e) {
   e.preventDefault();
   var index = $(this).attr('href')
-  cc.subtitle(index)
+  cc.subtitles(index)
   $('.jq-dropdown-menu a').removeClass('active')
   $(this).addClass('active')
 })
