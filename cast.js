@@ -70,6 +70,7 @@ class Castjs {
                 cast.framework.CastContext.getInstance().setOptions({
                     receiverApplicationId:  this.receiver,
                     autoJoinPolicy:         this.joinpolicy,
+                    resumeSavedSession:     false,
                 });
                 // create remote player controller
                 this.player = new cast.framework.RemotePlayer();
