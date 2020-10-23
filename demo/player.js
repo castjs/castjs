@@ -48,17 +48,17 @@ cc.on('timeupdate', () => {
 
 $('#cast').on('click', () => {
   if (cc.available) {
-    cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
-      poster     : 'https://castjs.github.io/castjs/demo/poster.jpg',
+    cc.cast('https://castjs.io/demo/sintel.mp4', {
+      poster     : 'https://castjs.io/poster.jpg',
       title      : 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
       subtitles: [{
           active: true,
           label : 'English',
-          src   : 'https://castjs.github.io/castjs/demo/english.vtt'
+          src   : 'https://castjs.io/demo/english.vtt'
       }, {
           label : 'Spanish',
-          src   : 'https://castjs.github.io/castjs/demo/spanish.vtt'
+          src   : 'https://castjs.io/demo/spanish.vtt'
       }],
     })
   }

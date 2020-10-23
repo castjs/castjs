@@ -18,17 +18,16 @@
 ##### Getting started
 ```html
 <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://castjs.io/cast.min.js"></script> <!-- master -->
-<!-- <script src="https://cdn.jsdelivr.net/gh/castjs/castjs@latest/cast.min.js"></script> -->
-<!-- <script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v4.0.0/cast.min.js"></script> -->
-<!-- <script src="https://cdn.jsdelivr.net/gh/castjs/castjs@master/cast.min.js"></script> -->
+<script src="https://castjs.io/cast.min.js"></script>                  <!-- master  -->
+<!-- <script src="https://castjs.io/@v4.0.0/cast.min.js"></script> --> <!-- version -->
+<!-- <script src="https://castjs.io/@latest/cast.min.js"></script> --> <!-- latest  -->
 ```
 
 ##### Casting a video is simple:
 
 ```js
 var device = new Castjs();
-var source = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4';
+var source = 'https://castjs.io/demo/sintel.mp4';
 $('button').on('click', () => {
   if (cc.available) {
     cc.cast(source);
@@ -40,7 +39,7 @@ $('button').on('click', () => {
 
 ```js
 var device   = new Castjs();
-var source   = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4';
+var source   = 'https://castjs.io/demo/sintel.mp4';
 var metadata = {
   title:       'Sintel',
   description: 'Third Open Movie by Blender Foundation',
