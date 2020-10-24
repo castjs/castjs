@@ -14,6 +14,20 @@ h1 {
   margin-bottom: 10px;
     font-size: 25px;
 }
+#debug {
+  display: block;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 400px;
+  border: 0;
+  resize: none;
+  font-family: 'Consolas';
+  font-size: 10px;
+  margin-top: 15px;
+  background: black;
+  color: lightgreen;
+}
 .link {
   color: #fefefe;
   font-size: 12px;

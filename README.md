@@ -52,7 +52,7 @@ var metadata = {
 }
 $('button').on('click', () => {
     if (cc.available) {
-        cc.cast('https://castjs.io/demo/sintel.mp4', metadata);
+        cc.cast('https://castjs.io/sintel.mp4', metadata);
     }
 });
 ```

@@ -1,13 +1,19 @@
 
+function debug(msg) {
+  if (typeof msg === 'string') {
+    $('#debug').append(msg + "\n")
+  } else {
+    $('#debug').append(JSON.stringify(msg, null, 4) + "\n")
+  }
+}
+
 var cc = new Castjs();
 
 cc.on('available', () => {
-  console.log('[DEBUG] available')
   $('#cast').removeClass('disabled')
 })
 
 cc.on('connect', () => {
-  console.log('[DEBUG] connected')
   $('#cast').removeClass('disabled')
   $('#cast').addClass('connected')
   if (cc.paused) {
@@ -18,17 +24,14 @@ cc.on('connect', () => {
 })
 
 cc.on('disconnect', () => {
-  console.log('[DEBUG] disconnected')
   $('#cast').removeClass('connected')
 })
 
 cc.on('statechange', () => {
-  console.log('[DEBUG] statechange', cc.device + ': ' + cc.state)
   $('#state').text(cc.device + ': ' + cc.state)
 })
 
 cc.on('pause', () => {
-  console.log('[DEBUG] paused')
   if (cc.paused) {
     $('#play').removeClass('fa-pause').addClass('fa-play')
   } else {
@@ -37,7 +40,6 @@ cc.on('pause', () => {
 })
 
 cc.on('volumechange', () => {
-  console.log('[DEBUG] volumechange', cc.volumeLevel)
   if (cc.volumeLevel == 0) {
     $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
   } else {
@@ -46,7 +48,6 @@ cc.on('volumechange', () => {
 })
 
 cc.on('timeupdate', () => {
-  // console.log('[DEBUG] timeupdate', cc.progress)
   $('#time').text(cc.timePretty);
   $('#duration').text(cc.durationPretty);
   $('#range').attr('value', cc.progress);
@@ -54,12 +55,12 @@ cc.on('timeupdate', () => {
 })
 
 cc.on('error', (err) => {
-  console.log('[DEBUG] error', err)
+  debug('[DEBUG] error', err)
 })
 
 $('#cast').on('click', () => {
   if (cc.available) {
-    cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
+    cc.cast('https://castjs.io/sintel.mp4', {
       poster     : 'https://castjs.io/demo/poster.jpg',
       title      : 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
