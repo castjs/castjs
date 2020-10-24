@@ -1,19 +1,23 @@
 
 function debug(msg) {
+  var d = new Date();
+  var n = d.toLocaleTimeString().split(' ')[0]
   if (typeof msg === 'string') {
-    $('#debug').append(msg + "\n")
+    $('#debug').append('[' + n + '] ' + msg + '\n')
   } else {
-    $('#debug').append(JSON.stringify(msg, null, 4) + "\n")
+    $('#debug').append('[' + n + '] ' + JSON.stringify(msg) + '\n')
   }
 }
 
 var cc = new Castjs();
 
 cc.on('available', () => {
+  debug('Event -> available')
   $('#cast').removeClass('disabled')
 })
 
 cc.on('connect', () => {
+  debug('Event -> connect')
   $('#cast').removeClass('disabled')
   $('#cast').addClass('connected')
   if (cc.paused) {
@@ -24,22 +28,27 @@ cc.on('connect', () => {
 })
 
 cc.on('disconnect', () => {
+  debug('Event -> disconnect')
   $('#cast').removeClass('connected')
 })
 
 cc.on('statechange', () => {
+  debug('Event -> statechange: ' + cc.state)
   $('#state').text(cc.device + ': ' + cc.state)
 })
 
+cc.on('playing', () => {
+  debug('Event -> playing')
+  $('#play').removeClass('fa-play').addClass('fa-pause')
+})
+
 cc.on('pause', () => {
-  if (cc.paused) {
-    $('#play').removeClass('fa-pause').addClass('fa-play')
-  } else {
-    $('#play').removeClass('fa-play').addClass('fa-pause')
-  }
+  debug('Event -> pause')
+  $('#play').removeClass('fa-pause').addClass('fa-play')
 })
 
 cc.on('volumechange', () => {
+  debug('Event -> volumechange: ' + cc.volumeLevel)
   if (cc.volumeLevel == 0) {
     $('#mute').removeClass('fa-volume-up').addClass('fa-volume-mute')
   } else {
@@ -48,6 +57,7 @@ cc.on('volumechange', () => {
 })
 
 cc.on('timeupdate', () => {
+  //debug('Event -> timeupdate: ' + cc.timePretty + '/' + cc.durationPretty + ' (' + cc.progress + '%)')
   $('#time').text(cc.timePretty);
   $('#duration').text(cc.durationPretty);
   $('#range').attr('value', cc.progress);
@@ -55,12 +65,12 @@ cc.on('timeupdate', () => {
 })
 
 cc.on('error', (err) => {
-  debug('[DEBUG] error', err)
+  debug('Event -> error: ' + err)
 })
 
 $('#cast').on('click', () => {
   if (cc.available) {
-    cc.cast('https://castjs.io/sintel.mp4', {
+    cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
       poster     : 'https://castjs.io/demo/poster.jpg',
       title      : 'Sintel',
       description: 'Third Open Movie by Blender Foundation',

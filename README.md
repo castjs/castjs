@@ -25,7 +25,7 @@
 var cc = new Castjs();
 $('button').on('click', () => {
     if (cc.available) {
-        cc.cast('https://castjs.io/demo/sintel.mp4');
+        cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4');
     }
 });
 ```
@@ -52,7 +52,7 @@ var metadata = {
 }
 $('button').on('click', () => {
     if (cc.available) {
-        cc.cast('https://castjs.io/sintel.mp4', metadata);
+        cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', metadata);
     }
 });
 ```
