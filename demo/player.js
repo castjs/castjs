@@ -116,15 +116,15 @@ $('#play').on('click', () => {
 
 $('#stop').on('click', () => {
     cc.disconnect();
-    $('#cast').removeClass('session');
+    $('#cast').removeClass('connected');
 })
 
 $('#back').on('click', () => {
-    var goback = cc.progress - 1;
-    if (goback <= 0) {
-      goback = 0;
-    }
-    cc.seek(goback)
+  var goback = cc.time - 30;
+  if (goback < 1) {
+    goback = 0;
+  }
+  cc.seek(goback)
 })
 
 var slider = $('input[type="range"]').rangeslider({

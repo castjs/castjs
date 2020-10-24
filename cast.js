@@ -317,9 +317,9 @@ class Castjs {
             return this;
         });
     }
-    seek(seconds, percentage) {
+    seek(seconds, isPercentage) {
         // if seek(15, true) we assume 15 is percentage instead of seconds
-        if (percentage) {
+        if (isPercentage) {
             seconds = this.controller.getSeekTime(seconds, this.player.duration);
         }
         this.player.currentTime = seconds;
