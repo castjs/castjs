@@ -17,18 +17,18 @@ h1 {
 #debug {
   display: block;
   width: 100%;
-  max-width: 800px;
+  max-width: 500px;
   margin: 0 auto;
-  min-height: 400px;
+  min-height: 300px;
   border: 0;
   resize: none;
-  font-family: 'Consolas';
+  font-family: 'Source Code Pro', monospace;
   font-size: 10px;
   margin-top: 15px;
   background: black;
   color: lightgreen;
   padding: 7px;
-  
+  margin-bottom: 30px;
 }
 .link {
   color: #fefefe;
@@ -142,9 +142,7 @@ h1 {
   border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
 }
-.jq-dropdown .jq-dropdown-menu li>a {
 
-}
 .jq-dropdown .jq-dropdown-menu li>a.active {
   background: #B8080A;
   color: #ffffff;
@@ -178,3 +176,5 @@ h1 {
 .rangeslider__handle:after {
   background-image: none;
 }
+
+

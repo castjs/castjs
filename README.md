@@ -42,28 +42,7 @@ document.getElementById('cast').addEventListener('click', function() {
 </script>
 ```
 
-You can send metadata along with the media source
-
-
-# API Documentation
-
-Create a new `Castjs` instance.
-```js
-const cjs = new Castjs([opts])
-```
-If `opts` is specified, then the default options (shown below) will be overriden.
-```js
-{
-  // Cast application id.
-  receiver: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-
-  // Indicates if to join a running session on initialization.
-  joinpolicy: chrome.cast.AutoJoinPolicy.TAB_AND_ORIGIN_SCOPED
-}
-```
-
-
-##### Documentation:
+##### API Documentation:
 
 ```javascript
 // Default instance
@@ -86,6 +65,7 @@ cc.on('statechange',  ()  => {});  // Device state
 cc.on('timeupdate',   ()  => {});  // Current time changed
 cc.on('volumechange', ()  => {});  // Volume changed
 cc.on('mute',         ()  => {});  // Muted state changed
+cc.on('unmute',       ()  => {});  // Muted state changed
 cc.on('playing',      ()  => {});  // Media is playing
 cc.on('pause',        ()  => {});  // Media is paused
 cc.on('end',          ()  => {});  // Media ended
@@ -94,15 +74,15 @@ cc.on('event',        (e) => {});  // Catch all events except 'error'
 cc.on('error',        (e) => {});  // Catch any errors
 
 // Castjs functions
-cc.cast(source, [metadata]);  // Create session with media
+cc.cast(source, [metadata]); // Create session with media
 cc.volume(0.7);              // Change volume
 cc.play();                   // Play media
 cc.pause();                  // Pause media
 cc.mute();                   // Mutes media
 cc.unmute();                 // Unmutes media
-cc.subtitles(2);             // Change active subtitle index
-cc.seek(seconds);            // Seek with seconds
-cc.seek(percentage, [true]); // Seek with percentages
+cc.subtitle(2);              // Change active subtitle index
+cc.seek(15);                 // Seek 15 seconds
+cc.seek(15.9, true);         // Seek 15.9% percentage
 cc.disconnect();             // Disconnect session
 
 // Castjs properties
