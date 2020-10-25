@@ -1,10 +1,16 @@
-// castjs class
+// Import cast framework
+if (window.chrome && !window.chrome.cast) {
+    var script = document.createElement('script');
+    script.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+    document.head.appendChild(script);
+}
+
+// Castjs
 class Castjs {
     // constructor takes optional options
     constructor(opt = {}) {
         // valid join policies
         var joinpolicies = [
-            'custom_controller_scoped',
             'tab_and_origin_scoped',
             'origin_scoped',
             'page_scoped'
@@ -12,7 +18,7 @@ class Castjs {
 
         // only allow valid join policy
         if (!opt.joinpolicies || joinpolicies.indexOf(opt.joinpolicy) === -1) {
-            opt.joinpolicy = 'origin_scoped';
+            opt.joinpolicy = 'tab_and_origin_scoped';
         }
 
         // set default receiver ID if none provided
@@ -20,24 +26,22 @@ class Castjs {
             opt.receiver = 'CC1AD845';
         }
 
-        // application variables
-        this.events     = {}
-        this.receiver   = opt.receiver;
-        this.joinpolicy = opt.joinpolicy;
-        this.available  = false;
-        this.connected  = false;
-        this.player     = null;
-        this.controller = null;
-        this.device     = 'Chromecast';
+        // private variables
+        this._events     = {}
+        this._player     = null;
+        this._controller = null;
 
-        // media variables
-        this.src         = ''
-        this.title       = ''
-        this.description = ''
-        this.poster      = ''
-        this.subtitles   = []
-
-        // player variable
+        // public variables
+        this.receiver       = opt.receiver;
+        this.joinpolicy     = opt.joinpolicy;
+        this.available      = false;
+        this.connected      = false;
+        this.device         = 'Chromecast';
+        this.src            = ''
+        this.title          = ''
+        this.description    = ''
+        this.poster         = ''
+        this.subtitles      = []
         this.volumeLevel    = 1;
         this.muted          = false;
         this.paused         = false;
@@ -48,46 +52,48 @@ class Castjs {
         this.progress       = 0;
         this.state          = 'disconnected';
 
-        this.intervalIsAvailable = setInterval(() => {
-            // casting only works on chrome, opera, brave and vivaldi
-            if (!window.chrome) {
-                clearInterval(this.intervalIsAvailable);
-                return this.trigger('error', 'Casting is not supported in this browser');
-            }
-
-            // wait for isAvailable boolean
-            if (window.chrome.cast && window.chrome.cast.isAvailable) {
-                // terminate loop
-                clearInterval(this.intervalIsAvailable);
-                // initialize cast API
-                cast.framework.CastContext.getInstance().setOptions({
-                    receiverApplicationId:      this.receiver,
-                    autoJoinPolicy:             this.joinpolicy,
-                    language:                   'en-US',
-                    resumeSavedSession:         false,
-                });
-                // create remote player controller
-                this.player = new cast.framework.RemotePlayer();
-                this.controller = new cast.framework.RemotePlayerController(this.player);
-
-                // register callback events
-                this.controller.addEventListener('isConnectedChanged',  this.controller_isConnectedChanged.bind(this));
-                this.controller.addEventListener('isMediaLoadedChanged',this.controller_isMediaLoadedChanged.bind(this));
-                this.controller.addEventListener('isMutedChanged',      this.controller_isMutedChanged.bind(this));
-                this.controller.addEventListener('isPausedChanged',     this.controller_isPausedChanged.bind(this));
-                this.controller.addEventListener('currentTimeChanged',  this.controller_currentTimeChanged.bind(this));
-                this.controller.addEventListener('durationChanged',     this.controller_durationChanged.bind(this));
-                this.controller.addEventListener('volumeLevelChanged',  this.controller_volumeLevelChanged.bind(this));
-                this.controller.addEventListener('playerStateChanged',  this.controller_playerStateChanged.bind(this));
-                this.available = true;
-                this.trigger('available');
-            }
-        }, 250); // update every 250ms
+        // initialize chromecast framework
+        this._init()
     }
 
-    controller_isMediaLoadedChanged() {
+    _init(tries = 0) {
+        // casting only works on chrome, opera, brave and vivaldi
+        if (!window.chrome || !window.chrome.cast || !window.chrome.cast.isAvailable) {
+            if (tries++ > 20) {
+                return this.trigger('error', 'Casting is not supported in this browser');
+            }
+            return setTimeout(this._init.bind(this), 250, tries);
+        }
+
+        // terminate loop
+        clearInterval(this.intervalIsAvailable);
+        // initialize cast API
+        cast.framework.CastContext.getInstance().setOptions({
+            receiverApplicationId:      this.receiver,
+            autoJoinPolicy:             this.joinpolicy,
+            language:                   'en-US',
+            resumeSavedSession:         false,
+        });
+        // create remote player controller
+        this._player = new cast.framework.RemotePlayer();
+        this._controller = new cast.framework.RemotePlayerController(this._player);
+
+        // register callback events
+        this._controller.addEventListener('isConnectedChanged',  this._isConnectedChanged.bind(this));
+        this._controller.addEventListener('isMediaLoadedChanged',this._isMediaLoadedChanged.bind(this));
+        this._controller.addEventListener('isMutedChanged',      this._isMutedChanged.bind(this));
+        this._controller.addEventListener('isPausedChanged',     this._isPausedChanged.bind(this));
+        this._controller.addEventListener('currentTimeChanged',  this._currentTimeChanged.bind(this));
+        this._controller.addEventListener('durationChanged',     this._durationChanged.bind(this));
+        this._controller.addEventListener('volumeLevelChanged',  this._volumeLevelChanged.bind(this));
+        this._controller.addEventListener('playerStateChanged',  this._playerStateChanged.bind(this));
+        this.available = true;
+        this.trigger('available');
+    }
+
+    _isMediaLoadedChanged() {
         // don't update media info if not available
-        if (!this.player.isMediaLoaded || !this.player.mediaInfo) {
+        if (!this._player.isMediaLoaded || !this._player.mediaInfo) {
             return
         }
 
@@ -95,30 +101,30 @@ class Castjs {
         this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || 'Chromecast'
 
         // Update media variables
-        console.log(this.player.mediaInfo)
-        this.src                = this.player.mediaInfo.contentId;
-        this.title              = this.player.mediaInfo.metadata.title || null;
-        this.description        = this.player.mediaInfo.metadata.subtitle || null;
-        this.poster             = this.player.imageUrl || null;
+        console.log(this._player.mediaInfo)
+        this.src                = this._player.mediaInfo.contentId;
+        this.title              = this._player.mediaInfo.metadata.title || null;
+        this.description        = this._player.mediaInfo.metadata.subtitle || null;
+        this.poster             = this._player.imageUrl || null;
         this.subtitles          = [];
-        this.volumeLevel        = this.player.volumeLevel;
-        this.muted              = this.player.isMuted;
-        this.paused             = this.player.isPaused;
-        this.time               = this.player.currentTime;
-        this.timePretty         = this.controller.getFormattedTime(this.player.currentTime);
-        this.duration           = this.player.duration;
-        this.durationPretty     = this.controller.getFormattedTime(this.player.duration);
-        this.progress           = this.controller.getSeekPosition(this.player.currentTime, this.player.duration);
-        this.state              = this.player.playerState.toLowerCase();
+        this.volumeLevel        = this._player.volumeLevel;
+        this.muted              = this._player.isMuted;
+        this.paused             = this._player.isPaused;
+        this.time               = this._player.currentTime;
+        this.timePretty         = this._controller.getFormattedTime(this._player.currentTime);
+        this.duration           = this._player.duration;
+        this.durationPretty     = this._controller.getFormattedTime(this._player.duration);
+        this.progress           = this._controller.getSeekPosition(this._player.currentTime, this._player.duration);
+        this.state              = this._player.playerState.toLowerCase();
 
         // Loop over the subtitle tracks
-        for (var i in this.player.mediaInfo.tracks) {
+        for (var i in this._player.mediaInfo.tracks) {
             // Check for subtitle
-            if (this.player.mediaInfo.tracks[i].type === 'TEXT') {
+            if (this._player.mediaInfo.tracks[i].type === 'TEXT') {
                 // Push to media subtitles array
                 this.subtitles.push({
-                    label: this.player.mediaInfo.tracks[i].name,
-                    src:   this.player.mediaInfo.tracks[i].trackContentId
+                    label: this._player.mediaInfo.tracks[i].name,
+                    src:   this._player.mediaInfo.tracks[i].trackContentId
                 });
             }
         }
@@ -129,9 +135,9 @@ class Castjs {
         }
     }
     // Player controller events
-    controller_isConnectedChanged() {
+    _isConnectedChanged() {
         // check if we have a running session
-        this.connected = this.player.isConnected;
+        this.connected = this._player.isConnected;
         if (!this.connected) {
             this.state = 'disconnected'
             this.trigger('disconnect')
@@ -142,37 +148,37 @@ class Castjs {
         }
         this.trigger('statechange')
     }
-    controller_currentTimeChanged() {
-        this.time           = this.player.currentTime;
-        this.duration       = this.player.duration;
-        this.progress       = this.controller.getSeekPosition(this.time, this.duration);
-        this.timePretty     = this.controller.getFormattedTime(this.time);
-        this.durationPretty = this.controller.getFormattedTime(this.duration);
+    _currentTimeChanged() {
+        this.time           = this._player.currentTime;
+        this.duration       = this._player.duration;
+        this.progress       = this._controller.getSeekPosition(this.time, this.duration);
+        this.timePretty     = this._controller.getFormattedTime(this.time);
+        this.durationPretty = this._controller.getFormattedTime(this.duration);
         this.trigger('timeupdate');
     }
-    controller_durationChanged() {
-        this.duration = this.player.duration;
+    _durationChanged() {
+        this.duration = this._player.duration;
     }
-    controller_volumeLevelChanged() {
-        this.volumeLevel = this.player.volumeLevel;
+    _volumeLevelChanged() {
+        this.volumeLevel = this._player.volumeLevel;
         this.trigger('volumechange');
     }
-    controller_isMutedChanged() {
-        this.muted = this.player.isMuted;
+    _isMutedChanged() {
+        this.muted = this._player.isMuted;
         this.trigger('mute');
     }
-    controller_isPausedChanged() {
-        this.paused = this.player.isPaused;
+    _isPausedChanged() {
+        this.paused = this._player.isPaused;
         if (this.paused) {
             this.trigger('pause');
         }
     }
-    controller_playerStateChanged() {
-        this.connected = this.player.isConnected
+    _playerStateChanged() {
+        this.connected = this._player.isConnected
         if (this.connected) {
             this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || 'Chromecast'
         }
-        this.state = this.player.playerState.toLowerCase();
+        this.state = this._player.playerState.toLowerCase();
         if (this.state === 'idle') {
             this.state = 'ended'
             this.trigger('end');
@@ -187,20 +193,20 @@ class Castjs {
     // Class functions
     on(event, cb) {
         // If event is not registered, create array to store callbacks
-        if (!this.events[event]) {
-            this.events[event] = [];
+        if (!this._events[event]) {
+            this._events[event] = [];
         }
         // Push callback into event array
-        this.events[event].push(cb);
+        this._events[event].push(cb);
         return this
     }
     off(event) {
         if (!event) {
             // if no event name was given, reset all events
-            this.events = {};
-        } else if (this.events[event]) {
+            this._events = {};
+        } else if (this._events[event]) {
             // remove all callbacks from event
-            this.events[event] = [];
+            this._events[event] = [];
         }
         return this
     }
@@ -208,16 +214,16 @@ class Castjs {
         // Slice arguments into array
         var tail = Array.prototype.slice.call(arguments, 1);
         // If event exist, call callback with callback data
-        for (var i in this.events[event]) {
-            this.events[event][i].apply(this, tail);
+        for (var i in this._events[event]) {
+            this._events[event][i].apply(this, tail);
         }
         // dont call global event if error
         if (event === 'error') {
             return this
         }
         // call global event handler if exist
-        for (var i in this.events['event']) {
-            this.events['event'][i].apply(this, [event]);
+        for (var i in this._events['event']) {
+            this._events['event'][i].apply(this, [event]);
         }
         return this
     }
@@ -295,7 +301,7 @@ class Castjs {
 
                 // check when connection drops
                 this.intervalIsConnected = setInterval(() => {
-                    this.connected = this.player.isConnected
+                    this.connected = this._player.isConnected
                     if (!this.connected) {
                         clearInterval(this.intervalIsConnected);
                         this.state = 'disconnected'
@@ -320,38 +326,38 @@ class Castjs {
     seek(seconds, isPercentage) {
         // if seek(15, true) we assume 15 is percentage instead of seconds
         if (isPercentage) {
-            seconds = this.controller.getSeekTime(seconds, this.player.duration);
+            seconds = this._controller.getSeekTime(seconds, this._player.duration);
         }
-        this.player.currentTime = seconds;
-        this.controller.seek();
+        this._player.currentTime = seconds;
+        this._controller.seek();
         return this;
     }
     volume(float) {
-        this.player.volumeLevel = float;
-        this.controller.setVolumeLevel();
+        this._player.volumeLevel = float;
+        this._controller.setVolumeLevel();
         return this;
     }
     play() {
         if (this.paused) {
-            this.controller.playOrPause();
+            this._controller.playOrPause();
         }
         return this;
     }
     pause() {
         if (!this.paused) {
-            this.controller.playOrPause();
+            this._controller.playOrPause();
         }
         return this;
     }
     mute() {
         if (this.muted === false) {
-          this.controller.muteOrUnmute();
+          this._controller.muteOrUnmute();
         }
         return this;
     }
     unmute() {
         if (this.muted === true) {
-          this.controller.muteOrUnmute();
+          this._controller.muteOrUnmute();
         }
         return this;
     }
@@ -381,7 +387,7 @@ class Castjs {
     // disconnect will end the current session
     disconnect() {
         cast.framework.CastContext.getInstance().endCurrentSession(true);
-        this.controller.stop();
+        this._controller.stop();
 
         // application variables
         this.connected  = false;
@@ -409,4 +415,8 @@ class Castjs {
         this.trigger('disconnect');
         return this;
     }
+}
+
+if (typeof module !== 'undefined'){
+    module.exports = Castjs;
 }

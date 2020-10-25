@@ -10,52 +10,58 @@
   This library works in chrome, opera, brave and vivaldi, see it in action and check out the <a href="https://castjs.io/demo/">online demo</a>.
 </p>
 
-##### Import library
+# Getting Started
+
+Import the `cast.min.js` with the option for version control
+```html
+<script src="https://castjs.io/cast.min.js"></script>        <!-- latest version   -->
+<script src="https://castjs.io/cast.min.js@v4.1.0"></script> <!-- specific version -->
+<script src="https://castjs.io/cast.min.js@master"></script> <!-- master version   -->
+```
+
+# Getting Started
+
+Casting a media source to your chromecast device.
 
 ```html
-<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-<script src="https://castjs.io/cast.min.js"></script>            <!-- master version -->
-<script src="https://castjs.io/cast.min.js@latest"></script> --> <!-- latest version -->
-<script src="https://castjs.io/cast.min.js@v4.1.0"></script> --> <!-- locked version -->
-```
+<button id="cast">Cast</button>
 
-##### Casting a media source
+<script src="https://castjs.io/cast.min.js"></script>
+<script>
+// Create new Castjs instance
+const cjs = new Castjs();
 
-```js
-var cc = new Castjs();
-$('button').on('click', () => {
-    if (cc.available) {
-        cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4');
+// Wait for user interaction
+document.getElementById('cast').addEventListener('click', function() {
+    // Check if casting is available
+    if (cjs.available) {
+        // Initiate new cast session
+        cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4');
     }
 });
+</script>
 ```
 
-##### Adding metadata to media source
+You can send metadata along with the media source
 
+
+# API Documentation
+
+Create a new `Castjs` instance.
 ```js
-var cc = new Castjs();
-var metadata = {
-    title      : 'Sintel',
-    description: 'Third Open Movie by Blender Foundation',
-    poster     : 'https://castjs.io/demo/poster.jpg',
-    muted      : false,
-    paused     : false,
-    time       : 35,
-    subtitles: [{
-        active: true,
-        label:  'English',
-        source: 'https://castjs.io/demo/english.vtt'
-    }, {
-        label:  'Spanish',
-        source: 'https://castjs.io/demo/spanish.vtt'
-  }]
+const cjs = new Castjs([opts])
+```
+If `opts` is specified, then the default options (shown below) will be overriden.
+```js
+{
+  // Cast application id.
+  receiver: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+
+  // Indicates if to join a running session on initialization.
+  joinpolicy: chrome.cast.AutoJoinPolicy.TAB_AND_ORIGIN_SCOPED
 }
-$('button').on('click', () => {
-    if (cc.available) {
-        cc.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', metadata);
-    }
-});
 ```
+
 
 ##### Documentation:
 
