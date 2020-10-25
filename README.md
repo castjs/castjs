@@ -86,6 +86,7 @@ cjs.seek(15.9, true);         // Seek 15.9% percentage
 cjs.disconnect();             // Disconnect session
 
 // Castjs properties
+cjs.version          // Castjs Version
 cjs.receiver         // Receiver ID
 cjs.available        // Casting is available
 cjs.connected        // Connected with cast device
