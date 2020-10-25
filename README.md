@@ -58,52 +58,52 @@ const cc = new Castjs({
 });
 
 // Castjs Events
-cc.on('available',    ()  => {});  // Casting is available
-cc.on('connect',      ()  => {});  // Connected with device
-cc.on('disconnect',   ()  => {});  // Disconnected with device
-cc.on('statechange',  ()  => {});  // Device state
-cc.on('timeupdate',   ()  => {});  // Current time changed
-cc.on('volumechange', ()  => {});  // Volume changed
-cc.on('mute',         ()  => {});  // Muted state changed
-cc.on('unmute',       ()  => {});  // Muted state changed
-cc.on('playing',      ()  => {});  // Media is playing
-cc.on('pause',        ()  => {});  // Media is paused
-cc.on('end',          ()  => {});  // Media ended
-cc.on('buffering',    ()  => {});  // Media is buffering / seeking
-cc.on('event',        (e) => {});  // Catch all events except 'error'
-cc.on('error',        (e) => {});  // Catch any errors
+cjs.on('available',    ()  => {});  // Casting is available
+cjs.on('connect',      ()  => {});  // Connected with device
+cjs.on('disconnect',   ()  => {});  // Disconnected with device
+cjs.on('statechange',  ()  => {});  // Device state
+cjs.on('timeupdate',   ()  => {});  // Current time changed
+cjs.on('volumechange', ()  => {});  // Volume changed
+cjs.on('mute',         ()  => {});  // Muted state changed
+cjs.on('unmute',       ()  => {});  // Muted state changed
+cjs.on('playing',      ()  => {});  // Media is playing
+cjs.on('pause',        ()  => {});  // Media is paused
+cjs.on('end',          ()  => {});  // Media ended
+cjs.on('buffering',    ()  => {});  // Media is buffering / seeking
+cjs.on('event',        (e) => {});  // Catch all events except 'error'
+cjs.on('error',        (e) => {});  // Catch any errors
 
 // Castjs functions
-cc.cast(source, [metadata]); // Create session with media
-cc.volume(0.7);              // Change volume
-cc.play();                   // Play media
-cc.pause();                  // Pause media
-cc.mute();                   // Mutes media
-cc.unmute();                 // Unmutes media
-cc.subtitle(2);              // Change active subtitle index
-cc.seek(15);                 // Seek 15 seconds
-cc.seek(15.9, true);         // Seek 15.9% percentage
-cc.disconnect();             // Disconnect session
+cjs.cast(source, [metadata]); // Create session with media
+cjs.volume(0.7);              // Change volume
+cjs.play();                   // Play media
+cjs.pause();                  // Pause media
+cjs.mute();                   // Mutes media
+cjs.unmute();                 // Unmutes media
+cjs.subtitle(2);              // Change active subtitle index
+cjs.seek(15);                 // Seek 15 seconds
+cjs.seek(15.9, true);         // Seek 15.9% percentage
+cjs.disconnect();             // Disconnect session
 
 // Castjs properties
-cc.receiver         // Receiver ID
-cc.available        // Casting is available
-cc.connected        // Connected with cast device
-cc.device           // Cast device name
-cc.src              // Media source
-cc.title            // Media title
-cc.description      // Media description
-cc.poster           // Media poster image
-cc.subtitles        // Media subtitles
-cc.volumeLevel      // Volume level
-cc.muted            // If muted
-cc.paused           // If paused
-cc.time             // Time in seconds
-cc.timePretty       // Time formatted in time hh:mm:ss
-cc.duration         // Duration in seconds
-cc.durationPretty   // Duration formatted in hh:mm:ss
-cc.progress         // Progress in percentage 0 - 100
-cc.state            // State of cast device
+cjs.receiver         // Receiver ID
+cjs.available        // Casting is available
+cjs.connected        // Connected with cast device
+cjs.device           // Cast device name
+cjs.src              // Media source
+cjs.title            // Media title
+cjs.description      // Media description
+cjs.poster           // Media poster image
+cjs.subtitles        // Media subtitles
+cjs.volumeLevel      // Volume level
+cjs.muted            // If muted
+cjs.paused           // If paused
+cjs.time             // Time in seconds
+cjs.timePretty       // Time formatted in time hh:mm:ss
+cjs.duration         // Duration in seconds
+cjs.durationPretty   // Duration formatted in hh:mm:ss
+cjs.progress         // Progress in percentage 0 - 100
+cjs.state            // State of cast device
 ```
 
 ##### TODO
