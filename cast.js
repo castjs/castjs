@@ -32,7 +32,7 @@ class Castjs {
         this._controller = null;
 
         // public variables
-        this.version        = 'v4.1.0'
+        this.version        = 'v4.1.1'
         this.receiver       = opt.receiver;
         this.joinpolicy     = opt.joinpolicy;
         this.available      = false;
@@ -112,14 +112,14 @@ class Castjs {
             this.description        = this._player.mediaInfo.metadata.subtitle || null;
             this.poster             = this._player.imageUrl || null;
             this.subtitles          = [];
-            this.volumeLevel        = this._player.volumeLevel;
+            this.volumeLevel        = this.volumeLevel = Number((this._player.volumeLevel).toFixed(1));
             this.muted              = this._player.isMuted;
             this.paused             = this._player.isPaused;
-            this.time               = this._player.currentTime;
-            this.timePretty         = this._controller.getFormattedTime(this._player.currentTime);
+            this.time               = Math.round(this._player.currentTime, 1);
+            this.timePretty         = this._controller.getFormattedTime(this.time);
             this.duration           = this._player.duration;
             this.durationPretty     = this._controller.getFormattedTime(this._player.duration);
-            this.progress           = this._controller.getSeekPosition(this._player.currentTime, this._player.duration);
+            this.progress           = this._controller.getSeekPosition(this.time, this._player.duration);
             this.state              = this._player.playerState.toLowerCase();
 
             // Loop over the subtitle tracks
@@ -167,12 +167,15 @@ class Castjs {
         this.duration = this._player.duration;
     }
     _volumeLevelChanged() {
-        this.volumeLevel = this._player.volumeLevel;
+        this.volumeLevel = Number((this._player.volumeLevel).toFixed(1));
         this.trigger('volumechange');
     }
     _isMutedChanged() {
+        var old = this.muted
         this.muted = this._player.isMuted;
-        this.trigger(this.muted ? 'mute' : 'unmute');
+        if (old != this.muted) {
+            this.trigger(this.muted ? 'mute' : 'unmute');
+        }
     }
     _isPausedChanged() {
         this.paused = this._player.isPaused;
@@ -193,7 +196,7 @@ class Castjs {
                 this.trigger('end');
                 break;
             case 'buffering':
-                this.time           = this._player.currentTime;
+                this.time           = Math.round(this._player.currentTime, 1);
                 this.duration       = this._player.duration;
                 this.progress       = this._controller.getSeekPosition(this.time, this.duration);
                 this.timePretty     = this._controller.getFormattedTime(this.time);

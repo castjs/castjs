@@ -35,6 +35,13 @@ cjs.on('event', (e) => {
     debug(e + '\t: ' + cjs.timePretty)
   } else if (e === 'disconnect') {
     debug(e + '\t: ' + cjs.device)
+  } else if (e === 'subtitlechange') {
+    for (var i in cjs.subtitles) {
+        if (cjs.subtitles[i].active) {
+            debug('subtitle\t: ' + cjs.subtitles[i].label)
+            break;
+        }
+    }
   } else {
     debug(e)
   }
