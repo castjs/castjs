@@ -11,37 +11,65 @@
     <link rel="stylesheet" href="/demo/style.css">
     <title>Cast.js Sender 📺 Demo</title>
   </head>
-  <body>
-    <div class="wrapper">
-      <h1>Demo</h1>
-      <a class="link" href="https://castjs.io">https://castjs.io</a>
-      <img id="poster" src="/demo/poster.jpg">
-      <div class="settings">
-        <i id="captions" data-jq-dropdown="#jq-dropdown-1" class="fas fa-closed-captioning"></i>
-        <div id="jq-dropdown-1" class="jq-dropdown jq-dropdown-tip">
-          <ul class="jq-dropdown-menu">
-            <li><a class="active" href="0">English</a></li>
-            <li><a href="1">Spanish</a></li>
-          </ul>
+  <body class="disabled">
+    <div class="container">
+      <h1>Cast.js Demo</h1>
+      <p>📺 Chromecast Sender Library for the Browser</p>
+      <a href="https://github.com/castjs/castjs" class="btn">View on GitHub</a>
+      
+      <div class="col">
+
+        <div class="media">
+          <img src="/demo/poster.jpg" class="poster">
+          <div class="title">Sintel (2010)</div>
+          <div class="description">Third Open Movie by Blender Foundation</div>
+          <div class="genres">
+            <div class="genre">Animation</div>
+            <div class="genre">Short</div>
+            <div class="genre">Fantasy</div>
+          </div>
+          <div class="rating">
+            <span>7.5</span>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half"></i>
+          </div>
         </div>
-        <i id="mute" class="fas fa-volume-up"></i>
-        <i id="cast" class="fab fa-chromecast disabled"></i>
+
+        <div class="clear"></div>
+
+        <div class="settings">
+          <i id="captions" data-jq-dropdown="#jq-dropdown-1" class="fas fa-closed-captioning"></i>
+          <div id="jq-dropdown-1" class="jq-dropdown jq-dropdown-tip">
+            <ul class="jq-dropdown-menu">
+              <li><a class="active" href="0">English</a></li>
+              <li><a href="1">Spanish</a></li>
+            </ul>
+          </div>
+          <i id="mute" class="fas fa-volume-up"></i>
+          <i id="cast" class="fab fa-chromecast disabled"></i>
+        </div>
+        <div class="timeline">
+          <div id="time">00:00:00</div>
+          <input id="range" type="range" min="0" max="100" step="1" value="0">
+          <div id="duration">00:00:00</div>
+        </div>
+        <div class="controls">
+          <i id="back" class="fas fa-history"></i>
+          <i id="play" class="fas fa-play"></i>
+          <i id="forward" class="fas fa-history fa-flip-horizontal"></i>
+        </div>
+        <div id="state">Disconnected</div>
       </div>
-      <div class="timeline">
-        <div id="time">00:00:00</div>
-        <input id="range" type="range" min="0" max="100" step="1" value="0">
-        <div id="duration">00:00:00</div>
+
+      <div class="col">
+        <textarea id="debug"></textarea>
       </div>
-      <div class="controls">
-        <i id="back" class="fas fa-history"></i>
-        <i id="play" class="fas fa-play"></i>
-        <i id="forward" class="fas fa-history fa-flip-horizontal"></i>
-      </div>
-      <div id="title">Sintel</div>
-      <div id="description">Third Open Movie by Blender Foundation</div>
-      <div id="state">Disconnected</div>
+
+      <div class="clear"></div>
     </div>
-    <textarea id="debug"></textarea>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.js"></script>

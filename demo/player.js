@@ -7,8 +7,9 @@ function debug(msg) {
     $('#debug').append('[' + n + '] ' + JSON.stringify(msg) + '\n')
   }
   var textarea = document.getElementById('debug');
-textarea.scrollTop = textarea.scrollHeight;
+  textarea.scrollTop = textarea.scrollHeight;
 }
+debug('debugging\t: enabled')
 
 var cjs = new Castjs();
 
@@ -18,13 +19,13 @@ cjs.on('event', (e) => {
   } else if (e === 'volumechange') {
     debug(e + '\t: ' + cjs.volumeLevel)
   } else if (e === 'timeupdate') {
-    debug(e + '\t: ' + cjs.timePretty + ' - ' + cjs.durationPretty)
+    // debug(e + '\t: ' + cjs.timePretty + ' - ' + cjs.durationPretty)
   } else if (e === 'playing') {
     debug(e + '\t: ' + cjs.title)
   } else if (e === 'connect') {
     debug(e + '\t: ' + cjs.device)
   } else if (e === 'available') {
-    debug(e + '\t: Castjs ' + cjs.version)
+    debug(e + '\t: castjs ' + cjs.version)
   } else if (e === 'buffering') {
     debug(e + '\t: ' + cjs.timePretty)
   } else if (e === 'mute') {
@@ -32,7 +33,7 @@ cjs.on('event', (e) => {
   } else if (e === 'unmute') {
     debug(e + '\t: ' + cjs.volumeLevel)
   } else if (e === 'pause') {
-    debug(e + '\t: ' + cjs.timePretty)
+    debug(e + '\t\t: ' + cjs.timePretty)
   } else if (e === 'disconnect') {
     debug(e + '\t: ' + cjs.device)
   } else if (e === 'subtitlechange') {
@@ -52,8 +53,8 @@ cjs.on('available', () => {
 })
 
 cjs.on('connect', () => {
-  $('#cast').removeClass('disabled')
-  $('#cast').addClass('connected')
+  $('body').removeClass('disabled')
+  $('body').addClass('connected')
   if (cjs.paused) {
     $('#play').removeClass('fa-pause').addClass('fa-play')
   } else {
@@ -74,25 +75,31 @@ cjs.on('statechange', () => {
 })
 
 cjs.on('buffering', () => {
-  //debug('Event -> buffering')
+  $('body').addClass('disabled');
 })
 
 
 cjs.on('playing', () => {
+  $('body').removeClass('disabled');
   $('#play').removeClass('fa-play').addClass('fa-pause')
 })
 
 cjs.on('pause', () => {
+  $('body').removeClass('disabled');
   $('#play').removeClass('fa-pause').addClass('fa-play')
 })
 
 cjs.on('timeupdate', () => {
   $('#time').text(cjs.timePretty);
   $('#duration').text(cjs.durationPretty);
-  $('#range').attr('value', cjs.progress);
-  $('#range').rangeslider('update', true);
+  slider.attr('value', cjs.progress);
+  slider.rangeslider('update', true);
 })
-
+cjs.on('disconnect', () => {
+  $('body').addClass('disabled');
+  $('body').removeClass('connected');
+  
+})
 cjs.on('error', (err) => {
   debug('Event -> error: ' + err)
 })
@@ -145,7 +152,6 @@ $('#play').on('click', () => {
 
 $('#stop').on('click', () => {
     cjs.disconnect();
-    $('#cast').removeClass('connected');
 })
 
 $('#back').on('click', () => {

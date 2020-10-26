@@ -148,8 +148,8 @@ class Castjs {
             this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || this.device
         }
         this.state = !this.connected ? 'disconnected' : 'connected'
-        this.trigger(!this.connected ? 'disconnect' : 'connect')
         this.trigger('statechange')
+        this.trigger(!this.connected ? 'disconnect' : 'connect')
     }
     _currentTimeChanged() {
         var past            = this.time
@@ -159,7 +159,7 @@ class Castjs {
         this.timePretty     = this._controller.getFormattedTime(this.time);
         this.durationPretty = this._controller.getFormattedTime(this.duration);
         // Only trigger timeupdate if there is a difference
-        if (past != this.time) {
+        if (past != this.time && !this._player.isPaused) {
             this.trigger('timeupdate');
         }
     }
@@ -168,7 +168,9 @@ class Castjs {
     }
     _volumeLevelChanged() {
         this.volumeLevel = Number((this._player.volumeLevel).toFixed(1));
-        this.trigger('volumechange');
+        if (this._player.isMediaLoaded) {
+            this.trigger('volumechange');
+        }
     }
     _isMutedChanged() {
         var old = this.muted
@@ -193,25 +195,26 @@ class Castjs {
         switch(this.state) {
             case 'idle':
                 this.state = 'ended';
+                this.trigger('statechange');
                 this.trigger('end');
-                break;
+                return this
             case 'buffering':
                 this.time           = Math.round(this._player.currentTime, 1);
                 this.duration       = this._player.duration;
                 this.progress       = this._controller.getSeekPosition(this.time, this.duration);
                 this.timePretty     = this._controller.getFormattedTime(this.time);
                 this.durationPretty = this._controller.getFormattedTime(this.duration);
+                this.trigger('statechange');
                 this.trigger('buffering');
-                break;
+                return this
             case 'playing':
                 // we have to skip a tick to give mediaInfo some time to update
                 setTimeout(() => {
-                    this.trigger('playing');
                     this.trigger('statechange');
+                    this.trigger('playing');
                 })
-                return;
+                return this
         }
-        this.trigger('statechange');
     }
     // Class functions
     on(event, cb) {
