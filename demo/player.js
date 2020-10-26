@@ -101,7 +101,7 @@ cjs.on('disconnect', () => {
   
 })
 cjs.on('error', (err) => {
-  debug('Event -> error: ' + err)
+  debug('error\t\t: ' + err)
 })
 
 $('#cast').on('click', () => {
