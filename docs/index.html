@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.css">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/an-old-hope.min.css" integrity="sha512-pHbw/heFWZcIQnE/c/R0rGx+jmWwAju9YJZ9S3l5H7Ns34x3/gxJ1PQY5JS5HWO89OOKfDvcJZskcYmqoBlcRQ==" crossorigin="anonymous" /><link rel="stylesheet" href="/style.css">
     <title>Cast.js Sender 📺 Demo</title>
   </head>
   <body class="disabled">
@@ -69,11 +70,38 @@
       </div>
 
       <div class="clear"></div>
+      <h1>Getting Started</h1>
+      <pre>
+        <code class="code language-html">
+        </code>
+      </pre>
+      <pre>
+        <code class="code language-js minus-margin">
+  // Create new Castjs instance
+  const cjs = new Castjs();
+
+  // Wait for user interaction
+  $('#cast').on('click', function() {
+      // Check if casting is available
+      if (cjs.available) {
+          // Initiate new cast session
+          cjs.cast('https://example.com/movie.mp4');
+      }
+  });
+        </code>
+      </pre>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.js"></script>
-    <script src="https://castjs.io/cast.min.js@master"></script>                  <!-- master  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/highlight.min.js"></script>
+    <script src="https://castjs.io/cast.js@latest"></script>                  <!-- master  -->
     <script src="/player.js" crossorigin="anonymous"></script>
+    <script>
+      var val = '<script src=\"https://castjs.io/cast.min.js\">\<\/script>'
+      val = val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      $('.language-html').html(val)
+      hljs.initHighlightingOnLoad();
+    </script>
   </body>
 </html>

@@ -116,10 +116,18 @@ p {
   font-weight: 600;
   margin-right: 2px;
 }
+.minus-margin {
+  margin-top: -60px;
+}
+pre {
+  margin-top: 0;
+  padding: 10px;
+  margin-bottom: 0;
+  padding: 10px;
+}
 #debug {
   display: block;
   width: 100%;
-  max-width: 500px;
   margin: 0 auto;
   min-height: 359px;
   border: 0;
@@ -154,6 +162,10 @@ body.disabled .fa-star {
 }
 body.connected #cast {
   color: #33B5E5;
+}
+.hljs {
+  text-align: left;
+  padding: 10px;
 }
 #poster {
   width: 100%;
