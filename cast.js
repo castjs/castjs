@@ -32,7 +32,7 @@ class Castjs {
         this._controller = null;
 
         // public variables
-        this.version        = 'v4.1.1'
+        this.version        = 'v4.1.2'
         this.receiver       = opt.receiver;
         this.joinpolicy     = opt.joinpolicy;
         this.available      = false;
