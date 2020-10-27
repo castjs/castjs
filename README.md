@@ -42,6 +42,11 @@ document.getElementById('cast').addEventListener('click', function() {
 </script>
 ```
 
+# Supported Browsers
+Almost any [Chromium]() based browser supports cast framework out of the box.
+<a href="https://vivaldi.com/"><img src="https://vivaldi.com/favicon.ico" height="13"> Vivaldi</a>
+<a href="https://brave.com/"><img src="https://brave.com/static-assets/images/brave-favicon.png" height="15"> Brave</a>
+
 ##### API Documentation:
 
 ```javascript

@@ -56,12 +56,22 @@ class Castjs {
         // initialize chromecast framework
         this._init()
     }
-
+    _getBrowser() {
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+            return "Firefox: Casting is not supported in this browser."
+        }
+        if (navigator.userAgent.toLowerCase().indexOf('opr/') > -1) {
+            return "Opera: Please enable casting, click here: https://bit.ly/2G1PMhD"
+        }
+        if (navigator.userAgent.toLowerCase().indexOf('iron safari') > -1) {
+            return "Iron Safari: Please enable casting, click here: https://bit.ly/2G1PMhD"
+        }
+    }
     _init(tries = 0) {
         // casting only works on chrome, opera, brave and vivaldi
         if (!window.chrome || !window.chrome.cast || !window.chrome.cast.isAvailable) {
             if (tries++ > 20) {
-                return this.trigger('error', 'Casting is not supported in this browser');
+                return this.trigger('error', 'Casting is not supported in ' + getBrowser());
             }
             return setTimeout(this._init.bind(this), 250, tries);
         }

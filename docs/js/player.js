@@ -107,16 +107,16 @@ cjs.on('error', (err) => {
 $('#cast').on('click', () => {
   if (cjs.available) {
     cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
-      poster     : 'https://castjs.io/demo/poster.jpg',
+      poster     : 'https://castjs.io/media/poster.jpg',
       title      : 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
       subtitles: [{
           active: true,
           label : 'English',
-          src   : 'https://castjs.io/demo/english.vtt'
+          src   : 'https://castjs.io/media/english.vtt'
       }, {
           label : 'Spanish',
-          src   : 'https://castjs.io/demo/spanish.vtt'
+          src   : 'https://castjs.io/media/spanish.vtt'
       }],
     })
   }
