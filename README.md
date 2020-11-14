@@ -12,11 +12,9 @@
 
 # Getting Started
 
-Import the `cast.min.js` with the option for version control
+Include the `cast.min.js` from [cdnjs](https://cdnjs.com/libraries/castjs):
 ```html
-<script src="https://castjs.io/cast.min.js"></script>        <!-- latest version   -->
-<script src="https://castjs.io/cast.min.js@v4.1.0"></script> <!-- specific version -->
-<script src="https://castjs.io/cast.min.js@master"></script> <!-- master version   -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js"></script>
 ```
 
 # Getting Started
