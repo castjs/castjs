@@ -297,6 +297,13 @@ class Castjs {
                 mediaInfo.textTrackStyle.fontScale       = 1.0;
                 mediaInfo.textTrackStyle.foregroundColor = '#FFFFFF';
 
+                // Overwrite default subtitle track style with user defined values
+                // See https://developers.google.com/cast/docs/reference/chrome/chrome.cast.media.TextTrackStyle for a list of all configurable properties
+                mediaInfo.textTrackStyle = {
+                    ...mediaInfo.textTrackStyle, 
+                    ...this.subtitleStyle
+                };
+
                 var tracks = [];
                 for (var i in this.subtitles) {
                     // chrome.cast.media.TrackType.TEXT
