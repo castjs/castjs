@@ -7,14 +7,14 @@
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with chromecast devices from the browser.
   <br>
-  This library works in chrome, opera, brave and vivaldi, see it in action and check out the <a href="https://castjs.io/demo/">online demo</a>.
+  This library works in chrome, opera, brave, firefox and vivaldi, see it in action and check out the <a href="https://castjs.io/demo/">online demo</a>.
 </p>
 
 # Getting Started
 
 Include the `cast.min.js` from [cdnjs](https://cdnjs.com/libraries/castjs):
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.0.0/cast.min.js"></script>
 ```
 
 # Getting Started
