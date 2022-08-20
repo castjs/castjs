@@ -14,7 +14,7 @@
 
 Include the `cast.min.js` from [cdnjs](https://cdnjs.com/libraries/castjs):
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.0.0/cast.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js"></script>
 ```
 
 # Getting Started
@@ -24,7 +24,7 @@ Casting a media source to your chromecast device.
 ```html
 <button id="cast">Cast</button>
 
-<script src="https://castjs.io/cast.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js"></script>
 <script>
 // Create new Castjs instance
 const cjs = new Castjs();
