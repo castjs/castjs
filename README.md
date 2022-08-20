@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/SE0fwqV.jpg" alt="Castjs" width="100%">
+  <img src="https://i.imgur.com/ZjTpQ3S.png" alt="Castjs" width="100%">
 </p>
 
 <h4 align="center">Javascript library for the complex chromecast SDK</h4>
