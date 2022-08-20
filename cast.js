@@ -32,7 +32,7 @@ class Castjs {
         this._controller = null;
 
         // public variables
-        this.version        = 'v4.1.2'
+        this.version        = 'v5.0.0'
         this.receiver       = opt.receiver;
         this.joinpolicy     = opt.joinpolicy;
         this.available      = false;
@@ -58,32 +58,37 @@ class Castjs {
     }
     _getBrowser() {
         if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-            return "Firefox: Casting is not supported in this browser."
+            return "Firefox: Please enable casting, click here: https://googlechromecast.com/how-to-cast-firefox-to-tv/"
         }
         if (navigator.userAgent.toLowerCase().indexOf('opr/') > -1) {
-            return "Opera: Please enable casting, click here: https://bit.ly/2G1PMhD"
+            return "Opera: Please enable casting, click here: https://googlechromecast.com/how-to-cast-opera-browser-to-tv-using-google-chromecast/"
         }
         if (navigator.userAgent.toLowerCase().indexOf('iron safari') > -1) {
-            return "Iron Safari: Please enable casting, click here: https://bit.ly/2G1PMhD"
+            return "Iron Safari: Please enable casting, click here: https://googlechromecast.com/how-to-cast-opera-browser-to-tv-using-google-chromecast/"
         }
+        if (navigator.brave) {
+            return "Brave: Please enable casting, click here: https://googlechromecast.com/how-to-cast-brave-browser-to-chromecast/"
+        }
+        return "This Browser"
     }
     _init(tries = 0) {
         // casting only works on chrome, opera, brave and vivaldi
         if (!window.chrome || !window.chrome.cast || !window.chrome.cast.isAvailable) {
             if (tries++ > 20) {
-                return this.trigger('error', 'Casting is not supported in ' + getBrowser());
+                return this.trigger('error', 'Casting is not enabled in ' + _getBrowser());
             }
             return setTimeout(this._init.bind(this), 250, tries);
         }
 
         // terminate loop
         clearInterval(this.intervalIsAvailable);
+
         // initialize cast API
         cast.framework.CastContext.getInstance().setOptions({
             receiverApplicationId:      this.receiver,
             autoJoinPolicy:             this.joinpolicy,
             language:                   'en-US',
-            resumeSavedSession:         false,
+            resumeSavedSession:         true,
         });
         // create remote player controller
         this._player = new cast.framework.RemotePlayer();
