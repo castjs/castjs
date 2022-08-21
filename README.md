@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/ZjTpQ3S.png" alt="Castjs" width="100%">
 </p>
 
-<h4 align="center">Javascript library for the complex chromecast SDK</h4>
+<h4 align="center">Javascript library (<10kb) for the complex chromecast SDK</h4>
 
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with chromecast devices from the browser.
@@ -14,7 +14,7 @@
 
 Include the `cast.min.js` from [cdnjs](https://cdnjs.com/libraries/castjs):
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.0.0/cast.min.js"></script>
 ```
 
 # Getting Started
@@ -24,7 +24,7 @@ Casting a media source to your chromecast device.
 ```html
 <button id="cast">Cast</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.0.0/cast.min.js"></script>
 <script>
 // Create new Castjs instance
 const cjs = new Castjs();
