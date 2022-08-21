@@ -49,10 +49,10 @@ Almost any [Chromium]() based browser supports cast framework out of the box.
 
 ```javascript
 // Default instance
-const cc = new Castjs();
+const cjs = new Castjs();
 
 // Custom receiver or joinpolicy
-const cc = new Castjs({
+const cjs = new Castjs({
     receiver  : 'CC1AD845',              // default
     joinpolicy: 'tab_and_origin_scoped', // default
 //  joinpolicy: 'custom_controller_scoped',
