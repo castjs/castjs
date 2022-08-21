@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/an-old-hope.min.css">
-    <link rel="stylesheet" href="/castjs/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <title>Cast.js Sender 📺 Demo</title>
     <!-- Primary Meta Tags -->
 <title>Cast.js - Chromecast Sender Library for the Browser</title>
@@ -43,7 +43,7 @@ This library works in chrome, opera, brave, firefox and vivaldi see https://gith
       <div class="col">
 
         <div class="media">
-          <img src="/castjs/media/poster.jpg" class="poster">
+          <img src="/media/poster.jpg" class="poster">
           <div class="title">Sintel (2010)</div>
           <div class="description">Third Open Movie by Blender Foundation</div>
           <div class="genres">
@@ -130,10 +130,10 @@ $('#cast').on('click', () => {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/highlight.min.js"></script>
-    <script src="/castjs/js/cast.js" crossorigin="anonymous"></script>
-    <script src="/castjs/js/player.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.1.0/cast.min.js" crossorigin="anonymous"></script>
+    <script src="/js/player.js" crossorigin="anonymous"></script>
     <script>
-      var val = '<script src=\"https://cdnjs.cloudflare.com/ajax/libs/castjs/5.0.0/cast.min.js\">\<\/script>'
+      var val = '<script src=\"https://cdnjs.cloudflare.com/ajax/libs/castjs/5.1.0/cast.min.js\">\<\/script>'
       val = val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
       $('.language-html').html(val)
       hljs.initHighlightingOnLoad();
