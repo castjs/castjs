@@ -127,13 +127,11 @@ cjs.state            // State of cast device
 
 # FAQ
 
-**Question:** Can I cast local resources?
-  
+**Question:** Can I cast local resources?<br>
 **Answer:** It was possible in the past from the browser by using service workers. But we had to remove it from our library because Google dropped support, see https://github.com/fenny/chromecast-service-worker-crash
 
-**Question:** Do I need to enable CORS for all hosts?
-  
-**Answer:** Yes and no. Chromecast is using an User-Agent starting with `CrKey/*version` -> `CrKey/1.44.175293`, so you could allow agents starting with `CrKey` but this is not officialy documented.
+**Question:** Do I need to enable CORS for all hosts?<br>
+**Answer:** Yes and no. Chromecast is using an User-Agent that contains the word `CrKey` -> `Mozilla/5.0 (X11; Linux armv7l) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.225 Safari/537.36 CrKey/1.56.500000 DeviceType/Chromecast` so you could allow agents containing `CrKey` or `Chromecast` but this is not officialy documented.
 
 # TODO
 
