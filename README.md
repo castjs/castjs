@@ -17,7 +17,7 @@ Include the `cast.min.js` from [cdnjs](https://cdnjs.com/libraries/castjs):
 <script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.0.0/cast.min.js"></script>
 ```
 
-# Getting Started
+# Casting Media
 
 Casting a media source to your chromecast device. Make sure you enable [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) `Header set Access-Control-Allow-Origin "*"` on your media resources.
 
@@ -124,6 +124,14 @@ cjs.durationPretty   // Duration formatted in hh:mm:ss
 cjs.progress         // Progress in percentage 0 - 100
 cjs.state            // State of cast device
 ```
+
+##### FAQ
+
+**Question:** Can I cast local resources?
+**Answer:** It was possible in the past from the browser by using service workers. But we had to remove it from our library because Google dropped support, see https://github.com/fenny/chromecast-service-worker-crash
+
+**Question:** Do I need to enable CORS for all hosts?
+**Answer:** Yes and no. Chromecast is using a User-Agent starting with `CrKey/*version` -> `CrKey/1.44.175293`, so you could allow agents starting with `CrKey`
 
 ##### TODO
 
