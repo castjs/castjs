@@ -7,7 +7,8 @@
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with chromecast devices from the browser.
   <br>
-  This library works in chrome, opera, brave, firefox and vivaldi, see it in action and check out the <a href="https://castjs.io/demo/">online demo</a>.
+  This library works in chrome, opera, brave, firefox and vivaldi, see it in action and check out the <a href="https://castjs.io/">online demo</a>.
+  <a href="https://castjs.io/"><img src="https://i.imgur.com/1nBtUac.png" width="100%"></a>.
   <br><br>
   Do you want to support my work, feel free to donate a <a href="https://www.buymeacoffee.com/fenny" target="_blank">☕ Hot Beverage</a>
 </p>
