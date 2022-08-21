@@ -35,6 +35,21 @@ document.getElementById('cast').addEventListener('click', function() {
     if (cjs.available) {
         // Initiate new cast session
         cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4');
+
+        // A more complex example
+        cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
+            poster     : 'https://castjs.io/media/poster.jpg',
+            title      : 'Sintel',
+            description: 'Third Open Movie by Blender Foundation',
+            subtitles: [{
+                active: true,
+                label : 'English',
+                src   : 'https://castjs.io/media/english.vtt'
+            }, {
+                label : 'Spanish',
+                src   : 'https://castjs.io/media/spanish.vtt'
+            }],
+        })
     }
 });
 </script>
