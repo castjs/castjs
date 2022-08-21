@@ -60,7 +60,7 @@ Almost any [Chromium]() based browser supports cast framework out of the box.
 <a href="https://vivaldi.com/"><img src="https://vivaldi.com/favicon.ico" height="13"> Vivaldi</a>
 <a href="https://brave.com/"><img src="https://brave.com/static-assets/images/brave-favicon.png" height="15"> Brave</a>
 
-##### API Documentation:
+# API Documentation:
 
 ```javascript
 // Default instance
@@ -125,7 +125,7 @@ cjs.progress         // Progress in percentage 0 - 100
 cjs.state            // State of cast device
 ```
 
-##### FAQ
+# FAQ
 
 **Question:** Can I cast local resources?
 **Answer:** It was possible in the past from the browser by using service workers. But we had to remove it from our library because Google dropped support, see https://github.com/fenny/chromecast-service-worker-crash
@@ -133,7 +133,7 @@ cjs.state            // State of cast device
 **Question:** Do I need to enable CORS for all hosts?
 **Answer:** Yes and no. Chromecast is using a User-Agent starting with `CrKey/*version` -> `CrKey/1.44.175293`, so you could allow agents starting with `CrKey`
 
-##### TODO
+# TODO
 
 ```
 - Add local media and stream support after google fixes service worker crash
