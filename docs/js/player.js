@@ -11,7 +11,9 @@ function debug(msg) {
 }
 debug('debugging\t: enabled')
 
-var cjs = new Castjs();
+var cjs = new Castjs({
+  joinpolicy: 'origin_scoped'
+});
 
 cjs.on('event', (e) => {
   if (e === 'statechange') {
@@ -19,7 +21,7 @@ cjs.on('event', (e) => {
   } else if (e === 'volumechange') {
     debug(e + '\t: ' + cjs.volumeLevel)
   } else if (e === 'timeupdate') {
-    // debug(e + '\t: ' + cjs.timePretty + ' - ' + cjs.durationPretty)
+    debug(e + '\t: ' + cjs.timePretty + ' - ' + cjs.durationPretty)
   } else if (e === 'playing') {
     debug(e + '\t: ' + cjs.title)
   } else if (e === 'connect') {
@@ -104,21 +106,23 @@ cjs.on('error', (err) => {
   debug('error\t\t: ' + err)
 })
 
+var metadata = {
+  poster     : 'https://castjs.io/media/poster.jpg',
+  title      : 'Sintel',
+  description: 'Third Open Movie by Blender Foundation',
+  subtitles: [{
+      active: true,
+      label : 'English',
+      src   : 'https://castjs.io/media/english.vtt'
+  }, {
+      label : 'Spanish',
+      src   : 'https://castjs.io/media/spanish.vtt'
+  }],
+}
+
 $('#cast').on('click', () => {
   if (cjs.available) {
-    cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
-      poster     : 'https://castjs.io/media/poster.jpg',
-      title      : 'Sintel',
-      description: 'Third Open Movie by Blender Foundation',
-      subtitles: [{
-          active: true,
-          label : 'English',
-          src   : 'https://castjs.io/media/english.vtt'
-      }, {
-          label : 'Spanish',
-          src   : 'https://castjs.io/media/spanish.vtt'
-      }],
-    })
+    cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', metadata)
   }
 })
 
