@@ -19,7 +19,7 @@ Include the `cast.min.js` from [cdnjs](https://cdnjs.com/libraries/castjs):
 
 # Getting Started
 
-Casting a media source to your chromecast device.
+Casting a media source to your chromecast device. Make sure you enable [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) `Header set Access-Control-Allow-Origin "*"` on your media resources.
 
 ```html
 <button id="cast">Cast</button>
