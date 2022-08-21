@@ -10,8 +10,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/an-old-hope.min.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/castjs/css/style.css">
     <title>Cast.js Sender 📺 Demo</title>
+    <!-- Primary Meta Tags -->
+<title>Cast.js - Chromecast Sender Library for the Browser</title>
+<meta name="title" content="Cast.js - Chromecast Sender Library for the Browser">
+<meta name="description" content="Castjs provides simple events and functions to communicate with chromecast devices from the browser.
+This library works in chrome, opera, brave, firefox and vivaldi see https://github.com/castjs/castjs">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://metatags.io/">
+<meta property="og:title" content="Cast.js - Chromecast Sender Library for the Browser">
+<meta property="og:description" content="Castjs provides simple events and functions to communicate with chromecast devices from the browser.
+This library works in chrome, opera, brave, firefox and vivaldi see https://github.com/castjs/castjs">
+<meta property="og:image" content="https://metatags.io/assets/meta-tags-16a33a6a8531e519cc0936fbba0ad904e52d35f34a46c97a2c9f6f7dd7d336f2.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://metatags.io/">
+<meta property="twitter:title" content="Cast.js - Chromecast Sender Library for the Browser">
+<meta property="twitter:description" content="Castjs provides simple events and functions to communicate with chromecast devices from the browser.
+This library works in chrome, opera, brave, firefox and vivaldi see https://github.com/castjs/castjs">
+<meta property="twitter:image" content="https://metatags.io/assets/meta-tags-16a33a6a8531e519cc0936fbba0ad904e52d35f34a46c97a2c9f6f7dd7d336f2.png">
   </head>
   <body class="disabled">
     <div class="container">
@@ -22,7 +43,7 @@
       <div class="col">
 
         <div class="media">
-          <img src="/media/poster.jpg" class="poster">
+          <img src="/castjs/media/poster.jpg" class="poster">
           <div class="title">Sintel (2010)</div>
           <div class="description">Third Open Movie by Blender Foundation</div>
           <div class="genres">
@@ -81,14 +102,27 @@
 // Create new Castjs instance
 const cjs = new Castjs();
 
+// Optional metadata
+var metadata = {
+  poster     : 'https://castjs.io/media/poster.jpg',
+  title      : 'Sintel',
+  description: 'Third Open Movie by Blender Foundation',
+  subtitles: [{
+      active: true,
+      label : 'English',
+      src   : 'https://castjs.io/media/english.vtt'
+  }, {
+      label : 'Spanish',
+      src   : 'https://castjs.io/media/spanish.vtt'
+  }],
+}
+
 // Wait for user interaction
-$('#cast').on('click', function() {
-    // Check if casting is available
-    if (cjs.available) {
-        // Initiate new cast session
-        cjs.cast('https://example.com/movie.mp4');
-    }
-});
+$('#cast').on('click', () => {
+  if (cjs.available) {
+    cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', metadata)
+  }
+})
         </code>
       </pre>
     </div>
@@ -96,10 +130,10 @@ $('#cast').on('click', function() {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.2/rangeslider.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js" crossorigin="anonymous"></script>
-    <script src="/js/player.js" crossorigin="anonymous"></script>
+    <script src="/castjs/js/cast.js" crossorigin="anonymous"></script>
+    <script src="/castjs/js/player.js" crossorigin="anonymous"></script>
     <script>
-      var val = '<script src=\"https://cdnjs.cloudflare.com/ajax/libs/castjs/4.1.2/cast.min.js\">\<\/script>'
+      var val = '<script src=\"https://cdnjs.cloudflare.com/ajax/libs/castjs/5.0.0/cast.min.js\">\<\/script>'
       val = val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
       $('.language-html').html(val)
       hljs.initHighlightingOnLoad();
