@@ -38,7 +38,7 @@ const cjs = new Castjs();
 document.getElementById('cast').addEventListener('click', function() {
     // Check if casting is available
     if (cjs.available) {
-        // Initiate new cast session
+        // Initiate new cast session with a simple video
         cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4');
 
         // A more complex example
