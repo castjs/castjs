@@ -19,7 +19,7 @@
 
 Include the `cast.min.js` from [cdnjs](https://cdnjs.com/libraries/castjs):
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.1.0/cast.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.2.0/cast.min.js"></script>
 ```
 
 # Casting Media
@@ -29,7 +29,7 @@ Casting a media source to your chromecast device. Make sure you enable [CORS](ht
 ```html
 <button id="cast">Cast</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.1.0/cast.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/5.2.0/cast.min.js"></script>
 <script>
 // Create new Castjs instance
 const cjs = new Castjs();
