@@ -32,7 +32,7 @@ class Castjs {
         this._controller = null;
 
         // public variables
-        this.version        = 'v5.1.0'
+        this.version        = 'v5.2.0'
         this.receiver       = opt.receiver;
         this.joinpolicy     = opt.joinpolicy;
         this.available      = false;
@@ -239,6 +239,13 @@ class Castjs {
         }
         // Push callback into event array
         this._events[event].push(cb);
+
+        // Immediately call the callback if the event is 'available' and this.available is true
+        // https://github.com/castjs/castjs/issues/38
+        if (event === 'available' && this.available === true) {
+            setTimeout(() => cb(), 0); // Use setTimeout to ensure it's asynchronously executed
+        }
+
         return this
     }
     off(event) {
@@ -536,3 +543,4 @@ class Castjs {
 if (typeof module !== 'undefined'){
     module.exports = Castjs;
 }
+This looks like a JavaScript file. Click this bar to format it.No 4
