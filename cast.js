@@ -543,4 +543,3 @@ class Castjs {
 if (typeof module !== 'undefined'){
     module.exports = Castjs;
 }
-This looks like a JavaScript file. Click this bar to format it.No 4
