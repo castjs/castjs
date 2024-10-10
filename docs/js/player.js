@@ -121,7 +121,9 @@ var metadata = {
 }
 
 $('#cast').on('click', () => {
-  if (cjs.available) {
+  if (cjs.connected) {
+    cjs.disconnect()
+  } else if (cjs.available) {
     cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', metadata)
   }
 })
