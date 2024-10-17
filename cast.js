@@ -325,7 +325,7 @@ class Castjs {
                     // chrome.cast.media.TextTrackType.CAPTIONS
                     var track =  new chrome.cast.media.Track(i, 'TEXT');
                     track.name =             this.subtitles[i].label;
-                    track.subtype =          'CAPTIONS';
+                    track.subtype =          this.subtitles[i].subtype ? this.subtitles[i].subtype : 'CAPTIONS';
                     track.trackContentId =   this.subtitles[i].src;
                     track.trackContentType = 'text/vtt';
                     // This bug made me question life for a while
@@ -400,7 +400,7 @@ class Castjs {
                         // chrome.cast.media.TextTrackType.CAPTIONS
                         var track =  new chrome.cast.media.Track(i, 'TEXT');
                         track.name =             this.subtitles[i].label;
-                        track.subtype =          'CAPTIONS';
+                        track.subtype =          this.subtitles[i].subtype ? this.subtitles[i].subtype : 'CAPTIONS'
                         track.trackContentId =   this.subtitles[i].src;
                         track.trackContentType = 'text/vtt';
                         // This bug made me question life for a while
