@@ -1,545 +1,659 @@
-// Import cast framework
+// Castjs - Chromecast Sender Library
+// https://github.com/castjs/castjs
+
 if (window.chrome && !window.chrome.cast) {
     var script = document.createElement('script');
     script.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
     document.head.appendChild(script);
 }
 
-// Castjs
 class Castjs {
-    // constructor takes optional options
-    constructor(opt = {}) {
-        // valid join policies
+
+    constructor(opt) {
+        opt = opt || {};
+
         var joinpolicies = [
             'tab_and_origin_scoped',
             'origin_scoped',
             'page_scoped'
         ];
 
-        // only allow valid join policy
         if (!opt.joinpolicy || joinpolicies.indexOf(opt.joinpolicy) === -1) {
             opt.joinpolicy = 'tab_and_origin_scoped';
         }
 
-        // set default receiver ID if none provided
         if (!opt.receiver || opt.receiver === '') {
             opt.receiver = 'CC1AD845';
         }
 
-        // private variables
-        this._events     = {}
+        this._events     = {};
         this._player     = null;
         this._controller = null;
+        this._context    = null;
 
-        // public variables
-        this.version        = 'v5.3.0'
-        this.receiver       = opt.receiver;
-        this.joinpolicy     = opt.joinpolicy;
-        this.available      = false;
-        this.connected      = false;
-        this.device         = 'Chromecast';
-        this.src            = ''
-        this.title          = ''
-        this.description    = ''
-        this.poster         = ''
-        this.subtitles      = []
-        this.volumeLevel    = 1;
-        this.muted          = false;
-        this.paused         = false;
-        this.time           = 0;
-        this.timePretty     = '00:00:00';
-        this.duration       = 0;
-        this.durationPretty = '00:00:00';
-        this.progress       = 0;
-        this.state          = 'disconnected';
+        this._available   = false;
+        this._connected   = false;
+        this._device      = 'Chromecast';
+        this._src         = '';
+        this._title       = '';
+        this._description = '';
+        this._poster      = '';
+        this._subtitles   = [];
+        this._volume      = 1;
+        this._muted       = false;
+        this._paused      = false;
+        this._time        = 0;
+        this._duration    = 0;
+        this._progress    = 0;
+        this._state       = 'disconnected';
+        this.subtitleStyle = opt.subtitleStyle || null;
+        this.debug        = opt.debug || false;
 
-        // initialize chromecast framework
-        this._init()
-    }
-    _getBrowser() {
-        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-            return "Firefox: Please enable casting, click here: https://googlechromecast.com/how-to-cast-firefox-to-tv/"
-        }
-        if (navigator.userAgent.toLowerCase().indexOf('opr/') > -1) {
-            return "Opera: Please enable casting, click here: https://googlechromecast.com/how-to-cast-opera-browser-to-tv-using-google-chromecast/"
-        }
-        if (navigator.userAgent.toLowerCase().indexOf('iron safari') > -1) {
-            return "Iron Safari: Please enable casting, click here: https://googlechromecast.com/how-to-cast-opera-browser-to-tv-using-google-chromecast/"
-        }
-        if (navigator.brave) {
-            return "Brave: Please enable casting, click here: https://googlechromecast.com/how-to-cast-brave-browser-to-chromecast/"
-        }
-        return "This Browser"
-    }
-    _init(tries = 0) {
-        // casting only works on chrome, opera, brave and vivaldi
-        if (!window.chrome || !window.chrome.cast || !window.chrome.cast.isAvailable) {
-            if (tries++ > 20) {
-                return this.trigger('error', 'Casting is not enabled in ' + this._getBrowser());
-            }
-            return setTimeout(this._init.bind(this), 250, tries);
-        }
+        this.version    = 'v7.0.0';
+        this.receiver   = opt.receiver;
+        this.joinpolicy = opt.joinpolicy;
 
-        // terminate loop
-        clearInterval(this.intervalIsAvailable);
-
-        // initialize cast API
-        cast.framework.CastContext.getInstance().setOptions({
-            receiverApplicationId:      this.receiver,
-            autoJoinPolicy:             this.joinpolicy,
-            language:                   'en-US',
-            resumeSavedSession:         true,
-        });
-        // create remote player controller
-        this._player = new cast.framework.RemotePlayer();
-        this._controller = new cast.framework.RemotePlayerController(this._player);
-
-        // register callback events
-        this._controller.addEventListener('isConnectedChanged',  this._isConnectedChanged.bind(this));
-        this._controller.addEventListener('isMediaLoadedChanged',this._isMediaLoadedChanged.bind(this));
-        this._controller.addEventListener('isMutedChanged',      this._isMutedChanged.bind(this));
-        this._controller.addEventListener('isPausedChanged',     this._isPausedChanged.bind(this));
-        this._controller.addEventListener('currentTimeChanged',  this._currentTimeChanged.bind(this));
-        this._controller.addEventListener('durationChanged',     this._durationChanged.bind(this));
-        this._controller.addEventListener('volumeLevelChanged',  this._volumeLevelChanged.bind(this));
-        this._controller.addEventListener('playerStateChanged',  this._playerStateChanged.bind(this));
-        this.available = true;
-        this.trigger('available');
+        this._init();
     }
 
-    _isMediaLoadedChanged() {
-        // don't update media info if not available
-        if (!this._player.isMediaLoaded) {
-            return
-        }
-        // there is a bug where mediaInfo is not directly available
-        // so we are skipping one tick in the event loop, zzzzzzzzz
-        setTimeout(() => {
-            if (!this._player.mediaInfo) {
-                return
-            }
-            // Update device name
-            this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || this.device
+    // Public getters / setters
 
-            // Update media variables
-            this.src                = this._player.mediaInfo.contentId;
-            this.title              = this._player.title || null;
-            this.description        = this._player.mediaInfo.metadata.subtitle || null;
-            this.poster             = this._player.imageUrl || null;
-            this.subtitles          = [];
-            this.volumeLevel        = this.volumeLevel = Number((this._player.volumeLevel).toFixed(1));
-            this.muted              = this._player.isMuted;
-            this.paused             = this._player.isPaused;
-            this.time               = Math.round(this._player.currentTime, 1);
-            this.timePretty         = this._controller.getFormattedTime(this.time);
-            this.duration           = this._player.duration;
-            this.durationPretty     = this._controller.getFormattedTime(this._player.duration);
-            this.progress           = this._controller.getSeekPosition(this.time, this._player.duration);
-            this.state              = this._player.playerState.toLowerCase();
+    available() {
+        return this._available;
+    }
 
-            // Loop over the subtitle tracks
-            for (var i in this._player.mediaInfo.tracks) {
-                // Check for subtitle
-                if (this._player.mediaInfo.tracks[i].type === 'TEXT') {
-                    // Push to media subtitles array
-                    this.subtitles.push({
-                        label: this._player.mediaInfo.tracks[i].name,
-                        src:   this._player.mediaInfo.tracks[i].trackContentId
-                    });
-                }
-            }
-            // Get the active subtitle
-            var active = cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].activeTrackIds;
-            if (active && active.length && this.subtitles[active[0]]) {
-                this.subtitles[active[0]].active = true;
-            }
-        })
+    connected() {
+        return this._connected;
+    }
 
+    device() {
+        return this._device;
     }
-    // Player controller events
-    _isConnectedChanged() {
-        this.connected = this._player.isConnected;
-        if (this.connected) {
-            this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || this.device
-        }
-        this.state = !this.connected ? 'disconnected' : 'connected'
-        this.trigger('statechange')
-        this.trigger(!this.connected ? 'disconnect' : 'connect')
-    }
-    _currentTimeChanged() {
-        var past            = this.time
-        this.time           = Math.round(this._player.currentTime, 1);
-        this.duration       = this._player.duration;
-        this.progress       = this._controller.getSeekPosition(this.time, this.duration);
-        this.timePretty     = this._controller.getFormattedTime(this.time);
-        this.durationPretty = this._controller.getFormattedTime(this.duration);
-        // Only trigger timeupdate if there is a difference
-        if (past != this.time || this._player.isPaused) {
-            this.trigger('timeupdate');
-        }
-    }
-    _durationChanged() {
-        this.duration = this._player.duration;
-    }
-    _volumeLevelChanged() {
-        this.volumeLevel = Number((this._player.volumeLevel).toFixed(1));
-        if (this._player.isMediaLoaded) {
-            this.trigger('volumechange');
-        }
-    }
-    _isMutedChanged() {
-        var old = this.muted
-        this.muted = this._player.isMuted;
-        if (old != this.muted) {
-            this.trigger(this.muted ? 'mute' : 'unmute');
-        }
-    }
-    _isPausedChanged() {
-        this.paused = this._player.isPaused;
-        if (this.paused) {
-            this.trigger('pause');
-        }
-    }
-    _playerStateChanged() {
-        this.connected = this._player.isConnected
-        if (!this.connected) {
-            return
-        }
-        this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || this.device
-        this.state = this._player.playerState.toLowerCase();
-        switch(this.state) {
-            case 'idle':
-                this.state = 'ended';
-                this.trigger('statechange');
-                this.trigger('end');
-                return this
-            case 'buffering':
-                this.time           = Math.round(this._player.currentTime, 1);
-                this.duration       = this._player.duration;
-                this.progress       = this._controller.getSeekPosition(this.time, this.duration);
-                this.timePretty     = this._controller.getFormattedTime(this.time);
-                this.durationPretty = this._controller.getFormattedTime(this.duration);
-                this.trigger('statechange');
-                this.trigger('buffering');
-                return this
-            case 'playing':
-                // we have to skip a tick to give mediaInfo some time to update
-                setTimeout(() => {
-                    this.trigger('statechange');
-                    this.trigger('playing');
-                })
-                return this
-        }
-    }
-    // Class functions
-    on(event, cb) {
-        // If event is not registered, create array to store callbacks
-        if (!this._events[event]) {
-            this._events[event] = [];
-        }
-        // Push callback into event array
-        this._events[event].push(cb);
 
-        // Immediately call the callback if the event is 'available' and this.available is true
-        // https://github.com/castjs/castjs/issues/38
-        if (event === 'available' && this.available === true) {
-            setTimeout(() => cb(), 0); // Use setTimeout to ensure it's asynchronously executed
-        }
+    state() {
+        return this._state;
+    }
 
-        return this
+    paused() {
+        return this._paused;
     }
-    off(event) {
-        if (!event) {
-            // if no event name was given, reset all events
-            this._events = {};
-        } else if (this._events[event]) {
-            // remove all callbacks from event
-            this._events[event] = [];
-        }
-        return this
+
+    src() {
+        return this._src;
     }
-    trigger(event) {
-        // Slice arguments into array
-        var tail = Array.prototype.slice.call(arguments, 1);
-        // If event exist, call callback with callback data
-        for (var i in this._events[event]) {
-            setTimeout(() => {
-                this._events[event][i].apply(this, tail);
-            }, 1)
-            // this._events[event][i].apply(this, tail);
-        }
-        // dont call global event if error
-        if (event === 'error') {
-            return this
-        }
-        // call global event handler if exist
-        for (var i in this._events['event']) {
-            setTimeout(() => {
-                this._events['event'][i].apply(this, [event]);
-            }, 1)
-            // this._events['event'][i].apply(this, [event]);
-        }
-        return this
+
+    title() {
+        return this._title;
     }
-    cast(src, metadata = {}) {
-        // We need a source! Don't forget to enable CORS
+
+    description() {
+        return this._description;
+    }
+
+    poster() {
+        return this._poster;
+    }
+
+    subtitles() {
+        return this._subtitles;
+    }
+
+    progress() {
+        return this._progress;
+    }
+
+    volume(value) {
+        if (typeof value === 'undefined') {
+            return this._volume;
+        }
+        if (this._controller) {
+            this._player.volumeLevel = value;
+            this._controller.setVolumeLevel();
+        }
+        return this;
+    }
+
+    muted(value) {
+        if (typeof value === 'undefined') {
+            return this._muted;
+        }
+        if (this._controller && !!value !== this._muted) {
+            this._controller.muteOrUnmute();
+        }
+        return this;
+    }
+
+    time(value) {
+        if (typeof value === 'undefined') {
+            return this._time;
+        }
+        if (value === true) {
+            return this._format_time(this._time);
+        }
+        if (this._controller) {
+            this._player.currentTime = value;
+            this._controller.seek();
+        }
+        this._time = value;
+        return this;
+    }
+
+    duration(value) {
+        if (value === true) {
+            return this._format_time(this._duration);
+        }
+        return this._duration;
+    }
+
+    // Actions
+
+    play() {
+        if (this._controller && this._paused) {
+            this._controller.playOrPause();
+        }
+        return this;
+    }
+
+    pause() {
+        if (this._controller && !this._paused) {
+            this._controller.playOrPause();
+        }
+        return this;
+    }
+
+    cast(src, metadata) {
+        metadata = metadata || {};
+
         if (!src) {
             return this.trigger('error', 'No media source specified.');
         }
-        metadata.src = src;
-        // Update media variables with user input
-        for (var key in metadata) {
-            if (metadata.hasOwnProperty(key)) {
-                this[key] = metadata[key];
-            }
+
+        this._src         = src;
+        this._title       = metadata.title || '';
+        this._description = metadata.description || '';
+        this._poster      = metadata.poster || '';
+        this._subtitles   = metadata.subtitles || [];
+        this._time        = metadata.time || 0;
+        this._paused      = metadata.paused || false;
+
+        if (metadata.subtitleStyle) {
+            this.subtitleStyle = metadata.subtitleStyle;
         }
-        // Use current session if available
-        if (cast.framework.CastContext.getInstance().getCurrentSession()) {
-            // Create media cast object
-            var mediaInfo = new chrome.cast.media.MediaInfo(this.src);
-            mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
 
-            // This part is the reason why people love this library <3
-            if (this.subtitles.length) {
-                // I'm using the Netflix subtitle styling
-                // chrome.cast.media.TextTrackFontGenericFamily.CASUAL
-                // chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
-                mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
-                mediaInfo.textTrackStyle.backgroundColor = '#00000000';
-                mediaInfo.textTrackStyle.edgeColor       = '#00000016';
-                mediaInfo.textTrackStyle.edgeType        = 'DROP_SHADOW';
-                mediaInfo.textTrackStyle.fontFamily      = 'CASUAL';
-                mediaInfo.textTrackStyle.fontScale       = 1.0;
-                mediaInfo.textTrackStyle.foregroundColor = '#FFFFFF';
+        var session = this._context.getCurrentSession();
 
-                // Overwrite default subtitle track style with user defined values
-                // See https://developers.google.com/cast/docs/reference/chrome/chrome.cast.media.TextTrackStyle for a list of all configurable properties
-                mediaInfo.textTrackStyle = {
-                    ...mediaInfo.textTrackStyle, 
-                    ...this.subtitleStyle
-                };
-
-                var tracks = [];
-                for (var i in this.subtitles) {
-                    // chrome.cast.media.TrackType.TEXT
-                    // chrome.cast.media.TextTrackType.CAPTIONS
-                    var track =  new chrome.cast.media.Track(i, 'TEXT');
-                    track.name =             this.subtitles[i].label;
-                    track.subtype =          'CAPTIONS';
-                    track.trackContentId =   this.subtitles[i].src;
-                    track.trackContentType = 'text/vtt';
-                    // This bug made me question life for a while
-                    track.trackId = parseInt(i);
-                    tracks.push(track);
-                }
-                mediaInfo.tracks = tracks;
-            }
-            // Let's prepare the metadata
-            mediaInfo.metadata.images =   [new chrome.cast.Image(this.poster)];
-            mediaInfo.metadata.title =    this.title;
-            mediaInfo.metadata.subtitle = this.description;
-            // Prepare the actual request
-            var request = new chrome.cast.media.LoadRequest(mediaInfo);
-            // Didn't really test this currenttime thingy, dont forget
-            request.currentTime = this.time;
-            request.autoplay = !this.paused;
-            // If multiple subtitles, use the active: true one
-            if (this.subtitles.length) {
-                for (var i in this.subtitles) {
-                    if (this.subtitles[i].active) {
-                        request.activeTrackIds = [parseInt(i)];
-                        break;
-                    }
-                }
-            }
-            // Here we go!
-            cast.framework.CastContext.getInstance().getCurrentSession().loadMedia(request).then(() => {
-                // Update device name
-                this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || this.device
-                // Sometimes it stays paused if previous media ended, force play
-                if (this.paused) {
-                    this._controller.playOrPause();
-                }
-                return this;
-            }, (err) => {
-                return this.trigger('error', err);
-            });
+        if (session) {
+            this._load_media(session);
         } else {
-            // Time to request a session!
-            cast.framework.CastContext.getInstance().requestSession().then(() => {
-                if (!cast.framework.CastContext.getInstance().getCurrentSession()) {
+            this._context.requestSession().then(() => {
+                var new_session = this._context.getCurrentSession();
+                if (!new_session) {
                     return this.trigger('error', 'Could not connect with the cast device');
                 }
-                // Create media cast object
-                var mediaInfo = new chrome.cast.media.MediaInfo(this.src);
-                mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
-
-                // This part is the reason why people love this library <3
-                if (this.subtitles.length) {
-                    // I'm using the Netflix subtitle styling
-                    // chrome.cast.media.TextTrackFontGenericFamily.CASUAL
-                    // chrome.cast.media.TextTrackEdgeType.DROP_SHADOW
-                    mediaInfo.textTrackStyle = new chrome.cast.media.TextTrackStyle();
-                    mediaInfo.textTrackStyle.backgroundColor = '#00000000';
-                    mediaInfo.textTrackStyle.edgeColor       = '#00000016';
-                    mediaInfo.textTrackStyle.edgeType        = 'DROP_SHADOW';
-                    mediaInfo.textTrackStyle.fontFamily      = 'CASUAL';
-                    mediaInfo.textTrackStyle.fontScale       = 1.0;
-                    mediaInfo.textTrackStyle.foregroundColor = '#FFFFFF';
-
-                    // Overwrite default subtitle track style with user defined values
-                    // See https://developers.google.com/cast/docs/reference/chrome/chrome.cast.media.TextTrackStyle for a list of all configurable properties
-                    mediaInfo.textTrackStyle = {
-                        ...mediaInfo.textTrackStyle, 
-                        ...this.subtitleStyle
-                    };
-
-                    var tracks = [];
-                    for (var i in this.subtitles) {
-                        // chrome.cast.media.TrackType.TEXT
-                        // chrome.cast.media.TextTrackType.CAPTIONS
-                        var track =  new chrome.cast.media.Track(i, 'TEXT');
-                        track.name =             this.subtitles[i].label;
-                        track.subtype =          'CAPTIONS';
-                        track.trackContentId =   this.subtitles[i].src;
-                        track.trackContentType = 'text/vtt';
-                        // This bug made me question life for a while
-                        track.trackId = parseInt(i);
-                        tracks.push(track);
-                    }
-                    mediaInfo.tracks = tracks;
-                }
-                // Let's prepare the metadata
-                mediaInfo.metadata.images =   [new chrome.cast.Image(this.poster)];
-                mediaInfo.metadata.title =    this.title;
-                mediaInfo.metadata.subtitle = this.description;
-                // Prepare the actual request
-                var request = new chrome.cast.media.LoadRequest(mediaInfo);
-                // Didn't really test this currenttime thingy, dont forget
-                request.currentTime = this.time;
-                request.autoplay = !this.paused;
-                // If multiple subtitles, use the active: true one
-                if (this.subtitles.length) {
-                    for (var i in this.subtitles) {
-                        if (this.subtitles[i].active) {
-                            request.activeTrackIds = [parseInt(i)];
-                            break;
-                        }
-                    }
-                }
-                // Here we go!
-                cast.framework.CastContext.getInstance().getCurrentSession().loadMedia(request).then(() => {
-                    // Update device name
-                    this.device = cast.framework.CastContext.getInstance().getCurrentSession().getCastDevice().friendlyName || this.device
-                    // Sometimes it stays paused if previous media ended, force play
-                    if (this.paused) {
-                        this._controller.playOrPause();
-                    }
-                    return this;
-                }, (err) => {
-                    return this.trigger('error', err);
-                });
+                this._load_media(new_session);
             }, (err) => {
                 if (err !== 'cancel') {
                     this.trigger('error', err);
                 }
-                return this;
             });
         }
-    }
-    seek(seconds, isPercentage) {
-        // if seek(15, true) we assume 15 is percentage instead of seconds
-        if (isPercentage) {
-            seconds = this._controller.getSeekTime(seconds, this._player.duration);
-        }
-        this._player.currentTime = seconds;
-        this._controller.seek();
+
         return this;
     }
-    volume(float) {
-        this._player.volumeLevel = float;
-        this._controller.setVolumeLevel();
-        return this;
-    }
-    play() {
-        if (this.paused) {
-            this._controller.playOrPause();
-        }
-        return this;
-    }
-    pause() {
-        if (!this.paused) {
-            this._controller.playOrPause();
-        }
-        return this;
-    }
-    mute() {
-        if (!this.muted) {
-            this._controller.muteOrUnmute();
-        }
-        return this;
-    }
-    unmute() {
-        if (this.muted) {
-            this._controller.muteOrUnmute();
-        }
-        return this;
-    }
-    // subtitle allows you to change active subtitles while casting
+
     subtitle(index) {
-        // this is my favorite part of castjs
-        // prepare request to edit the tracks on current session
-        var request = new chrome.cast.media.EditTracksInfoRequest([parseInt(index)]);
-        cast.framework.CastContext.getInstance().getCurrentSession().getSessionObj().media[0].editTracksInfo(request, () => {
-            // after updating the device we should update locally
-            // loop trough subtitles
-            for (var i in this.subtitles) {
-                // remove active key from all subtitles
-                delete this.subtitles[i].active;
-                // if subtitle matches given index, we set to true
+        if (!this._controller) return this;
+
+        var request = new chrome.cast.media.EditTracksInfoRequest([parseInt(index) + 1]);
+        var media = null;
+
+        try {
+            media = this._context.getCurrentSession().getSessionObj().media[0];
+        } catch (e) {}
+
+        if (!media) {
+            return this.trigger('error', 'No active media session');
+        }
+
+        media.editTracksInfo(request, () => {
+            for (var i = 0; i < this._subtitles.length; i++) {
+                delete this._subtitles[i].active;
                 if (i == index) {
-                    this.subtitles[i].active = true;
+                    this._subtitles[i].active = true;
                 }
             }
-            return this.trigger('subtitlechange')
+            this.trigger('subtitlechange');
         }, (err) => {
-            // catch any error
-            return this.trigger('error', err);
+            this.trigger('error', err);
         });
+
+        return this;
     }
-    // disconnect will end the current session
+
     disconnect() {
-        cast.framework.CastContext.getInstance().endCurrentSession(true);
-        this._controller.stop();
+        if (this._context) {
+            this._context.endCurrentSession(true);
+        }
+        if (this._controller) {
+            this._controller.stop();
+        }
+        this._detach_player();
 
-        // application variables
-        this.connected  = false;
-        this.device     = 'Chromecast';
-
-        // media variables
-        this.src         = ''
-        this.title       = ''
-        this.description = ''
-        this.poster      = ''
-        this.subtitles   = []
-
-        // player variable
-        this.volumeLevel    = 1;
-        this.muted          = false;
-        this.paused         = false;
-        this.time           = 0;
-        this.timePretty     = '00:00:00';
-        this.duration       = 0;
-        this.durationPretty = '00:00:00';
-        this.progress       = 0;
-        this.state          = 'disconnected';
-
+        this._connected   = false;
+        this._device      = 'Chromecast';
+        this._src         = '';
+        this._title       = '';
+        this._description = '';
+        this._poster      = '';
+        this._subtitles   = [];
+        this._volume      = 1;
+        this._muted       = false;
+        this._paused      = false;
+        this._time        = 0;
+        this._duration    = 0;
+        this._progress    = 0;
+        this._state       = 'disconnected';
 
         this.trigger('disconnect');
         return this;
     }
+
+    // Events
+
+    on(event, cb) {
+        if (!this._events[event]) {
+            this._events[event] = [];
+        }
+        this._events[event].push(cb);
+
+        if (event === 'available' && this._available) {
+            setTimeout(() => cb(), 0);
+        }
+        return this;
+    }
+
+    off(event) {
+        if (!event) {
+            this._events = {};
+        } else if (this._events[event]) {
+            this._events[event] = [];
+        }
+        return this;
+    }
+
+    trigger(event) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        var list = this._events[event] || [];
+
+        for (var i = 0; i < list.length; i++) {
+            list[i].apply(this, args);
+        }
+
+        if (event !== 'error') {
+            var global = this._events['event'] || [];
+            for (var j = 0; j < global.length; j++) {
+                global[j].call(this, event);
+            }
+        }
+        return this;
+    }
+
+    // Internal
+
+    _log() {
+        if (this.debug) {
+            var args = Array.prototype.slice.call(arguments);
+            args.unshift('[Castjs]');
+            console.log.apply(console, args);
+        }
+    }
+
+    _format_time(seconds) {
+        if (!seconds || seconds < 0) return '00:00';
+
+        var h = Math.floor(seconds / 3600);
+        var m = Math.floor((seconds % 3600) / 60);
+        var s = Math.floor(seconds % 60);
+
+        var result =
+            (m < 10 ? '0' + m : m) + ':' +
+            (s < 10 ? '0' + s : s);
+
+        if (h > 0) {
+            result = (h < 10 ? '0' + h : h) + ':' + result;
+        }
+        return result;
+    }
+
+    _get_browser() {
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.indexOf('firefox') > -1) return 'Firefox: Please enable casting';
+        if (ua.indexOf('opr/') > -1) return 'Opera: Please enable casting';
+        if (navigator.brave) return 'Brave: Please enable casting';
+        return 'This Browser';
+    }
+
+    _init() {
+        if (window.chrome && window.chrome.cast && window.chrome.cast.isAvailable) {
+            this._setup();
+            return;
+        }
+
+        window['__onGCastApiAvailable'] = (isAvailable) => {
+            if (isAvailable) {
+                this._setup();
+            } else {
+                this.trigger('error', 'Casting is not enabled in ' + this._get_browser());
+            }
+        };
+    }
+
+    _setup() {
+        this._context = cast.framework.CastContext.getInstance();
+
+        this._context.setOptions({
+            receiverApplicationId: this.receiver,
+            autoJoinPolicy: this.joinpolicy,
+            language: 'en-US',
+            resumeSavedSession: true
+        });
+
+        this._context.addEventListener(
+            cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
+            (event) => this._on_session_state_changed(event)
+        );
+
+        this._available = true;
+        this._log('Framework ready');
+        this.trigger('available');
+
+        if (this._context.getCurrentSession()) {
+            this._attach_player();
+        }
+    }
+
+    _on_session_state_changed(event) {
+        this._log('Session state:', event.sessionState);
+
+        switch (event.sessionState) {
+            case cast.framework.SessionState.SESSION_STARTED:
+            case cast.framework.SessionState.SESSION_RESUMED:
+                this._attach_player();
+                this._connected = true;
+                this._device = this._context.getCurrentSession().getCastDevice().friendlyName || this._device;
+                this._state = 'connected';
+                this.trigger('statechange');
+                this.trigger('connect');
+                break;
+
+            case cast.framework.SessionState.SESSION_ENDED:
+                this._detach_player();
+                this._connected = false;
+                this._device = 'Chromecast';
+                this._state = 'disconnected';
+                this.trigger('statechange');
+                this.trigger('disconnect');
+                break;
+
+            case cast.framework.SessionState.SESSION_START_FAILED:
+                this.trigger('error', 'Could not start Cast session');
+                break;
+        }
+    }
+
+    _attach_player() {
+        this._player = new cast.framework.RemotePlayer();
+        this._controller = new cast.framework.RemotePlayerController(this._player);
+
+        this._controller.addEventListener('isConnectedChanged',   () => this._is_connected_changed());
+        this._controller.addEventListener('isMediaLoadedChanged', () => this._is_media_loaded_changed());
+        this._controller.addEventListener('isMutedChanged',       () => this._is_muted_changed());
+        this._controller.addEventListener('isPausedChanged',      () => this._is_paused_changed());
+        this._controller.addEventListener('currentTimeChanged',   () => this._current_time_changed());
+        this._controller.addEventListener('durationChanged',      () => this._duration_changed());
+        this._controller.addEventListener('volumeLevelChanged',   () => this._volume_changed());
+        this._controller.addEventListener('playerStateChanged',   () => this._player_state_changed());
+
+        if (this._player.isMediaLoaded) {
+            this._is_media_loaded_changed();
+        }
+    }
+
+    _detach_player() {
+        this._player = null;
+        this._controller = null;
+    }
+
+    _load_media(session) {
+        var mediaInfo = new chrome.cast.media.MediaInfo(this._src);
+        mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+        mediaInfo.metadata.title = this._title;
+        mediaInfo.metadata.subtitle = this._description;
+
+        if (this._poster) {
+            mediaInfo.metadata.images = [new chrome.cast.Image(this._poster)];
+        }
+
+        if (this._subtitles && this._subtitles.length) {
+            mediaInfo.textTrackStyle = {
+                backgroundColor: '#00000000',
+                foregroundColor: '#FFFFFF',
+                edgeType: 'DROP_SHADOW',
+                edgeColor: '#000000FF',
+                fontFamily: 'SANS_SERIF',
+                fontScale: 0.95,
+                fontStyle: 'NORMAL'
+            };
+
+            if (this.subtitleStyle) {
+                for (var key in this.subtitleStyle) {
+                    mediaInfo.textTrackStyle[key] = this.subtitleStyle[key];
+                }
+            }
+
+            var tracks = [];
+            for (var i = 0; i < this._subtitles.length; i++) {
+                var sub = this._subtitles[i];
+                var track = new chrome.cast.media.Track(i + 1, 'TEXT');
+
+                track.name = sub.label || ('Track ' + (i + 1));
+                track.trackContentId = sub.src;
+                track.trackContentType = 'text/vtt';
+                track.trackId = i + 1;
+                track.subtype = sub.subtype ? sub.subtype.toUpperCase() : Castjs.globals.subtype.CAPTIONS;
+
+                tracks.push(track);
+            }
+            mediaInfo.tracks = tracks;
+        }
+
+        var request = new chrome.cast.media.LoadRequest(mediaInfo);
+        request.currentTime = this._time || 0;
+        request.autoplay = !this._paused;
+
+        if (this._subtitles && this._subtitles.length) {
+            for (var j = 0; j < this._subtitles.length; j++) {
+                if (this._subtitles[j].active) {
+                    request.activeTrackIds = [j + 1];
+                    break;
+                }
+            }
+        }
+
+        session.loadMedia(request).then(() => {
+            this._device = session.getCastDevice().friendlyName || this._device;
+            this._log('Media loaded');
+            if (this._paused) {
+                this._controller.playOrPause();
+            }
+        }, (err) => {
+            this.trigger('error', err);
+        });
+    }
+
+    // Event handlers
+
+    _is_connected_changed() {
+        if (!this._player) return;
+
+        this._connected = this._player.isConnected;
+        if (this._connected) {
+            this._device = this._context.getCurrentSession()?.getCastDevice()?.friendlyName || this._device;
+        }
+    }
+
+    _is_media_loaded_changed() {
+        if (!this._player || !this._player.isMediaLoaded) return;
+
+        setTimeout(() => {
+            if (!this._player || !this._player.mediaInfo) return;
+
+            this._device      = this._context.getCurrentSession()?.getCastDevice()?.friendlyName || this._device;
+            this._src         = this._player.mediaInfo.contentId;
+            this._title       = this._player.title || '';
+            this._description = this._player.mediaInfo.metadata ? this._player.mediaInfo.metadata.subtitle : '';
+            this._poster      = this._player.imageUrl || '';
+            this._volume      = Number(this._player.volumeLevel.toFixed(1));
+            this._muted       = this._player.isMuted;
+            this._paused      = this._player.isPaused;
+            this._time        = Math.round(this._player.currentTime * 10) / 10;
+            this._duration    = this._player.duration;
+            this._progress    = this._controller.getSeekPosition(this._time, this._duration);
+            this._state       = this._player.playerState.toLowerCase();
+
+            this._subtitles = [];
+            var tracks = this._player.mediaInfo.tracks || [];
+            for (var i = 0; i < tracks.length; i++) {
+                if (tracks[i].type === 'TEXT') {
+                    this._subtitles.push({
+                        label: tracks[i].name,
+                        src: tracks[i].trackContentId,
+                        subtype: tracks[i].subtype,
+                        active: false
+                    });
+                }
+            }
+
+            try {
+                var active = this._context.getCurrentSession().getSessionObj().media[0].activeTrackIds;
+                if (active && active.length) {
+                    var idx = active[0] - 1;
+                    if (this._subtitles[idx]) {
+                        this._subtitles[idx].active = true;
+                    }
+                }
+            } catch (e) {}
+
+            this.trigger('timeupdate');
+        }, 0);
+    }
+
+    _current_time_changed() {
+        if (!this._player) return;
+
+        var past = this._time;
+        this._time = Math.round(this._player.currentTime * 10) / 10;
+        this._duration = this._player.duration;
+        this._progress = this._controller.getSeekPosition(this._time, this._duration);
+
+        if (past != this._time || this._player.isPaused) {
+            this.trigger('timeupdate');
+        }
+    }
+
+    _duration_changed() {
+        if (!this._player) return;
+        this._duration = this._player.duration;
+    }
+
+    _volume_changed() {
+        if (!this._player) return;
+
+        this._volume = Number(this._player.volumeLevel.toFixed(1));
+        if (this._player.isMediaLoaded) {
+            this.trigger('volumechange');
+        }
+    }
+
+    _is_muted_changed() {
+        if (!this._player) return;
+
+        var muted = this._player.isMuted;
+        if (muted === this._muted) return;
+        if (this._mute_lock) return;
+
+        this._muted = muted;
+        this.trigger(muted ? 'mute' : 'unmute');
+
+        this._mute_lock = true;
+        setTimeout(() => {
+            this._mute_lock = false;
+            if (this._player && this._player.isMuted !== this._muted) {
+                this._muted = this._player.isMuted;
+                this.trigger(this._muted ? 'mute' : 'unmute');
+            }
+        }, 400);
+    }
+
+    _is_paused_changed() {
+        if (!this._player) return;
+
+        this._paused = this._player.isPaused;
+        if (this._paused) {
+            this.trigger('pause');
+        }
+    }
+
+    _player_state_changed() {
+        if (!this._player || !this._player.isConnected) return;
+
+        this._device = this._context.getCurrentSession()?.getCastDevice()?.friendlyName || this._device;
+        this._state = this._player.playerState.toLowerCase();
+
+        switch (this._state) {
+            case 'idle':
+                this._state = 'ended';
+                this.trigger('statechange');
+                this.trigger('end');
+                break;
+
+            case 'buffering':
+                this._current_time_changed();
+                this.trigger('statechange');
+                this.trigger('buffering');
+                break;
+
+            case 'playing':
+                if (this._player.isPaused) return;
+                this._paused = false;
+                setTimeout(() => {
+                    this.trigger('statechange');
+                    this.trigger('playing');
+                }, 0);
+                break;
+
+            case 'paused':
+                this.trigger('statechange');
+                break;
+        }
+    }
 }
 
-if (typeof module !== 'undefined'){
+Castjs.globals = {
+    subtype: {
+        SUBTITLES: 'SUBTITLES',
+        CAPTIONS: 'CAPTIONS',
+        DESCRIPTIONS: 'DESCRIPTIONS',
+        CHAPTERS: 'CHAPTERS',
+        METADATA: 'METADATA'
+    },
+    joinpolicy: {
+        TAB_AND_ORIGIN_SCOPED: 'tab_and_origin_scoped',
+        ORIGIN_SCOPED: 'origin_scoped',
+        PAGE_SCOPED: 'page_scoped'
+    }
+};
+
+if (typeof module !== 'undefined') {
     module.exports = Castjs;
 }
