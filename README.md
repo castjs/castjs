@@ -38,7 +38,7 @@ Access-Control-Allow-Origin: *
 ```html
 <button id="cast">Cast</button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/7.0.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.0.0/cast.min.js"></script>
 <script>
 const cjs = new Castjs();
 
