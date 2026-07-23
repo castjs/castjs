@@ -20,7 +20,7 @@
 Include the library from [cdnjs](https://cdnjs.com/libraries/castjs):
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/castjs/7.0.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.0.0/cast.min.js"></script>
 ```
 
 > The Google Cast framework (`cast_sender.js`) is automatically loaded if it is not already present on the page.
