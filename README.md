@@ -45,10 +45,10 @@ const cjs = new Castjs();
 document.getElementById('cast').addEventListener('click', () => {
   if (cjs.available()) {
     // Simple example
-    cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4');
+    cjs.cast('https://www.peach.themazzone.com/durian/movies/sintel-1024-surround.mp4');
 
     // Full example with metadata + subtitles
-    cjs.cast('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', {
+    cjs.cast('https://www.peach.themazzone.com/durian/movies/sintel-1024-surround.mp4', {
       poster: 'https://castjs.io/media/poster.jpg',
       title: 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
