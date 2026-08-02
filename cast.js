@@ -49,7 +49,7 @@ class Castjs {
         this.subtitleStyle = opt.subtitleStyle || null;
         this.debug        = opt.debug || false;
 
-        this.version    = 'v7.0.1';
+        this.version    = 'v7.0.3';
         this.receiver   = opt.receiver;
         this.joinpolicy = opt.joinpolicy;
 
@@ -180,9 +180,17 @@ class Castjs {
             this.subtitleStyle = metadata.subtitleStyle;
         }
 
-        var session = this._context.getCurrentSession();
+        const session = this._context.getCurrentSession();
+        const state   = this._context.getSessionState();
 
-        if (session) {
+        // Only reuse the session when it is truly alive
+        const alive = session && (
+            state === cast.framework.SessionState.SESSION_STARTED ||
+            state === cast.framework.SessionState.SESSION_RESUMED
+        );
+
+        if (alive) {
+            console.log('wowi', this._context.getSessionState());
             this._load_media(session);
         } else {
             this._context.requestSession().then(() => {
@@ -231,9 +239,6 @@ class Castjs {
     }
 
     disconnect() {
-        if (this._context) {
-            this._context.endCurrentSession(true);
-        }
         if (this._controller) {
             this._controller.stop();
         }
@@ -253,6 +258,10 @@ class Castjs {
         this._duration    = 0;
         this._progress    = 0;
         this._state       = 'disconnected';
+
+        if (this._context) {
+            this._context.endCurrentSession(true);
+        }
 
         this.trigger('disconnect');
         return this;
@@ -335,34 +344,46 @@ class Castjs {
 
     _init() {
         if (window.chrome && window.chrome.cast && window.chrome.cast.isAvailable) {
-            this._setup();
+            this._framework();
             return;
         }
 
         window['__onGCastApiAvailable'] = (isAvailable) => {
             if (isAvailable) {
-                this._setup();
+                this._framework();
             } else {
                 this.trigger('error', 'Casting is not enabled in ' + this._get_browser());
             }
         };
     }
 
-    _setup(retries = 0) {
-        const MAX_RETRIES = 50;          // ~5 seconds at 100 ms
-        const RETRY_DELAY = 100;
+    _framework() {
+        if (this._context || this._framework_interval) return;
 
-        if (typeof cast === 'undefined' || !cast.framework || !cast.framework.CastContext) {
-            if (retries >= MAX_RETRIES) {
-                this.trigger('error', 'Cast framework failed to load (cast is not defined)');
+        // see https://issuetracker.google.com/issues/377941137?pli=1
+        const MAX_WAIT = 5000;
+        const INTERVAL = 10;
+        const start = Date.now();
+
+        this._framework_interval = setInterval(() => {
+            if (typeof cast !== 'undefined' && cast.framework?.CastContext) {
+                clearInterval(this._framework_interval);
+                this._framework_interval = null;
+                this._setup();
                 return;
             }
-            this._log('Waiting for cast.framework... (' + (retries + 1) + ')');
-            setTimeout(() => this._setup(retries + 1), RETRY_DELAY);
-            return;
-        }
 
-        // Original _setup body starts here
+            if (Date.now() - start >= MAX_WAIT) {
+                clearInterval(this._framework_interval);
+                this._framework_interval = null;
+                this.trigger('error', 'Cast framework failed to load (cast.framework is not defined)');
+            }
+        }, INTERVAL);
+    }
+
+    _setup() {
+        if (this._context) return;
+
         this._context = cast.framework.CastContext.getInstance();
 
         this._context.setOptions({
@@ -387,7 +408,7 @@ class Castjs {
     }
 
     _on_session_state_changed(event) {
-        this._log('Session state:', event.sessionState);
+        this._log('Session state:', event.sessionState, event.errorCode);
 
         switch (event.sessionState) {
             case cast.framework.SessionState.SESSION_STARTED:
@@ -410,7 +431,11 @@ class Castjs {
                 break;
 
             case cast.framework.SessionState.SESSION_START_FAILED:
-                this.trigger('error', 'Could not start Cast session');
+                if (event.errorCode == 'cancel') {
+                    this.trigger('error', 'User cancelled Cast session');
+                } else {
+                    this.trigger('error', 'Could not start Cast session');
+                }
                 break;
         }
     }
@@ -493,7 +518,6 @@ class Castjs {
                 }
             }
         }
-
         session.loadMedia(request).then(() => {
             this._device = session.getCastDevice().friendlyName || this._device;
             this._log('Media loaded');
