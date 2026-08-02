@@ -49,7 +49,7 @@ class Castjs {
         this.subtitleStyle = opt.subtitleStyle || null;
         this.debug        = opt.debug || false;
 
-        this.version    = 'v7.0.0';
+        this.version    = 'v7.0.1';
         this.receiver   = opt.receiver;
         this.joinpolicy = opt.joinpolicy;
 
@@ -348,7 +348,21 @@ class Castjs {
         };
     }
 
-    _setup() {
+    _setup(retries = 0) {
+        const MAX_RETRIES = 50;          // ~5 seconds at 100 ms
+        const RETRY_DELAY = 100;
+
+        if (typeof cast === 'undefined' || !cast.framework || !cast.framework.CastContext) {
+            if (retries >= MAX_RETRIES) {
+                this.trigger('error', 'Cast framework failed to load (cast is not defined)');
+                return;
+            }
+            this._log('Waiting for cast.framework... (' + (retries + 1) + ')');
+            setTimeout(() => this._setup(retries + 1), RETRY_DELAY);
+            return;
+        }
+
+        // Original _setup body starts here
         this._context = cast.framework.CastContext.getInstance();
 
         this._context.setOptions({
