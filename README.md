@@ -6,9 +6,9 @@
 
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with Chromecast devices from the browser.<br>
-  This library works in Chrome, Opera, Brave, Edge and Vivaldi. See it in action on the <a href="https://castjs.io/">online demo</a>.
+  This library works in Chrome, Opera, Brave, Edge and Vivaldi. See it in action on the <a href="https://castjs.com/">online demo</a>.
   <br><br>
-  <a href="https://castjs.io/"><img src="https://i.imgur.com/vDdyBwj.png" width="100%"></a>
+  <a href="https://castjs.com/"><img src="https://i.imgur.com/vDdyBwj.png" width="100%"></a>
   <br><br>
   Do you want to support my work? Feel free to donate a <a href="https://www.buymeacoffee.com/fenny" target="_blank">☕ Hot Beverage</a>
 </p>
@@ -49,16 +49,16 @@ document.getElementById('cast').addEventListener('click', () => {
 
     // Full example with metadata + subtitles
     cjs.cast('https://www.peach.themazzone.com/durian/movies/sintel-1024-surround.mp4', {
-      poster: 'https://castjs.io/media/poster.jpg',
+      poster: 'https://castjs.com/media/poster.jpg',
       title: 'Sintel',
       description: 'Third Open Movie by Blender Foundation',
       subtitles: [{
         active: true,
         label: 'English',
-        src: 'https://castjs.io/media/english.vtt'
+        src: 'https://castjs.com/media/english.vtt'
       }, {
         label: 'Spanish',
-        src: 'https://castjs.io/media/spanish.vtt'
+        src: 'https://castjs.com/media/spanish.vtt'
       }]
     });
   }
