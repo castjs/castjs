@@ -49,7 +49,7 @@ class Castjs {
         this.subtitleStyle = opt.subtitleStyle || null;
         this.debug        = opt.debug || false;
 
-        this.version    = 'v7.0.3';
+        this.version    = 'v7.1.0';
         this.receiver   = opt.receiver;
         this.joinpolicy = opt.joinpolicy;
 

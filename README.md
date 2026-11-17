@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/ZjTpQ3S.png" alt="Castjs" width="100%">
 </p>
 
-<h4 align="center">Javascript library (&lt;10kb) for the complex Chromecast SDK</h4>
+<h4 align="center">Javascript library (~12kb) for the complex Chromecast SDK</h4>
 
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with Chromecast devices from the browser.<br>
@@ -17,10 +17,10 @@
 
 ## Getting Started
 
-Include the library from [cdnjs](https://cdnjs.com/libraries/castjs):
+Include the library from [jsDelivr](https://www.jsdelivr.com/package/gh/castjs/castjs):
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.0.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.1.0/cast.min.js"></script>
 ```
 
 > The Google Cast framework (`cast_sender.js`) is automatically loaded if it is not already present on the page.
@@ -38,7 +38,7 @@ Access-Control-Allow-Origin: *
 ```html
 <button id="cast">Cast</button>
 
-<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.0.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.1.0/cast.min.js"></script>
 <script>
 const cjs = new Castjs();
 
@@ -206,6 +206,12 @@ cjs.cast('https://example.com/video.mp4', {
 
 **Question:** Can I cast local resources?<br>
 **Answer:** It was possible in the past using service workers, but Google dropped support. See [this issue](https://github.com/fenny/chromecast-service-worker-crash).
+
+**Question:** Can I list the available devices and pick one myself?<br>
+**Answer:** No. The Cast SDK only lets the browser show its own device picker, `cjs.cast()` opens it.
+
+**Question:** Does it work in Firefox or Safari?<br>
+**Answer:** No, they don't support Google Cast. Castjs fires an `error` event so you can hide your cast button.
 
 **Question:** Do I need to enable CORS?<br>
 **Answer:** Yes. Chromecast is strict about CORS. You can allow the `CrKey` user-agent if you want to be more specific, but `Access-Control-Allow-Origin: *` is the simplest solution.
