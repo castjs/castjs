@@ -337,14 +337,19 @@ class Castjs {
 
     _get_browser() {
         var ua = navigator.userAgent.toLowerCase();
-        if (ua.indexOf('firefox') > -1) return 'Firefox: Please enable casting';
         if (ua.indexOf('opr/') > -1) return 'Opera: Please enable casting';
         if (navigator.brave) return 'Brave: Please enable casting';
-        return 'This Browser';
+        return 'this browser';
     }
 
     _init() {
-        if (window.chrome && window.chrome.cast && window.chrome.cast.isAvailable) {
+        // Firefox, Safari and other non-Chromium browsers have no Cast support
+        if (!window.chrome) {
+            setTimeout(() => this.trigger('error', 'Casting is not supported in this browser'), 0);
+            return;
+        }
+
+        if (window.chrome.cast && window.chrome.cast.isAvailable) {
             this._framework();
             return;
         }
