@@ -106,7 +106,7 @@ class Castjs {
         if (typeof value === 'undefined') {
             return this._volume;
         }
-        if (this._controller) {
+        if (this._connected) {
             this._player.volumeLevel = value;
             this._controller.setVolumeLevel();
         }
@@ -117,7 +117,7 @@ class Castjs {
         if (typeof value === 'undefined') {
             return this._muted;
         }
-        if (this._controller && !!value !== this._muted) {
+        if (this._connected && !!value !== this._muted) {
             this._controller.muteOrUnmute();
         }
         return this;
@@ -130,7 +130,7 @@ class Castjs {
         if (value === true) {
             return this._format_time(this._time);
         }
-        if (this._controller) {
+        if (this._connected) {
             this._player.currentTime = value;
             this._controller.seek();
         }
@@ -148,14 +148,14 @@ class Castjs {
     // Actions
 
     play() {
-        if (this._controller && this._paused) {
+        if (this._connected && this._paused) {
             this._controller.playOrPause();
         }
         return this;
     }
 
     pause() {
-        if (this._controller && !this._paused) {
+        if (this._connected && !this._paused) {
             this._controller.playOrPause();
         }
         return this;
@@ -213,7 +213,7 @@ class Castjs {
     }
 
     subtitle(index) {
-        if (!this._controller) return this;
+        if (!this._connected) return this;
 
         var request = new chrome.cast.media.EditTracksInfoRequest([parseInt(index) + 1]);
         var media = null;
@@ -242,10 +242,7 @@ class Castjs {
     }
 
     disconnect() {
-        if (this._controller) {
-            this._controller.stop();
-        }
-        this._detach_player();
+        var session = this._context ? this._context.getCurrentSession() : null;
 
         this._connected   = false;
         this._device      = 'Chromecast';
@@ -262,11 +259,12 @@ class Castjs {
         this._progress    = 0;
         this._state       = 'disconnected';
 
-        if (this._context) {
+        if (session) {
+            // SESSION_ENDED will trigger the disconnect event
             this._context.endCurrentSession(true);
+        } else {
+            this.trigger('disconnect');
         }
-
-        this.trigger('disconnect');
         return this;
     }
 
@@ -396,6 +394,8 @@ class Castjs {
             resumeSavedSession: true
         });
 
+        this._attach_player();
+
         this._context.addEventListener(
             cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
             (event) => this._on_session_state_changed(event)
@@ -404,10 +404,6 @@ class Castjs {
         this._available = true;
         this._log('Framework ready');
         this.trigger('available');
-
-        if (this._context.getCurrentSession()) {
-            this._attach_player();
-        }
     }
 
     _on_session_state_changed(event) {
@@ -416,16 +412,17 @@ class Castjs {
         switch (event.sessionState) {
             case cast.framework.SessionState.SESSION_STARTED:
             case cast.framework.SessionState.SESSION_RESUMED:
-                this._attach_player();
                 this._connected = true;
                 this._device = this._context.getCurrentSession().getCastDevice().friendlyName || this._device;
                 this._state = 'connected';
                 this.trigger('statechange');
                 this.trigger('connect');
+                if (this._player && this._player.isMediaLoaded) {
+                    this._is_media_loaded_changed();
+                }
                 break;
 
             case cast.framework.SessionState.SESSION_ENDED:
-                this._detach_player();
                 this._connected = false;
                 this._device = 'Chromecast';
                 this._state = 'disconnected';
@@ -444,6 +441,9 @@ class Castjs {
     }
 
     _attach_player() {
+        // Created once and reused for every session, so listeners never stack up
+        if (this._player) return;
+
         this._player = new cast.framework.RemotePlayer();
         this._controller = new cast.framework.RemotePlayerController(this._player);
 
@@ -459,11 +459,6 @@ class Castjs {
         if (this._player.isMediaLoaded) {
             this._is_media_loaded_changed();
         }
-    }
-
-    _detach_player() {
-        this._player = null;
-        this._controller = null;
     }
 
     _load_media(session) {
@@ -587,7 +582,7 @@ class Castjs {
     }
 
     _current_time_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         var past = this._time;
         this._time = Math.round(this._player.currentTime * 10) / 10;
@@ -600,12 +595,12 @@ class Castjs {
     }
 
     _duration_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
         this._duration = this._player.duration;
     }
 
     _volume_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         this._volume = Number(this._player.volumeLevel.toFixed(1));
         if (this._player.isMediaLoaded) {
@@ -614,7 +609,7 @@ class Castjs {
     }
 
     _is_muted_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         var muted = this._player.isMuted;
         if (muted === this._muted) return;
@@ -634,7 +629,7 @@ class Castjs {
     }
 
     _is_paused_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         this._paused = this._player.isPaused;
         if (this._paused) {
