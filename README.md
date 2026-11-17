@@ -1,201 +1,195 @@
 <p align="center">
-  <img src="https://i.imgur.com/ZjTpQ3S.png" alt="Castjs" width="100%">
+  <a href="https://castjs.com/"><img src="https://i.imgur.com/ZjTpQ3S.png" alt="Castjs" width="100%"></a>
 </p>
-
-<h4 align="center">Javascript library (~15kb) for the complex Chromecast SDK</h4>
 
 <p align="center">
-  <b>Castjs</b> provides simple events and functions to communicate with Chromecast devices from the browser.<br>
-  This library works in Chrome, Opera, Brave, Edge and Vivaldi. See it in action on the <a href="https://castjs.com/">online demo</a>.
-  <br><br>
-  <a href="https://castjs.com/"><img src="https://i.imgur.com/vDdyBwj.png" width="100%"></a>
-  <br><br>
-  Do you want to support my work? Feel free to donate a <a href="https://www.buymeacoffee.com/fenny" target="_blank">☕ Hot Beverage</a>
+  <b>Cast video to any Chromecast, straight from the browser.</b><br>
+  A tiny wrapper around the Google Cast SDK with simple methods and events.
+</p>
+
+<p align="center">
+  <a href="https://github.com/castjs/castjs/releases"><img src="https://img.shields.io/github/v/release/castjs/castjs?label=version&color=185FA5" alt="Version"></a>
+  <a href="https://www.jsdelivr.com/package/gh/castjs/castjs"><img src="https://data.jsdelivr.com/v1/package/gh/castjs/castjs/badge?style=rounded" alt="jsDelivr"></a>
+  <img src="https://img.shields.io/badge/size-~15kb-0F6E56" alt="Size">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/castjs/castjs?color=185FA5" alt="License"></a>
+</p>
+
+<p align="center">
+  <a href="https://castjs.com/"><b>Live demo</b></a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#api">API</a> ·
+  <a href="#queue">Queue</a> ·
+  <a href="#faq">FAQ</a>
+</p>
+
+<p align="center">
+  <a href="https://castjs.com/"><img src="https://i.imgur.com/vDdyBwj.png" alt="Castjs demo" width="100%"></a>
 </p>
 
 ---
 
-## Getting Started
+## Features
 
-Include the library from [jsDelivr](https://www.jsdelivr.com/package/gh/castjs/castjs):
-
-```html
-<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.3.0/cast.min.js"></script>
-```
-
-> The Google Cast framework (`cast_sender.js`) is automatically loaded if it is not already present on the page.
+<table>
+  <tr>
+    <td>✅ Subtitles with custom styling</td>
+    <td>✅ Playlists and queues</td>
+  </tr>
+  <tr>
+    <td>✅ MP4, WebM, HLS, DASH and audio</td>
+    <td>✅ Live streams</td>
+  </tr>
+  <tr>
+    <td>✅ Custom receivers and custom data</td>
+    <td>✅ Resumes sessions after a page reload</td>
+  </tr>
+  <tr>
+    <td>✅ One class, simple events</td>
+    <td>✅ Zero dependencies</td>
+  </tr>
+</table>
 
 ---
 
-## Casting Media
+## Quick start
 
-Make sure you enable [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) on your media resources:
-
-```
-Access-Control-Allow-Origin: *
-```
+**1. Add the script**
 
 ```html
-<button id="cast">Cast</button>
-
 <script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.3.0/cast.min.js"></script>
-<script>
-const cjs = new Castjs();
+```
 
+**2. Create an instance**
+
+```js
+const cjs = new Castjs();
+```
+
+**3. Cast on click**
+
+```js
 document.getElementById('cast').addEventListener('click', () => {
   if (cjs.available()) {
-    // Simple example
-    cjs.cast('https://www.peach.themazzone.com/durian/movies/sintel-1024-surround.mp4');
-
-    // Full example with metadata + subtitles
     cjs.cast('https://www.peach.themazzone.com/durian/movies/sintel-1024-surround.mp4', {
-      poster: 'https://castjs.com/media/poster.jpg',
       title: 'Sintel',
-      description: 'Third Open Movie by Blender Foundation',
-      subtitles: [{
-        active: true,
-        label: 'English',
-        src: 'https://castjs.com/media/english.vtt'
-      }, {
-        label: 'Spanish',
-        src: 'https://castjs.com/media/spanish.vtt'
-      }]
+      poster: 'https://castjs.com/media/poster.jpg'
     });
   }
 });
-</script>
 ```
 
----
-
-## Supported Browsers
-
-Almost any Chromium-based browser supports the Cast framework:
-
-- [Chrome](https://www.google.com/chrome/)
-- [Edge](https://www.microsoft.com/edge)
-- [Opera](https://www.opera.com/)
-- [Brave](https://brave.com/)
-- [Vivaldi](https://vivaldi.com/)
-
-> Requires **HTTPS** (or `localhost`)
+> [!NOTE]
+> Your page needs **HTTPS** (or `localhost`) and your media needs **CORS** enabled (`Access-Control-Allow-Origin: *`).
+> The Google Cast framework (`cast_sender.js`) is loaded automatically.
 
 ---
 
-## API Documentation
+## Supported browsers
 
-### Initialize
+Works in Chromium-based browsers: **Chrome**, **Edge**, **Opera**, **Brave** and **Vivaldi**, on desktop and Android.
+Firefox and Safari don't support Google Cast; Castjs fires an `error` event there so you can hide your cast button.
+
+---
+
+## API
+
+### Options
 
 ```js
-// Default instance
-const cjs = new Castjs();
-
-// Custom options
 const cjs = new Castjs({
-  joinpolicy: 'tab_and_origin_scoped', // default
-                                       // 'tab_and_origin_scoped' | 'origin_scoped' | 'page_scoped'
   receiver: 'CC1AD845',                // default media receiver
+  joinpolicy: 'tab_and_origin_scoped', // 'tab_and_origin_scoped' | 'origin_scoped' | 'page_scoped'
   language: 'nl-NL',                   // cast dialog language, defaults to the browser language
-  debug: true                          // enable debug logs
+  debug: true                          // debug logs
 });
 ```
 
 ### Methods
 
 ```js
-cjs.cast(src, metadata)     // Start casting
-cjs.play()                  // Resume playback
-cjs.pause()                 // Pause playback
-cjs.disconnect()            // End session
+cjs.cast(src, metadata)     // start casting
+cjs.play()                  // resume playback
+cjs.pause()                 // pause playback
+cjs.disconnect()            // end the session
 
-cjs.time()                  // Get current time (seconds)
-cjs.time(120)               // Seek to 2:00
-cjs.time(true)              // Get formatted time ("02:00")
+cjs.time(120)               // seek to 2:00
+cjs.volume(0.5)             // set volume (0 → 1)
+cjs.muted(true)             // mute / unmute
 
-cjs.duration()              // Get duration (seconds)
-cjs.duration(true)          // Get formatted duration
+cjs.subtitle(0)             // switch subtitle by index
+cjs.subtitle(-1)            // subtitles off
 
-cjs.volume()                // Get volume (0 → 1)
-cjs.volume(0.5)             // Set volume
-
-cjs.muted()                 // Get mute state
-cjs.muted(true)             // Mute
-cjs.muted(false)            // Unmute
-
-cjs.subtitle(0)             // Change active subtitle by index
-cjs.subtitle(-1)            // Turn subtitles off
-
-cjs.queue(items, options)   // Cast a playlist (see Queue)
-cjs.next()                  // Next item in the queue
-cjs.prev()                  // Previous item in the queue
-cjs.index()                 // Get current queue index
-cjs.index(2)                // Jump to queue item 2
+cjs.queue(items, options)   // cast a playlist (see Queue)
+cjs.next()                  // next queue item
+cjs.prev()                  // previous queue item
+cjs.index(2)                // jump to queue item 2
 ```
 
 ### Events
 
 ```js
-cjs.on('available',      () => {})    // Cast framework is ready
-cjs.on('connect',        () => {})    // Connected to a device
-cjs.on('disconnect',     () => {})    // Session ended
+cjs.on('available',      () => {})  // Cast framework is ready
+cjs.on('connect',        () => {})  // connected to a device
+cjs.on('disconnect',     () => {})  // session ended
 
-cjs.on('statechange',    () => {})    // Player state changed
-cjs.on('playing',        () => {})    // Media is playing
-cjs.on('pause',          () => {})    // Media is paused
-cjs.on('buffering',      () => {})    // Buffering / seeking
-cjs.on('end',            () => {})    // Media ended
+cjs.on('statechange',    () => {})  // player state changed
+cjs.on('playing',        () => {})  // media is playing
+cjs.on('pause',          () => {})  // media is paused
+cjs.on('buffering',      () => {})  // buffering / seeking
+cjs.on('end',            () => {})  // media ended
 
-cjs.on('timeupdate',     () => {})    // Current time changed
-cjs.on('volumechange',   () => {})    // Volume changed
-cjs.on('mute',           () => {})    // Muted
-cjs.on('unmute',         () => {})    // Unmuted
-cjs.on('subtitlechange', () => {})    // Active subtitle changed
-cjs.on('queuechange',    () => {})    // Queue loaded or current item changed
+cjs.on('timeupdate',     () => {})  // current time changed
+cjs.on('volumechange',   () => {})  // volume changed
+cjs.on('mute',           () => {})  // muted
+cjs.on('unmute',         () => {})  // unmuted
+cjs.on('subtitlechange', () => {})  // active subtitle changed
+cjs.on('queuechange',    () => {})  // queue loaded or current item changed
 
-cjs.on('event',          (e) => {})   // Catch all events except 'error'
-cjs.on('error',          (e) => {})   // Catch any errors
+cjs.on('event',          (e) => {}) // every event except 'error'
+cjs.on('error',          (e) => {}) // errors
 ```
 
 ### Getters
 
 ```js
-cjs.available()      // boolean  – is Cast available
-cjs.connected()      // boolean  – is connected to a device
-cjs.device()         // string   – device name
-cjs.state()          // string   – current state
-cjs.paused()         // boolean  – is paused
+cjs.available()      // boolean, Cast is ready
+cjs.connected()      // boolean, connected to a device
+cjs.device()         // device name
+cjs.state()          // current state
+cjs.paused()         // boolean
 
-cjs.src()            // current media URL
+cjs.src()            // media URL
 cjs.title()          // media title
 cjs.description()    // media description
-cjs.poster()         // poster image URL
-cjs.subtitles()      // array of subtitle tracks
-cjs.queue()          // array of queue items
-cjs.index()          // current queue index (-1 when not using a queue)
+cjs.poster()         // poster URL
+cjs.subtitles()      // subtitle tracks
 cjs.progress()       // progress (0 → 100)
 
 cjs.volume()         // volume (0 → 1)
-cjs.muted()          // is muted
+cjs.muted()          // boolean
 cjs.time()           // current time in seconds
 cjs.time(true)       // formatted time ("01:23")
 cjs.duration()       // duration in seconds
 cjs.duration(true)   // formatted duration
+
+cjs.queue()          // queue items
+cjs.index()          // current queue index (-1 without a queue)
 ```
 
 ### Metadata
 
 ```js
 cjs.cast('https://example.com/video.mp4', {
-  title: 'My Video',
+  title: 'My video',
   description: 'Optional description',
   poster: 'https://example.com/poster.jpg',
   time: 30,                    // start position in seconds
   paused: false,
 
-  type: 'video/mp4',           // content type, guessed from the file extension when omitted
+  type: 'video/mp4',           // content type, guessed from the extension when omitted
                                // e.g. 'application/x-mpegurl' (HLS) or 'application/dash+xml' (DASH)
   live: false,                 // true for live streams
-  data: { token: 'abc' },      // custom data sent to your receiver with the load request
+  data: { token: 'abc' },      // custom data for your receiver
 
   subtitles: [{
     label: 'English',
@@ -204,7 +198,7 @@ cjs.cast('https://example.com/video.mp4', {
     active: true
   }],
 
-  // Optional (Netflix-style defaults are already applied)
+  // optional, Netflix-style defaults are already applied
   subtitlestyle: {
     backgroundColor: '#00000000',
     foregroundColor: '#FFFFFF',
@@ -216,9 +210,11 @@ cjs.cast('https://example.com/video.mp4', {
 });
 ```
 
-### Queue
+---
 
-Every item accepts the same fields as the `cast()` metadata, plus `src`.
+## Queue
+
+Every item takes the same fields as the `cast()` metadata, plus `src`.
 
 ```js
 cjs.queue([{
@@ -232,7 +228,7 @@ cjs.queue([{
   data: { id: 2 }              // custom data for this item
 }], {
   start: 0,                    // index to start with
-  repeat: false,               // true to loop the queue
+  repeat: false,               // true loops the queue
   time: 0,                     // start position of the first item in seconds
   paused: false,
   data: { token: 'abc' }       // custom data for the load request
@@ -249,22 +245,39 @@ cjs.on('queuechange', () => {
 
 ## FAQ
 
-**Question:** Can I cast local resources?<br>
-**Answer:** It was possible in the past using service workers, but Google dropped support. See [this issue](https://github.com/fenny/chromecast-service-worker-crash).
+<details>
+<summary><b>Can I cast local files?</b></summary>
+<br>
+No. It used to work with service workers, but Google dropped support. See <a href="https://github.com/fenny/chromecast-service-worker-crash">this issue</a>.
+</details>
 
-**Question:** Can I list the available devices and pick one myself?<br>
-**Answer:** No. The Cast SDK only lets the browser show its own device picker, `cjs.cast()` opens it.
+<details>
+<summary><b>Can I list the available devices and pick one myself?</b></summary>
+<br>
+No. The Cast SDK only lets the browser show its own device picker, <code>cjs.cast()</code> opens it.
+</details>
 
-**Question:** Does it work in Firefox or Safari?<br>
-**Answer:** No, they don't support Google Cast. Castjs fires an `error` event so you can hide your cast button.
+<details>
+<summary><b>Does it work in Firefox or Safari?</b></summary>
+<br>
+No, they don't support Google Cast. Castjs fires an <code>error</code> event so you can hide your cast button.
+</details>
 
-**Question:** Do I need to enable CORS?<br>
-**Answer:** Yes. Chromecast is strict about CORS. You can allow the `CrKey` user-agent if you want to be more specific, but `Access-Control-Allow-Origin: *` is the simplest solution.
+<details>
+<summary><b>Do I need to enable CORS?</b></summary>
+<br>
+Yes, Chromecast is strict about CORS. <code>Access-Control-Allow-Origin: *</code> is the simplest solution, or allow the <code>CrKey</code> user-agent to be more specific.
+</details>
+
+<details>
+<summary><b>My HLS or DASH stream doesn't play</b></summary>
+<br>
+Castjs guesses the content type from the file extension. If your URL has no <code>.m3u8</code> or <code>.mpd</code> extension, pass it yourself: <code>type: 'application/x-mpegurl'</code>.
+</details>
 
 ---
 
 <p align="center">
-  Do you want to support my work? Feel free to donate a <a href="https://www.buymeacoffee.com/fenny" target="_blank">☕ Hot Beverage</a>
+  Like Castjs? <a href="https://www.buymeacoffee.com/fenny">☕ Buy me a hot beverage</a><br>
+  <sub>MIT licensed</sub>
 </p>
-
----
