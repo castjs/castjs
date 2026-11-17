@@ -190,7 +190,6 @@ class Castjs {
         );
 
         if (alive) {
-            console.log('wowi', this._context.getSessionState());
             this._load_media(session);
         } else {
             this._context.requestSession().then(() => {
