@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/ZjTpQ3S.png" alt="Castjs" width="100%">
 </p>
 
-<h4 align="center">Javascript library (~13kb) for the complex Chromecast SDK</h4>
+<h4 align="center">Javascript library (~15kb) for the complex Chromecast SDK</h4>
 
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with Chromecast devices from the browser.<br>
@@ -20,7 +20,7 @@
 Include the library from [jsDelivr](https://www.jsdelivr.com/package/gh/castjs/castjs):
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.2.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.3.0/cast.min.js"></script>
 ```
 
 > The Google Cast framework (`cast_sender.js`) is automatically loaded if it is not already present on the page.
@@ -38,7 +38,7 @@ Access-Control-Allow-Origin: *
 ```html
 <button id="cast">Cast</button>
 
-<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.2.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.3.0/cast.min.js"></script>
 <script>
 const cjs = new Castjs();
 
@@ -124,6 +124,12 @@ cjs.muted(false)            // Unmute
 
 cjs.subtitle(0)             // Change active subtitle by index
 cjs.subtitle(-1)            // Turn subtitles off
+
+cjs.queue(items, options)   // Cast a playlist (see Queue)
+cjs.next()                  // Next item in the queue
+cjs.prev()                  // Previous item in the queue
+cjs.index()                 // Get current queue index
+cjs.index(2)                // Jump to queue item 2
 ```
 
 ### Events
@@ -144,6 +150,7 @@ cjs.on('volumechange',   () => {})    // Volume changed
 cjs.on('mute',           () => {})    // Muted
 cjs.on('unmute',         () => {})    // Unmuted
 cjs.on('subtitlechange', () => {})    // Active subtitle changed
+cjs.on('queuechange',    () => {})    // Queue loaded or current item changed
 
 cjs.on('event',          (e) => {})   // Catch all events except 'error'
 cjs.on('error',          (e) => {})   // Catch any errors
@@ -163,6 +170,8 @@ cjs.title()          // media title
 cjs.description()    // media description
 cjs.poster()         // poster image URL
 cjs.subtitles()      // array of subtitle tracks
+cjs.queue()          // array of queue items
+cjs.index()          // current queue index (-1 when not using a queue)
 cjs.progress()       // progress (0 → 100)
 
 cjs.volume()         // volume (0 → 1)
@@ -206,6 +215,35 @@ cjs.cast('https://example.com/video.mp4', {
   }
 });
 ```
+
+### Queue
+
+Every item accepts the same fields as the `cast()` metadata, plus `src`.
+
+```js
+cjs.queue([{
+  src: 'https://example.com/episode1.mp4',
+  title: 'Episode 1',
+  poster: 'https://example.com/ep1.jpg'
+}, {
+  src: 'https://example.com/episode2.m3u8',
+  title: 'Episode 2',
+  subtitles: [{ label: 'English', src: 'https://example.com/ep2-en.vtt', active: true }],
+  data: { id: 2 }              // custom data for this item
+}], {
+  start: 0,                    // index to start with
+  repeat: false,               // true to loop the queue
+  time: 0,                     // start position of the first item in seconds
+  paused: false,
+  data: { token: 'abc' }       // custom data for the load request
+});
+
+cjs.on('queuechange', () => {
+  console.log('Now playing', cjs.index(), cjs.title());
+});
+```
+
+`cjs.cast()` replaces the queue with a single item.
 
 ---
 
