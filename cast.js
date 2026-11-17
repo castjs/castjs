@@ -180,6 +180,10 @@ class Castjs {
             this.subtitleStyle = metadata.subtitleStyle;
         }
 
+        if (!this._context) {
+            return this.trigger('error', 'Cast framework is not available yet, wait for the available event');
+        }
+
         const session = this._context.getCurrentSession();
         const state   = this._context.getSessionState();
 
