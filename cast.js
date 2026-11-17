@@ -46,10 +46,14 @@ class Castjs {
         this._duration    = 0;
         this._progress    = 0;
         this._state       = 'disconnected';
-        this.subtitleStyle = opt.subtitleStyle || null;
+        this._type        = '';
+        this._live        = false;
+        this._data        = null;
+        this.subtitlestyle = opt.subtitlestyle || opt.subtitleStyle || null;
         this.debug        = opt.debug || false;
+        this.language     = opt.language || navigator.language || 'en-US';
 
-        this.version    = 'v7.1.0';
+        this.version    = 'v7.2.0';
         this.receiver   = opt.receiver;
         this.joinpolicy = opt.joinpolicy;
 
@@ -174,10 +178,13 @@ class Castjs {
         this._poster      = metadata.poster || '';
         this._subtitles   = metadata.subtitles || [];
         this._time        = metadata.time || 0;
+        this._type        = metadata.type || this._guess_type(src);
+        this._live        = metadata.live || false;
+        this._data        = metadata.data || null;
         this._paused      = metadata.paused || false;
 
-        if (metadata.subtitleStyle) {
-            this.subtitleStyle = metadata.subtitleStyle;
+        if (metadata.subtitlestyle || metadata.subtitleStyle) {
+            this.subtitlestyle = metadata.subtitlestyle || metadata.subtitleStyle;
         }
 
         if (!this._context) {
@@ -215,7 +222,11 @@ class Castjs {
     subtitle(index) {
         if (!this._connected) return this;
 
-        var request = new chrome.cast.media.EditTracksInfoRequest([parseInt(index) + 1]);
+        index = parseInt(index);
+
+        // subtitle(-1) turns subtitles off
+        var ids = index >= 0 ? [index + 1] : [];
+        var request = new chrome.cast.media.EditTracksInfoRequest(ids);
         var media = null;
 
         try {
@@ -335,6 +346,30 @@ class Castjs {
         return result;
     }
 
+    _guess_type(src) {
+        var ext = String(src).split(/[?#]/)[0].split('.').pop().toLowerCase();
+        var types = {
+            m3u8: 'application/x-mpegurl',
+            mpd:  'application/dash+xml',
+            mp4:  'video/mp4',
+            m4v:  'video/mp4',
+            webm: 'video/webm',
+            mkv:  'video/x-matroska',
+            mp3:  'audio/mpeg',
+            m4a:  'audio/mp4',
+            aac:  'audio/aac',
+            ogg:  'audio/ogg',
+            flac: 'audio/flac',
+            wav:  'audio/wav',
+            jpg:  'image/jpeg',
+            jpeg: 'image/jpeg',
+            png:  'image/png',
+            gif:  'image/gif',
+            webp: 'image/webp'
+        };
+        return types[ext] || '';
+    }
+
     _get_browser() {
         var ua = navigator.userAgent.toLowerCase();
         if (ua.indexOf('opr/') > -1) return 'Opera: Please enable casting';
@@ -395,7 +430,7 @@ class Castjs {
         this._context.setOptions({
             receiverApplicationId: this.receiver,
             autoJoinPolicy: this.joinpolicy,
-            language: 'en-US',
+            language: this.language,
             resumeSavedSession: true
         });
 
@@ -467,7 +502,10 @@ class Castjs {
     }
 
     _load_media(session) {
-        var mediaInfo = new chrome.cast.media.MediaInfo(this._src);
+        var mediaInfo = new chrome.cast.media.MediaInfo(this._src, this._type);
+        mediaInfo.streamType = this._live
+            ? chrome.cast.media.StreamType.LIVE
+            : chrome.cast.media.StreamType.BUFFERED;
         mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
         mediaInfo.metadata.title = this._title;
         mediaInfo.metadata.subtitle = this._description;
@@ -487,9 +525,9 @@ class Castjs {
                 fontStyle: 'NORMAL'
             };
 
-            if (this.subtitleStyle) {
-                for (var key in this.subtitleStyle) {
-                    mediaInfo.textTrackStyle[key] = this.subtitleStyle[key];
+            if (this.subtitlestyle) {
+                for (var key in this.subtitlestyle) {
+                    mediaInfo.textTrackStyle[key] = this.subtitlestyle[key];
                 }
             }
 
@@ -512,6 +550,10 @@ class Castjs {
         var request = new chrome.cast.media.LoadRequest(mediaInfo);
         request.currentTime = this._time || 0;
         request.autoplay = !this._paused;
+
+        if (this._data) {
+            request.customData = this._data;
+        }
 
         if (this._subtitles && this._subtitles.length) {
             for (var j = 0; j < this._subtitles.length; j++) {

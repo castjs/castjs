@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/ZjTpQ3S.png" alt="Castjs" width="100%">
 </p>
 
-<h4 align="center">Javascript library (~12kb) for the complex Chromecast SDK</h4>
+<h4 align="center">Javascript library (~13kb) for the complex Chromecast SDK</h4>
 
 <p align="center">
   <b>Castjs</b> provides simple events and functions to communicate with Chromecast devices from the browser.<br>
@@ -20,7 +20,7 @@
 Include the library from [jsDelivr](https://www.jsdelivr.com/package/gh/castjs/castjs):
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.1.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.2.0/cast.min.js"></script>
 ```
 
 > The Google Cast framework (`cast_sender.js`) is automatically loaded if it is not already present on the page.
@@ -38,7 +38,7 @@ Access-Control-Allow-Origin: *
 ```html
 <button id="cast">Cast</button>
 
-<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.1.0/cast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/castjs/castjs@v7.2.0/cast.min.js"></script>
 <script>
 const cjs = new Castjs();
 
@@ -95,6 +95,7 @@ const cjs = new Castjs({
   joinpolicy: 'tab_and_origin_scoped', // default
                                        // 'tab_and_origin_scoped' | 'origin_scoped' | 'page_scoped'
   receiver: 'CC1AD845',                // default media receiver
+  language: 'nl-NL',                   // cast dialog language, defaults to the browser language
   debug: true                          // enable debug logs
 });
 ```
@@ -122,6 +123,7 @@ cjs.muted(true)             // Mute
 cjs.muted(false)            // Unmute
 
 cjs.subtitle(0)             // Change active subtitle by index
+cjs.subtitle(-1)            // Turn subtitles off
 ```
 
 ### Events
@@ -181,6 +183,11 @@ cjs.cast('https://example.com/video.mp4', {
   time: 30,                    // start position in seconds
   paused: false,
 
+  type: 'video/mp4',           // content type, guessed from the file extension when omitted
+                               // e.g. 'application/x-mpegurl' (HLS) or 'application/dash+xml' (DASH)
+  live: false,                 // true for live streams
+  data: { token: 'abc' },      // custom data sent to your receiver with the load request
+
   subtitles: [{
     label: 'English',
     src: 'https://example.com/en.vtt',
@@ -189,7 +196,7 @@ cjs.cast('https://example.com/video.mp4', {
   }],
 
   // Optional (Netflix-style defaults are already applied)
-  subtitleStyle: {
+  subtitlestyle: {
     backgroundColor: '#00000000',
     foregroundColor: '#FFFFFF',
     edgeType: 'DROP_SHADOW',
