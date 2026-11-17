@@ -520,9 +520,6 @@ class Castjs {
         session.loadMedia(request).then(() => {
             this._device = session.getCastDevice().friendlyName || this._device;
             this._log('Media loaded');
-            if (this._paused) {
-                this._controller.playOrPause();
-            }
         }, (err) => {
             this.trigger('error', err);
         });
