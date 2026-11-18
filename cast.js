@@ -46,10 +46,17 @@ class Castjs {
         this._duration    = 0;
         this._progress    = 0;
         this._state       = 'disconnected';
-        this.subtitleStyle = opt.subtitleStyle || null;
+        this._type        = '';
+        this._live        = false;
+        this._data        = null;
+        this._queue       = [];
+        this._index       = -1;
+        this._repeat      = false;
+        this.subtitlestyle = opt.subtitlestyle || opt.subtitleStyle || null;
         this.debug        = opt.debug || false;
+        this.language     = opt.language || navigator.language || 'en-US';
 
-        this.version    = 'v7.0.3';
+        this.version    = 'v7.3.0';
         this.receiver   = opt.receiver;
         this.joinpolicy = opt.joinpolicy;
 
@@ -106,7 +113,7 @@ class Castjs {
         if (typeof value === 'undefined') {
             return this._volume;
         }
-        if (this._controller) {
+        if (this._connected) {
             this._player.volumeLevel = value;
             this._controller.setVolumeLevel();
         }
@@ -117,7 +124,7 @@ class Castjs {
         if (typeof value === 'undefined') {
             return this._muted;
         }
-        if (this._controller && !!value !== this._muted) {
+        if (this._connected && !!value !== this._muted) {
             this._controller.muteOrUnmute();
         }
         return this;
@@ -130,7 +137,7 @@ class Castjs {
         if (value === true) {
             return this._format_time(this._time);
         }
-        if (this._controller) {
+        if (this._connected) {
             this._player.currentTime = value;
             this._controller.seek();
         }
@@ -148,14 +155,14 @@ class Castjs {
     // Actions
 
     play() {
-        if (this._controller && this._paused) {
+        if (this._connected && this._paused) {
             this._controller.playOrPause();
         }
         return this;
     }
 
     pause() {
-        if (this._controller && !this._paused) {
+        if (this._connected && !this._paused) {
             this._controller.playOrPause();
         }
         return this;
@@ -168,51 +175,111 @@ class Castjs {
             return this.trigger('error', 'No media source specified.');
         }
 
+        this._queue       = [];
+        this._index       = -1;
         this._src         = src;
         this._title       = metadata.title || '';
         this._description = metadata.description || '';
         this._poster      = metadata.poster || '';
         this._subtitles   = metadata.subtitles || [];
         this._time        = metadata.time || 0;
+        this._type        = metadata.type || this._guess_type(src);
+        this._live        = metadata.live || false;
+        this._data        = metadata.data || null;
         this._paused      = metadata.paused || false;
 
-        if (metadata.subtitleStyle) {
-            this.subtitleStyle = metadata.subtitleStyle;
+        if (metadata.subtitlestyle || metadata.subtitleStyle) {
+            this.subtitlestyle = metadata.subtitlestyle || metadata.subtitleStyle;
         }
 
-        const session = this._context.getCurrentSession();
-        const state   = this._context.getSessionState();
-
-        // Only reuse the session when it is truly alive
-        const alive = session && (
-            state === cast.framework.SessionState.SESSION_STARTED ||
-            state === cast.framework.SessionState.SESSION_RESUMED
-        );
-
-        if (alive) {
-            console.log('wowi', this._context.getSessionState());
-            this._load_media(session);
-        } else {
-            this._context.requestSession().then(() => {
-                var new_session = this._context.getCurrentSession();
-                if (!new_session) {
-                    return this.trigger('error', 'Could not connect with the cast device');
-                }
-                this._load_media(new_session);
-            }, (err) => {
-                if (err !== 'cancel') {
-                    this.trigger('error', err);
-                }
-            });
+        if (!this._context) {
+            return this.trigger('error', 'Cast framework is not available yet, wait for the available event');
         }
 
+        this._session((session) => this._load_media(session));
+        return this;
+    }
+
+    queue(items, options) {
+        if (typeof items === 'undefined') {
+            return this._queue;
+        }
+        options = options || {};
+
+        if (!Array.isArray(items) || !items.length) {
+            return this.trigger('error', 'Queue needs at least one item.');
+        }
+        for (var i = 0; i < items.length; i++) {
+            if (!items[i] || !items[i].src) {
+                return this.trigger('error', 'Queue item ' + i + ' has no src.');
+            }
+        }
+
+        var start = parseInt(options.start) || 0;
+        if (start < 0 || start >= items.length) start = 0;
+
+        var item = items[start];
+
+        this._queue       = items.slice();
+        this._index       = start;
+        this._repeat      = options.repeat || false;
+        this._src         = item.src;
+        this._title       = item.title || '';
+        this._description = item.description || '';
+        this._poster      = item.poster || '';
+        this._subtitles   = item.subtitles || [];
+        this._time        = options.time || 0;
+        this._type        = item.type || this._guess_type(item.src);
+        this._live        = item.live || false;
+        this._data        = options.data || null;
+        this._paused      = options.paused || false;
+
+        if (!this._context) {
+            return this.trigger('error', 'Cast framework is not available yet, wait for the available event');
+        }
+
+        this._session((session) => this._load_media(session));
+        this.trigger('queuechange');
+        return this;
+    }
+
+    next() {
+        var media = this._media_session();
+        if (media && this._queue.length) {
+            media.queueNext(() => {}, (err) => this.trigger('error', err));
+        }
+        return this;
+    }
+
+    prev() {
+        var media = this._media_session();
+        if (media && this._queue.length) {
+            media.queuePrev(() => {}, (err) => this.trigger('error', err));
+        }
+        return this;
+    }
+
+    index(value) {
+        if (typeof value === 'undefined') {
+            return this._index;
+        }
+        // Jump to a queue item by index
+        var media = this._media_session();
+        var items = media && media.items;
+        if (items && items[value]) {
+            media.queueJumpToItem(items[value].itemId, () => {}, (err) => this.trigger('error', err));
+        }
         return this;
     }
 
     subtitle(index) {
-        if (!this._controller) return this;
+        if (!this._connected) return this;
 
-        var request = new chrome.cast.media.EditTracksInfoRequest([parseInt(index) + 1]);
+        index = parseInt(index);
+
+        // subtitle(-1) turns subtitles off
+        var ids = index >= 0 ? [index + 1] : [];
+        var request = new chrome.cast.media.EditTracksInfoRequest(ids);
         var media = null;
 
         try {
@@ -239,10 +306,7 @@ class Castjs {
     }
 
     disconnect() {
-        if (this._controller) {
-            this._controller.stop();
-        }
-        this._detach_player();
+        var session = this._context ? this._context.getCurrentSession() : null;
 
         this._connected   = false;
         this._device      = 'Chromecast';
@@ -251,6 +315,8 @@ class Castjs {
         this._description = '';
         this._poster      = '';
         this._subtitles   = [];
+        this._queue       = [];
+        this._index       = -1;
         this._volume      = 1;
         this._muted       = false;
         this._paused      = false;
@@ -259,11 +325,12 @@ class Castjs {
         this._progress    = 0;
         this._state       = 'disconnected';
 
-        if (this._context) {
+        if (session) {
+            // SESSION_ENDED will trigger the disconnect event
             this._context.endCurrentSession(true);
+        } else {
+            this.trigger('disconnect');
         }
-
-        this.trigger('disconnect');
         return this;
     }
 
@@ -334,16 +401,45 @@ class Castjs {
         return result;
     }
 
+    _guess_type(src) {
+        var ext = String(src).split(/[?#]/)[0].split('.').pop().toLowerCase();
+        var types = {
+            m3u8: 'application/x-mpegurl',
+            mpd:  'application/dash+xml',
+            mp4:  'video/mp4',
+            m4v:  'video/mp4',
+            webm: 'video/webm',
+            mkv:  'video/x-matroska',
+            mp3:  'audio/mpeg',
+            m4a:  'audio/mp4',
+            aac:  'audio/aac',
+            ogg:  'audio/ogg',
+            flac: 'audio/flac',
+            wav:  'audio/wav',
+            jpg:  'image/jpeg',
+            jpeg: 'image/jpeg',
+            png:  'image/png',
+            gif:  'image/gif',
+            webp: 'image/webp'
+        };
+        return types[ext] || '';
+    }
+
     _get_browser() {
         var ua = navigator.userAgent.toLowerCase();
-        if (ua.indexOf('firefox') > -1) return 'Firefox: Please enable casting';
         if (ua.indexOf('opr/') > -1) return 'Opera: Please enable casting';
         if (navigator.brave) return 'Brave: Please enable casting';
-        return 'This Browser';
+        return 'this browser';
     }
 
     _init() {
-        if (window.chrome && window.chrome.cast && window.chrome.cast.isAvailable) {
+        // Firefox, Safari and other non-Chromium browsers have no Cast support
+        if (!window.chrome) {
+            setTimeout(() => this.trigger('error', 'Casting is not supported in this browser'), 0);
+            return;
+        }
+
+        if (window.chrome.cast && window.chrome.cast.isAvailable) {
             this._framework();
             return;
         }
@@ -389,9 +485,11 @@ class Castjs {
         this._context.setOptions({
             receiverApplicationId: this.receiver,
             autoJoinPolicy: this.joinpolicy,
-            language: 'en-US',
+            language: this.language,
             resumeSavedSession: true
         });
+
+        this._attach_player();
 
         this._context.addEventListener(
             cast.framework.CastContextEventType.SESSION_STATE_CHANGED,
@@ -401,10 +499,6 @@ class Castjs {
         this._available = true;
         this._log('Framework ready');
         this.trigger('available');
-
-        if (this._context.getCurrentSession()) {
-            this._attach_player();
-        }
     }
 
     _on_session_state_changed(event) {
@@ -413,16 +507,17 @@ class Castjs {
         switch (event.sessionState) {
             case cast.framework.SessionState.SESSION_STARTED:
             case cast.framework.SessionState.SESSION_RESUMED:
-                this._attach_player();
                 this._connected = true;
                 this._device = this._context.getCurrentSession().getCastDevice().friendlyName || this._device;
                 this._state = 'connected';
                 this.trigger('statechange');
                 this.trigger('connect');
+                if (this._player && this._player.isMediaLoaded) {
+                    this._is_media_loaded_changed();
+                }
                 break;
 
             case cast.framework.SessionState.SESSION_ENDED:
-                this._detach_player();
                 this._connected = false;
                 this._device = 'Chromecast';
                 this._state = 'disconnected';
@@ -441,6 +536,9 @@ class Castjs {
     }
 
     _attach_player() {
+        // Created once and reused for every session, so listeners never stack up
+        if (this._player) return;
+
         this._player = new cast.framework.RemotePlayer();
         this._controller = new cast.framework.RemotePlayerController(this._player);
 
@@ -452,28 +550,63 @@ class Castjs {
         this._controller.addEventListener('durationChanged',      () => this._duration_changed());
         this._controller.addEventListener('volumeLevelChanged',   () => this._volume_changed());
         this._controller.addEventListener('playerStateChanged',   () => this._player_state_changed());
+        this._controller.addEventListener('mediaInfoChanged',     () => this._media_info_changed());
 
         if (this._player.isMediaLoaded) {
             this._is_media_loaded_changed();
         }
     }
 
-    _detach_player() {
-        this._player = null;
-        this._controller = null;
-    }
+    // Reuse the current session when alive, otherwise open the device picker
+    _session(cb) {
+        var session = this._context.getCurrentSession();
+        var state   = this._context.getSessionState();
 
-    _load_media(session) {
-        var mediaInfo = new chrome.cast.media.MediaInfo(this._src);
-        mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
-        mediaInfo.metadata.title = this._title;
-        mediaInfo.metadata.subtitle = this._description;
+        var alive = session && (
+            state === cast.framework.SessionState.SESSION_STARTED ||
+            state === cast.framework.SessionState.SESSION_RESUMED
+        );
 
-        if (this._poster) {
-            mediaInfo.metadata.images = [new chrome.cast.Image(this._poster)];
+        if (alive) {
+            return cb(session);
         }
 
-        if (this._subtitles && this._subtitles.length) {
+        this._context.requestSession().then(() => {
+            var new_session = this._context.getCurrentSession();
+            if (!new_session) {
+                return this.trigger('error', 'Could not connect with the cast device');
+            }
+            cb(new_session);
+        }, (err) => {
+            if (err !== 'cancel') {
+                this.trigger('error', err);
+            }
+        });
+    }
+
+    _media_session() {
+        try {
+            return this._context.getCurrentSession().getMediaSession();
+        } catch (e) {
+            return null;
+        }
+    }
+
+    _media_info(item) {
+        var subtitles = item.subtitles || [];
+        var mediaInfo = new chrome.cast.media.MediaInfo(item.src, item.type || this._guess_type(item.src));
+        mediaInfo.streamType = item.live
+            ? chrome.cast.media.StreamType.LIVE
+            : chrome.cast.media.StreamType.BUFFERED;
+        mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+        mediaInfo.metadata.title = item.title || '';
+        mediaInfo.metadata.subtitle = item.description || '';
+
+        if (item.poster) {
+            mediaInfo.metadata.images = [new chrome.cast.Image(item.poster)];
+        }
+
+        if (subtitles.length) {
             mediaInfo.textTrackStyle = {
                 backgroundColor: '#00000000',
                 foregroundColor: '#FFFFFF',
@@ -484,15 +617,15 @@ class Castjs {
                 fontStyle: 'NORMAL'
             };
 
-            if (this.subtitleStyle) {
-                for (var key in this.subtitleStyle) {
-                    mediaInfo.textTrackStyle[key] = this.subtitleStyle[key];
+            if (this.subtitlestyle) {
+                for (var key in this.subtitlestyle) {
+                    mediaInfo.textTrackStyle[key] = this.subtitlestyle[key];
                 }
             }
 
             var tracks = [];
-            for (var i = 0; i < this._subtitles.length; i++) {
-                var sub = this._subtitles[i];
+            for (var i = 0; i < subtitles.length; i++) {
+                var sub = subtitles[i];
                 var track = new chrome.cast.media.Track(i + 1, 'TEXT');
 
                 track.name = sub.label || ('Track ' + (i + 1));
@@ -506,24 +639,62 @@ class Castjs {
             mediaInfo.tracks = tracks;
         }
 
-        var request = new chrome.cast.media.LoadRequest(mediaInfo);
+        return mediaInfo;
+    }
+
+    _active_track(subtitles) {
+        subtitles = subtitles || [];
+        for (var i = 0; i < subtitles.length; i++) {
+            if (subtitles[i].active) return [i + 1];
+        }
+        return null;
+    }
+
+    _load_media(session) {
+        var current = {
+            src: this._src,
+            type: this._type,
+            live: this._live,
+            title: this._title,
+            description: this._description,
+            poster: this._poster,
+            subtitles: this._subtitles
+        };
+
+        var request = new chrome.cast.media.LoadRequest(this._media_info(current));
         request.currentTime = this._time || 0;
         request.autoplay = !this._paused;
 
-        if (this._subtitles && this._subtitles.length) {
-            for (var j = 0; j < this._subtitles.length; j++) {
-                if (this._subtitles[j].active) {
-                    request.activeTrackIds = [j + 1];
-                    break;
-                }
-            }
+        if (this._data) {
+            request.customData = this._data;
         }
+
+        var active = this._active_track(this._subtitles);
+        if (active) {
+            request.activeTrackIds = active;
+        }
+
+        if (this._queue.length) {
+            var items = [];
+            for (var q = 0; q < this._queue.length; q++) {
+                var queue_item = new chrome.cast.media.QueueItem(this._media_info(this._queue[q]));
+                queue_item.autoplay = true;
+                queue_item.activeTrackIds = this._active_track(this._queue[q].subtitles);
+                if (this._queue[q].data) {
+                    queue_item.customData = this._queue[q].data;
+                }
+                items.push(queue_item);
+            }
+            request.queueData = new chrome.cast.media.QueueData(
+                undefined, undefined, undefined,
+                this._repeat ? chrome.cast.media.RepeatMode.ALL : chrome.cast.media.RepeatMode.OFF,
+                items, this._index, this._time || 0
+            );
+        }
+
         session.loadMedia(request).then(() => {
             this._device = session.getCastDevice().friendlyName || this._device;
             this._log('Media loaded');
-            if (this._paused) {
-                this._controller.playOrPause();
-            }
         }, (err) => {
             this.trigger('error', err);
         });
@@ -586,8 +757,42 @@ class Castjs {
         }, 0);
     }
 
+    _media_info_changed() {
+        if (!this._player || !this._player.isConnected || !this._player.mediaInfo) return;
+
+        var media = this._media_session();
+
+        // Rebuild the queue after a page reload / resumed session
+        if (!this._queue.length && media && media.items && media.items.length > 1) {
+            this._queue = media.items.map((item) => ({
+                src: item.media.contentId,
+                title: item.media.metadata ? item.media.metadata.title : ''
+            }));
+        }
+        if (!this._queue.length) return;
+
+        var index = -1;
+        if (media && media.items) {
+            for (var i = 0; i < media.items.length; i++) {
+                if (media.items[i].itemId === media.currentItemId) index = i;
+            }
+        }
+        if (index === -1) {
+            var src = this._player.mediaInfo.contentId;
+            for (var j = 0; j < this._queue.length; j++) {
+                if (this._queue[j].src === src) { index = j; break; }
+            }
+        }
+
+        if (index !== this._index) {
+            this._index = index;
+            this._is_media_loaded_changed();
+            this.trigger('queuechange');
+        }
+    }
+
     _current_time_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         var past = this._time;
         this._time = Math.round(this._player.currentTime * 10) / 10;
@@ -600,12 +805,12 @@ class Castjs {
     }
 
     _duration_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
         this._duration = this._player.duration;
     }
 
     _volume_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         this._volume = Number(this._player.volumeLevel.toFixed(1));
         if (this._player.isMediaLoaded) {
@@ -614,7 +819,7 @@ class Castjs {
     }
 
     _is_muted_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         var muted = this._player.isMuted;
         if (muted === this._muted) return;
@@ -634,7 +839,7 @@ class Castjs {
     }
 
     _is_paused_changed() {
-        if (!this._player) return;
+        if (!this._player || !this._player.isConnected) return;
 
         this._paused = this._player.isPaused;
         if (this._paused) {
